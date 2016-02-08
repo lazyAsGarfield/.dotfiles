@@ -1,0 +1,430 @@
+" --------------- VUNDLE --------------- {{{
+set nocompatible
+filetype off
+
+" check if Vundle exists
+if isdirectory($HOME . '/.vim/bundle/')
+
+  set rtp+=~/.vim/bundle/Vundle.vim
+  let path='~/.vim/bundle'
+
+  call vundle#begin(path)
+
+  Plugin 'gmarik/Vundle.vim'
+  Plugin 'tpope/vim-surround'
+  Plugin 'scrooloose/nerdtree'
+  Plugin 'tpope/vim-commentary' 
+  Plugin 'kien/ctrlp.vim'
+  " Plugin 'bling/vim-airline'
+  Plugin 'godlygeek/tabular'
+  Plugin 'hynek/vim-python-pep8-indent'
+  Plugin 'rking/ag.vim'
+  Plugin 'tpope/vim-fugitive'
+  Plugin 'easymotion/vim-easymotion'
+  Plugin 'davidhalter/jedi-vim'
+  Plugin 'tpope/vim-unimpaired'
+  Plugin 'Valloric/YouCompleteMe'
+
+  call vundle#end()
+
+endif
+                                 
+" --------------- VUNDLE END --------------- }}}
+
+" --------------- MISC ----------------- {{{
+set nocompatible
+
+silent! colorscheme atom-dark-256-mine
+
+if has("gui_running")
+
+  " set guifont=DejaVu\ Sans\ Mono\ for\ Powerline
+  " set guifont=Consolas:h10
+
+  " start maximized
+  " autocmd GUIEnter * simalt ~s
+
+  " just make window larger (if above dosn't work):
+  winpos 0 0
+  set lines=100 columns=420
+
+endif
+
+" enable mouse if possible
+if has('mouse')
+  set mouse=a
+endif
+
+" when editing a file, always jump to the last known cursor position.
+autocmd BufReadPost *
+      \ if line("'\"") > 1 && line("'\"") <= line("$") |
+      \   exe "normal! g`\"" |
+      \ endif
+
+" 80/120 columns marker
+" let &colorcolumn="80,".join(range(120,999),",")
+let &colorcolumn="80,120"
+" call matchadd('ColorColumn', '\%=80v', -10)
+
+" enable syntax highlighting
+syntax on
+
+" filetype stuff
+filetype plugin indent on
+
+" indentation options
+set autoindent
+set expandtab
+set shiftwidth=2
+set softtabstop=2
+set tabstop=2
+set smarttab
+
+" completion options
+set completeopt=menuone,preview
+
+" do not indent visibility keywords in C++ classes
+" set cindent
+set cinoptions=g0
+
+" display line numbers
+set number
+
+" set folding method
+set foldmethod=marker
+
+" do not create a backup file
+set nobackup
+set noswapfile
+
+" Automatically read a file that has changed on disk
+set autoread
+
+" number of command line history lines kept
+set history=500
+
+" autochange directory to the one opened file is in
+" set autochdir
+
+" default encoding
+set encoding=utf-8
+
+" split settings
+set splitbelow
+set splitright
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" show the cursor position all the time
+set ruler
+
+" highlight cursor column/line - now done with 'cox' from vim-unimpaired
+" set cursorcolumn
+" set cursorline
+
+" display incomplete commands
+set showcmd
+
+" do incremental searching
+set incsearch
+
+" set search highlighting, bo do not highlight now 
+set hlsearch
+noh
+
+" line endings
+set fileformats=unix,dos
+
+" always show status line
+set laststatus=2
+
+" show at least 5 lines below/above cursor
+set scrolloff=5
+
+" allow to hide buffer with unsaved changes
+set hidden
+
+" no characters in separators
+set fillchars=""
+
+" disable that annoying beeping
+autocmd GUIEnter * set vb t_vb=
+
+" CtrlP plugin 
+let g:ctrlp_working_path_mode = 0 
+
+" jedi-vim settings
+" two below fix showing argument list when using YCM
+let g:jedi#show_call_signatures_delay = 0
+let g:jedi#show_call_signatures = "1"
+
+let g:jedi#use_splits_not_buffers = "right"
+let g:jedi#goto_command = "<leader>d"
+let g:jedi#goto_assignments_command = "<leader>g"
+let g:jedi#goto_definitions_command = ""
+let g:jedi#documentation_command = "K"
+let g:jedi#usages_command = "<leader>u"
+" let g:jedi#completions_command = "<C-Space>"
+" let g:jedi#completions_command = "<Tab>"
+let g:jedi#completions_command = ""
+let g:jedi#rename_command = "<leader>r"
+
+" YCM settings
+" default flags file for c-like langs for YCM
+let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
+
+let g:ycm_complete_in_comments = 1
+let g:ycm_seed_identifiers_with_syntax = 1
+let g:ycm_autoclose_preview_window_after_insertion = 1
+
+let g:ycm_semantic_triggers =  {
+  \   'c' : ['->', '.'],
+  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+  \             're!\[.*\]\s'],
+  \   'ocaml' : ['.', '#'],
+  \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
+  \   'perl' : ['->'],
+  \   'php' : ['->', '::'],
+  \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+  \   'ruby' : ['.', '::'],
+  \   'lua' : ['.', ':'],
+  \   'erlang' : [':'],
+  \ }
+
+" disable completions from jedi-vim, using YCM instead
+let g:jedi#completions_enabled = 0
+
+" disable youcompleteme
+" let g:loaded_youcompleteme = 1
+
+"}}}
+
+" --------------- MAPPINGS ------------- {{{
+
+
+" change leader key 
+let mapleader=","
+
+" insert :q easier
+map <leader>q :q<CR>
+
+" open/close quickfix window
+map cop :copen<CR>
+map ccl :cclose<CR>
+
+" substitute all occurences of text selected in visual mode 
+vnoremap <C-r> "hy:%s/<C-r>h//g<left><left>
+
+" quickly edit/reload the vimrc file 
+nmap <silent> <leader>ev :e $MYVIMRC<CR>
+nmap <silent> <leader>sv :so $MYVIMRC<CR>
+
+" disable search highlighting
+map <silent> <leader>n :noh<CR>
+
+" easier switch to previous buffer
+map <leader>b :b#<CR>
+
+" delete current buffer without closing split
+map <leader>d :BD<CR>
+
+" save current file
+map <leader>w :w<CR>
+
+" insert ':' easier 
+map <leader>; :
+
+" tab as omnicomplete key, but not at beginning of
+" file and not on non-letter char
+" YCM overrides tab mapping, therefore it's not needed
+" let g:tab_completion = 1
+
+" function! ToggleTabCompletion()
+"   let g:tab_completion = !g:tab_completion
+"   if g:tab_completion
+"     echo 'Tab completion enabled'
+"   else
+"     echo 'Tab completion disabled'
+"   endif
+" endfunction
+
+" nmap c<Tab> :call ToggleTabCompletion()<CR>
+
+" function! InsertTabWrapper()
+"     let col = col('.') - 1
+"     if !col || getline('.')[col - 1] !~ '\k' || !g:tab_completion
+"         return "\<tab>"
+"     else
+"         return "\<C-n>"
+"     endif
+" endfunction
+
+" inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
+" inoremap <S-Tab> <C-p>
+
+" easier yank/paste from clipboard 
+" nmap <leader>y "+y
+" vmap <leader>y "+y
+nmap cy "+y
+vmap cy "+y
+
+" nmap <leader>Y "+Y
+" vmap <leader>Y "+Y
+nmap cY "+Y
+vmap cY "+Y
+
+" nmap <leader>p "+p
+" vmap <leader>p "+p
+nmap cp "+p
+vmap cp "+p
+
+" nmap <leader>P "+P
+" vmap <leader>P "+P
+nmap cP "+P
+vmap cP "+P
+
+" easier paste from yank register
+" nmap <leader>0 "0p
+" vmap <leader>0 "0p
+nmap yp "0p
+
+nmap yP "0P
+
+" moving around wrapped lines more naturally
+noremap j gj
+noremap k gk
+
+" easier redrawing - sometimes strange artifacts are visible
+map <leader>r :redraw!<CR>
+
+" toggle relative line number
+map <leader>- :set relativenumber!<CR>
+
+" moving around splits more easily
+map <C-h> <C-w>h
+map <C-j> <C-w>j
+map <C-k> <C-w>k
+map <C-l> <C-w>l
+
+" scroll by whole pages
+map <a-u> <PageUp>
+map <a-d> <PageDown>
+
+" edit file under cursor in vertical split
+map gfv :vertical wincmd f<CR>
+
+" foldenable + foldcolumn
+silent! set nofoldenable
+silent! set foldcolumn=0
+
+func! ChangeFold()
+  if (&foldenable == 1)
+    set nofoldenable
+    set foldcolumn=0
+    echo 'Folding disabled'
+  else
+    set foldenable
+    set foldcolumn=1
+    echo 'Folding enabled'
+  endif
+endfunc
+
+map zi :call ChangeFold()<CR>
+
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+" resizing splits more easily
+nmap + :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
+nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
+
+" NERDTree plugin 
+" if exists('g:loaded_nerd_tree')
+
+  function! NERDTreeEnableOrToggle() 
+    try 
+      NERDTreeToggle 
+    catch 
+      silent! NERDTree 
+    endtry 
+  endfunction 
+
+  map <C-n> :call NERDTreeEnableOrToggle()<CR> 
+  map <leader><leader>n :NERDTreeFind<CR> 
+
+" endif
+
+" CtrlP plugin
+if exists('g:loaded_ctrlp')
+
+  let g:ctrlp_cmd = 'call CallCtrlP()'
+
+  func! CallCtrlP()
+      if exists('s:called_ctrlp')
+          CtrlPLastMode
+      else
+          let s:called_ctrlp = 1
+          CtrlPMRU
+      endif
+  endfunc
+
+  nmap <C-b> :CtrlPBuffer<CR>
+  
+endif
+
+" Easymotion mappings
+nmap <leader>t <Plug>(easymotion-f2)
+nmap <leader>f <Plug>(easymotion-t2)
+nmap <leader>T <Plug>(easymotion-F2)
+nmap <leader>F <Plug>(easymotion-T2)
+
+" --------------- MAPPINGS END -------------- }}}
+
+" --------------- COMMANDS ------------ {{{
+
+" open buffer [number] in vertical split
+command! -nargs=? VB vert sb <args>
+
+" buffer delete without closing split 
+function! CountListedBuffers() 
+  let cnt = 0 
+  for nr in range(1, bufnr('$')) 
+    if buflisted(nr) 
+      let cnt += 1 
+    endif 
+  endfor 
+  return cnt 
+endfunction 
+
+function! LastUsedBufferOrPrevious(bang) 
+  if a:bang
+    if CountListedBuffers() == 1 
+      bd!
+    elseif buflisted(bufname("#")) 
+      b # 
+      bd! #
+    else 
+      bp 
+      bd! #
+    endif 
+  elseif getbufvar(bufname("%"), "&mod")
+    echoerr "Unsaved changes (add ! to override)"
+  else
+    if CountListedBuffers() == 1 
+      bd
+    elseif buflisted(bufname("#")) 
+      b # 
+      bd #
+    else 
+      bp 
+      bd #
+    endif 
+  endif
+endfunction 
+
+command! -bang BD call LastUsedBufferOrPrevious(<bang>0) 
+
+" --------------- COMMANDS END -------------- }}}

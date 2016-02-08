@@ -1,0 +1,11 @@
+# A screen TERMINFO that adds the escape sequences for italic.
+# Overwrites system 'screen' TERMINFO
+#
+# Install:
+#
+#   tic screen.terminfo
+#
+
+screen|screen with italic,
+	sitm=\E[3m, ritm=\E[23m,
+	use=screen,
