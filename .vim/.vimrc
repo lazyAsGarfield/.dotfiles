@@ -304,9 +304,6 @@ noremap k gk
 " easier redrawing - sometimes strange artifacts are visible
 map <leader>r :redraw!<CR>
 
-" toggle relative line number
-" map <leader>- :set relativenumber!<CR>
-
 " moving around splits more easily
 map <C-h> <C-w>h
 map <C-j> <C-w>j
