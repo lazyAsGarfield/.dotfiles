@@ -53,6 +53,10 @@ endif
 " enable mouse if possible
 if has('mouse')
   set mouse=a
+  if &term =~ '^screen'
+    " tmux knows the extended mouse mode
+    set ttymouse=xterm2
+  endif
 endif
 
 " when editing a file, always jump to the last known cursor position.
@@ -157,7 +161,7 @@ let g:ctrlp_working_path_mode = 0
 " jedi-vim settings
 " two below fix showing argument list when using YCM
 let g:jedi#show_call_signatures_delay = 0
-let g:jedi#show_call_signatures = "1"
+let g:jedi#show_call_signatures = "0"
 
 let g:jedi#use_splits_not_buffers = "right"
 let g:jedi#goto_command = "<leader>d"
@@ -186,11 +190,13 @@ let g:ycm_semantic_triggers =  {
   \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
   \   'perl' : ['->'],
   \   'php' : ['->', '::'],
-  \   'cs,java,javascript,typescript,d,python,perl6,scala,vb,elixir,go' : ['.'],
+  \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
+  \   'python' : ['.'],
   \   'ruby' : ['.', '::'],
   \   'lua' : ['.', ':'],
   \   'erlang' : [':'],
   \ }
+  " \   'python' : ['.', 're!\w+'],
 
 " disable completions from jedi-vim, using YCM instead
 let g:jedi#completions_enabled = 0
@@ -299,7 +305,7 @@ noremap k gk
 map <leader>r :redraw!<CR>
 
 " toggle relative line number
-map <leader>- :set relativenumber!<CR>
+" map <leader>- :set relativenumber!<CR>
 
 " moving around splits more easily
 map <C-h> <C-w>h
@@ -376,10 +382,15 @@ if exists('g:loaded_ctrlp')
 endif
 
 " Easymotion mappings
-nmap <leader>t <Plug>(easymotion-f2)
-nmap <leader>f <Plug>(easymotion-t2)
-nmap <leader>T <Plug>(easymotion-F2)
-nmap <leader>F <Plug>(easymotion-T2)
+nmap <leader><leader>t <Plug>(easymotion-t2)
+nmap <leader><leader>f <Plug>(easymotion-f2)
+nmap <leader><leader>T <Plug>(easymotion-T2)
+nmap <leader><leader>F <Plug>(easymotion-F2)
+
+nmap <leader>t <Plug>(easymotion-t)
+nmap <leader>f <Plug>(easymotion-f)
+nmap <leader>T <Plug>(easymotion-T)
+nmap <leader>F <Plug>(easymotion-F)
 
 " --------------- MAPPINGS END -------------- }}}
 
