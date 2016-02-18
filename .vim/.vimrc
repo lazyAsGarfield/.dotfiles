@@ -158,6 +158,10 @@ autocmd GUIEnter * set vb t_vb=
 " CtrlP plugin 
 let g:ctrlp_working_path_mode = 0 
 
+" vim-commentary settings
+autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
+autocmd FileType cmake setlocal commentstring=#\ %s
+
 " jedi-vim settings
 " two below fix showing argument list when using YCM
 let g:jedi#show_call_signatures_delay = 0
@@ -180,7 +184,7 @@ let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/
 
 let g:ycm_complete_in_comments = 1
 let g:ycm_seed_identifiers_with_syntax = 1
-let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_autoclose_preview_window_after_insertion = 0
 
 let g:ycm_semantic_triggers =  {
   \   'c' : ['->', '.'],
@@ -208,23 +212,30 @@ let g:jedi#completions_enabled = 0
 
 " --------------- MAPPINGS ------------- {{{
 
-
 " change leader key 
 let mapleader=","
-
-" insert :q easier
-map <leader>q :q<CR>
 
 " open/close quickfix window
 map cop :copen<CR>
 map ccl :cclose<CR>
 
-" substitute all occurences of text selected in visual mode 
-vnoremap <C-r> "hy:%s/<C-r>h//g<left><left>
+" YCM mappings
+nnoremap <leader>gt :YcmCompleter GoTo<CR>
+nnoremap yc :YcmForceCompileAndDiagnostics<CR>
+nnoremap fi :YcmCompleter FixIt<CR>
 
-" quickly edit/reload the vimrc file 
-nmap <silent> <leader>ev :e $MYVIMRC<CR>
-nmap <silent> <leader>sv :so $MYVIMRC<CR>
+" close preview window (used by YCM)
+map ccp <C-w>z
+
+" moving around wrapped lines more naturally
+noremap j gj
+noremap k gk
+
+" insert :q easier
+map <leader>q :q<CR>
+
+" save current file
+map <leader>w :w<CR>
 
 " disable search highlighting
 map <silent> <leader>n :noh<CR>
@@ -233,13 +244,36 @@ map <silent> <leader>n :noh<CR>
 map <leader>b :b#<CR>
 
 " delete current buffer without closing split
-map <leader>d :BD<CR>
+map <leader>D :BD<CR>
 
-" save current file
-map <leader>w :w<CR>
+" quickly edit/reload the vimrc file 
+nmap <silent> <leader>ev :e $MYVIMRC<CR>
+nmap <silent> <leader>sv :so $MYVIMRC<CR>
 
-" insert ':' easier 
-map <leader>; :
+" resizing splits more easily
+nmap + :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
+nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
+
+" easier yank/paste from clipboard 
+nmap cy "+y
+vmap cy "+y
+nmap cY "+Y
+vmap cY "+Y
+
+nmap cp "+p
+vmap cp "+p
+nmap cP "+P
+vmap cP "+P
+
+vmap <leader>0 "0p
+nmap yp "0p
+nmap yP "0P
+
+" easier redrawing - sometimes strange artifacts are visible
+map <leader>r :redraw!<CR>
+
+" substitute all occurences of text selected in visual mode 
+vnoremap <C-r> "hy:%s/<C-r>h//g<left><left>
 
 " tab as omnicomplete key, but not at beginning of
 " file and not on non-letter char
@@ -269,41 +303,6 @@ map <leader>; :
 " inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
 " inoremap <S-Tab> <C-p>
 
-" easier yank/paste from clipboard 
-" nmap <leader>y "+y
-" vmap <leader>y "+y
-nmap cy "+y
-vmap cy "+y
-
-" nmap <leader>Y "+Y
-" vmap <leader>Y "+Y
-nmap cY "+Y
-vmap cY "+Y
-
-" nmap <leader>p "+p
-" vmap <leader>p "+p
-nmap cp "+p
-vmap cp "+p
-
-" nmap <leader>P "+P
-" vmap <leader>P "+P
-nmap cP "+P
-vmap cP "+P
-
-" easier paste from yank register
-" nmap <leader>0 "0p
-" vmap <leader>0 "0p
-nmap yp "0p
-
-nmap yP "0P
-
-" moving around wrapped lines more naturally
-noremap j gj
-noremap k gk
-
-" easier redrawing - sometimes strange artifacts are visible
-map <leader>r :redraw!<CR>
-
 " moving around splits more easily
 map <C-h> <C-w>h
 map <C-j> <C-w>j
@@ -313,9 +312,6 @@ map <C-l> <C-w>l
 " scroll by whole pages
 map <a-u> <PageUp>
 map <a-d> <PageDown>
-
-" edit file under cursor in vertical split
-map gfv :vertical wincmd f<CR>
 
 " foldenable + foldcolumn
 silent! set nofoldenable
@@ -335,14 +331,9 @@ endfunc
 
 map zi :call ChangeFold()<CR>
 
-
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
-
-" resizing splits more easily
-nmap + :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
-nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
 
 " NERDTree plugin 
 " if exists('g:loaded_nerd_tree')

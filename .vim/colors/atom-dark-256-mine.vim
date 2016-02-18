@@ -85,17 +85,18 @@ hi NonText        cterm=bold      ctermfg=59               gui=bold      guifg=#
 hi SpecialKey     cterm=NONE      ctermfg=59               gui=NONE      guifg=#465457              
 
 " YCM colors
-hi YcmErrorSign    cterm=NONE     ctermfg=202 ctermbg=235
-hi YcmWarningSign  cterm=NONE     ctermfg=220 ctermbg=235
-hi YcmErrorLine    cterm=NONE                 
-hi YcmWarningLine  cterm=NONE                 
-hi YcmErrorSection cterm=NONE                 ctermbg=58 
+hi YcmErrorSign      cterm=NONE     ctermfg=166 ctermbg=235
+hi YcmWarningSign    cterm=NONE     ctermfg=229 ctermbg=235
+hi YcmErrorLine      cterm=NONE                 ctermbg=52
+hi YcmWarningLine    cterm=NONE                   
+hi YcmErrorSection   cterm=NONE                 ctermbg=100 
+hi YcmWarningSection cterm=NONE                 ctermbg=58 
 
 if has("spell")
-    hi SpellBad   cterm=undercurl            ctermfg=196 gui=undercurl                   guisp=#FF0000
-    hi SpellCap   cterm=undercurl            ctermfg=63  gui=undercurl                   guisp=#7070F0
-    hi SpellLocal cterm=undercurl            ctermfg=87  gui=undercurl                   guisp=#70F0F0
-    hi SpellRare  cterm=undercurl            ctermfg=231 gui=undercurl                   guisp=#FFFFFF
+    hi SpellBad   cterm=undercurl               ctermbg=88 gui=undercurl                   guisp=#FF0000
+    hi SpellCap   cterm=undercurl               ctermbg=88 gui=undercurl                   guisp=#7070F0
+    hi SpellLocal cterm=undercurl ctermfg=87               gui=undercurl                   guisp=#70F0F0
+    hi SpellRare  cterm=undercurl ctermfg=231              gui=undercurl                   guisp=#FFFFFF
 endif
 
 " Must be at the end, because of ctermbg=234 bug.
