@@ -15,11 +15,11 @@ if isdirectory($HOME . '/.vim/bundle/')
   Plugin 'scrooloose/nerdtree'
   Plugin 'tpope/vim-commentary' 
   Plugin 'kien/ctrlp.vim'
+  Plugin 'tpope/vim-fugitive'
   " Plugin 'bling/vim-airline'
   Plugin 'godlygeek/tabular'
   Plugin 'hynek/vim-python-pep8-indent'
   Plugin 'rking/ag.vim'
-  Plugin 'tpope/vim-fugitive'
   Plugin 'easymotion/vim-easymotion'
   Plugin 'davidhalter/jedi-vim'
   Plugin 'tpope/vim-unimpaired'
@@ -156,7 +156,7 @@ set fillchars=""
 autocmd GUIEnter * set vb t_vb=
 
 " CtrlP plugin 
-let g:ctrlp_working_path_mode = 0 
+" let g:ctrlp_working_path_mode = 0 
 
 " vim-commentary settings
 autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
@@ -352,22 +352,21 @@ inoremap <C-U> <C-G>u<C-U>
 " endif
 
 " CtrlP plugin
-if exists('g:loaded_ctrlp')
+" if exists('g:loaded_ctrlp')
 
   let g:ctrlp_cmd = 'call CallCtrlP()'
 
   func! CallCtrlP()
-      if exists('s:called_ctrlp')
+      if exists('g:called_ctrlp')
           CtrlPLastMode
       else
-          let s:called_ctrlp = 1
-          CtrlPMRU
+          let g:called_ctrlp = 1
+          " CtrlPMRU
+          CtrlP
       endif
   endfunc
 
-  nmap <C-b> :CtrlPBuffer<CR>
-  
-endif
+" endif
 
 " Easymotion mappings
 nmap <leader><leader>t <Plug>(easymotion-t2)
