@@ -15,8 +15,7 @@ if isdirectory($HOME . '/.vim/bundle/')
   Plugin 'scrooloose/nerdtree'
   Plugin 'tpope/vim-commentary' 
   Plugin 'kien/ctrlp.vim'
-  Plugin 'tpope/vim-fugitive'
-  " Plugin 'bling/vim-airline'
+  Plugin 'bling/vim-airline'
   Plugin 'godlygeek/tabular'
   Plugin 'hynek/vim-python-pep8-indent'
   Plugin 'rking/ag.vim'
@@ -24,6 +23,9 @@ if isdirectory($HOME . '/.vim/bundle/')
   Plugin 'davidhalter/jedi-vim'
   Plugin 'tpope/vim-unimpaired'
   Plugin 'Valloric/YouCompleteMe'
+  Plugin 'tpope/vim-fugitive'
+  Plugin 'octol/vim-cpp-enhanced-highlight'
+  Plugin 'Raimondi/delimitMate'
 
   call vundle#end()
 
@@ -185,6 +187,7 @@ let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/
 let g:ycm_complete_in_comments = 1
 let g:ycm_seed_identifiers_with_syntax = 1
 let g:ycm_autoclose_preview_window_after_insertion = 0
+let g:ycm_always_populate_location_list = 1
 
 let g:ycm_semantic_triggers =  {
   \   'c' : ['->', '.'],
@@ -208,6 +211,11 @@ let g:jedi#completions_enabled = 0
 " disable youcompleteme
 " let g:loaded_youcompleteme = 1
 
+" delimitMate opts
+let delimitMate_expand_cr=2
+let delimitMate_expand_space=1
+let delimitMate_balance_matchpairs=1
+
 "}}}
 
 " --------------- MAPPINGS ------------- {{{
@@ -215,17 +223,25 @@ let g:jedi#completions_enabled = 0
 " change leader key 
 let mapleader=","
 
-" open/close quickfix window
-map cop :copen<CR>
-map ccl :cclose<CR>
+" open/close quickfix/location-list window
+noremap \Q :copen<CR>
+noremap \q :cclose<CR>
+noremap \L :lopen<CR>
+noremap \l :lclose<CR>
+" close preview window
+noremap \p <C-w>z
 
 " YCM mappings
-nnoremap <leader>gt :YcmCompleter GoTo<CR>
+nnoremap ygt :YcmCompleter GoTo<CR>
 nnoremap yc :YcmForceCompileAndDiagnostics<CR>
-nnoremap fi :YcmCompleter FixIt<CR>
+nnoremap <leader>fi :YcmCompleter FixIt<CR>
+nnoremap <leader>gt :YcmCompleter GetType<CR>
+vnoremap <leader>gt :<BS><BS><BS><BS><BS>YcmCompleter GetType<CR>
 
-" close preview window (used by YCM)
-map ccp <C-w>z
+" delimitMate mappings
+imap <C-k> <Plug>delimitMateJumpMany
+imap <C-l> <Plug>delimitMateS-Tab
+imap <C-d> <Plug>delimitMateS-BS
 
 " moving around wrapped lines more naturally
 noremap j gj
