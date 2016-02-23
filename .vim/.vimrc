@@ -89,9 +89,9 @@ set smarttab
 " completion options
 set completeopt=menuone,preview
 
-" do not indent visibility keywords in C++ classes
+" do not indent visibility keywords in C++ classes, indent lambdas
 " set cindent
-set cinoptions=g0
+set cinoptions=g0,j1
 
 " display line numbers
 set number
@@ -203,7 +203,6 @@ let g:ycm_semantic_triggers =  {
   \   'lua' : ['.', ':'],
   \   'erlang' : [':'],
   \ }
-  " \   'python' : ['.', 're!\w+'],
 
 " disable completions from jedi-vim, using YCM instead
 let g:jedi#completions_enabled = 0
@@ -241,7 +240,8 @@ vnoremap <leader>gt :<BS><BS><BS><BS><BS>YcmCompleter GetType<CR>
 " delimitMate mappings
 imap <C-k> <Plug>delimitMateJumpMany
 imap <C-l> <Plug>delimitMateS-Tab
-imap <C-d> <Plug>delimitMateS-BS
+imap <C-h> <Plug>delimitMateS-BS
+imap <C-j> <C-k><CR>
 
 " moving around wrapped lines more naturally
 noremap j gj
@@ -289,7 +289,8 @@ nmap yP "0P
 map <leader>r :redraw!<CR>
 
 " substitute all occurences of text selected in visual mode 
-vnoremap <C-r> "hy:%s/<C-r>h//g<left><left>
+vnoremap <C-r><C-r> "hy:%s/<C-r>h//g<left><left>
+vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>//g<left><left>
 
 " tab as omnicomplete key, but not at beginning of
 " file and not on non-letter char
