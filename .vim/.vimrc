@@ -16,7 +16,6 @@ if isdirectory($HOME . '/.vim/bundle/')
   Plugin 'tpope/vim-commentary' 
   Plugin 'kien/ctrlp.vim'
   Plugin 'bling/vim-airline'
-  Plugin 'godlygeek/tabular'
   Plugin 'hynek/vim-python-pep8-indent'
   Plugin 'rking/ag.vim'
   Plugin 'easymotion/vim-easymotion'
@@ -26,10 +25,13 @@ if isdirectory($HOME . '/.vim/bundle/')
   Plugin 'tpope/vim-fugitive'
   Plugin 'octol/vim-cpp-enhanced-highlight'
   Plugin 'Raimondi/delimitMate'
+  Plugin 'junegunn/vim-easy-align'
 
   call vundle#end()
 
 endif
+
+filetype plugin indent on
                                  
 " --------------- VUNDLE END --------------- }}}
 
@@ -98,9 +100,6 @@ let &colorcolumn="80,120"
 
 " enable syntax highlighting
 syntax on
-
-" filetype stuff
-filetype plugin indent on
 
 " indentation options
 set autoindent
