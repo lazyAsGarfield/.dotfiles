@@ -26,6 +26,8 @@ if isdirectory($HOME . '/.vim/bundle/')
   Plugin 'octol/vim-cpp-enhanced-highlight'
   Plugin 'Raimondi/delimitMate'
   Plugin 'junegunn/vim-easy-align'
+  Plugin 'tpope/vim-vividchalk'
+  Plugin 'mbbill/undotree'
 
   call vundle#end()
 
@@ -108,6 +110,13 @@ set shiftwidth=2
 set softtabstop=2
 set tabstop=2
 set smarttab
+
+" enable persistent undo + its settings
+if has("persistent_undo")
+  set undolevels=15000
+  set undofile
+  set undodir=/home/garfield/.vim/.undodir/
+endif
 
 " completion options
 set completeopt=menuone,preview
@@ -240,7 +249,7 @@ let g:jedi#completions_enabled = 0
 let delimitMate_expand_cr=2
 let delimitMate_expand_space=1
 let delimitMate_balance_matchpairs=1
-let delimitMate_matchpairs = "(:),[:],{:},<:>"
+let delimitMate_matchpairs = "(:),[:],{:}"
 let delimitMate_smart_matchpairs = '^\%(\w\|[£$]\|[^[:space:][:punct:]]\)'
 
 "}}}
@@ -386,6 +395,9 @@ map zi :call ChangeFold()<CR>
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
+
+" Undotree plugin
+nnoremap <C-t> :UndotreeToggle<CR>
 
 " NERDTree plugin 
 " if exists('g:loaded_nerd_tree')
