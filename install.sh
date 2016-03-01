@@ -2,14 +2,38 @@
 
 echo_and_call() {
   echo $1
-  `$1`
+  $1
 }
 
-echo_and_call "ln -s ~/.dotfiles/.vim/.vimrc ~/.vimrc"
+echo -n "Cloning repo to dir: $HOME/.dotfiles, proceed? y/[n]: "
+read ANS
 
-echo_and_call "ln -s ~/.dotfiles/.vim ~/.vim"
+if [[ $ANS = 'y' ]]; then
+  DEST=$HOME/.dotfiles
+else
+  echo -n "Provide dir to clone to: "
+  read DEST
+fi
 
-echo -n "Install build tools? (requires sudo) [y/n]: "
+echo_and_call "git clone --recursive http://github.com/lazyasgarfield/.dotfiles $DEST"
+
+echo_and_call "ln -s $DEST/.vim/.vimrc $HOME/.vimrc"
+
+echo_and_call "ln -s $DEST/.vim $HOME/.vim"
+
+command -v vim >/dev/null 2>&1 || NO_VIM=1
+command -v vimx >/dev/null 2>&1 || NO_VIMX=1
+if [[ $NO_VIM = 1 ]]; then
+  if [[ $NO_VIMX = 1 ]]; then
+    echo "Neither vim nor vimx command found, aborting."
+    exit 1
+  fi
+  echo_and_call "vimx -c VundleInstall -c qall"
+else
+  echo_and_call "vim -c VundleInstall -c qall"
+fi
+
+echo -n "Install build tools? (requires sudo) y/[n]: "
 read ANS
 if [[ $ANS = 'y' ]]; then
   echo "Installing build tools"
@@ -18,12 +42,11 @@ else
   echo "Skipping"
 fi
 
-
-echo -n "Install YCM? [y/n]: "
+echo -n "Install YCM? y/[n]: "
 read ANS
 if [[ $ANS = 'y' ]]; then
   echo "Installing YCM"
-  echo_and_call "cd ~/.vim/bundle/YouCompleteMe"
+  echo_and_call "cd $DEST/.vim/bundle/YouCompleteMe"
   echo_and_call "./install.py --clang-completer"
 else
   echo "Skipping"
