@@ -21,6 +21,10 @@ echo_and_call "ln -s $DEST/.vim/.vimrc $HOME/.vimrc"
 
 echo_and_call "ln -s $DEST/.vim $HOME/.vim"
 
+if [[ -d '$HOME/.byobu' ]]; then
+  echo_and_call "ln -s $DEST/.tmux.conf $HOME/.byobu"
+fi
+
 command -v vim >/dev/null 2>&1 || NO_VIM=1
 command -v vimx >/dev/null 2>&1 || NO_VIMX=1
 if [[ $NO_VIM = 1 ]]; then
