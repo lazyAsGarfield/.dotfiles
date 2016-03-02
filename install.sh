@@ -25,6 +25,29 @@ if [[ -d '$HOME/.byobu' ]]; then
   echo_and_call "ln -s $DEST/.tmux.conf $HOME/.byobu"
 fi
 
+command -v git >/dev/null 2>&1 && GIT=1
+if [[ $GIT = 1 ]]; then
+  echo -n "Configure git? y/[n]: "
+  read ANS
+  if [[ $ANS = 'y' ]]; then
+    echo_and_call "git config --global --add include.path $DEST/.gitconfig"
+    if [[ -z "`git config --global user.name`" ]]; then
+      echo -n "Username for git: "
+      read UNAME
+      if [[ -n "$UNAME" ]]; then
+        echo_and_call "git config --global user.name $UNAME"
+      fi
+    fi
+    if [[ -z "`git config --global user.email`" ]]; then
+      echo -n "Email for git: "
+      read EMAIL
+      if [[ -n "$EMAIL" ]]; then
+        echo_and_call "git config --global user.email $EMAIL"
+      fi
+    fi
+  fi
+fi
+
 command -v vim >/dev/null 2>&1 || NO_VIM=1
 command -v vimx >/dev/null 2>&1 || NO_VIMX=1
 if [[ $NO_VIM = 1 ]]; then
