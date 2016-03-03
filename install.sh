@@ -21,7 +21,8 @@ echo_and_call "ln -s $DEST/.vim/.vimrc $HOME/.vimrc"
 
 echo_and_call "ln -s $DEST/.vim $HOME/.vim"
 
-if [[ -d '$HOME/.byobu' ]]; then
+if [[ -d "$HOME/.byobu" ]]; then
+  echo_and_call "mv $HOME/.byobu/.tmux.conf $HOME/.byobu/.tmux.conf.old"
   echo_and_call "ln -s $DEST/.tmux.conf $HOME/.byobu"
 fi
 
