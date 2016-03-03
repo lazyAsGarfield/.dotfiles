@@ -7,12 +7,11 @@ function saved()
 {
   if [[ $# = 0 ]]; then
     if [[ ${#__SAVED_DIRS__[@]} = 0 ]]; then
-      echo -n "No directories saved"
+      echo "No directories saved"
     fi
     for ((i = 1 ; i <= ${#__SAVED_DIRS__[@]} ; ++i)) ; do
-      echo -n "#$i: ${__SAVED_DIRS__[$i]} "
+      echo "$i ${__SAVED_DIRS__[$i]} "
     done
-    echo
   else
     local dir
     for dir in $@; do
@@ -56,6 +55,10 @@ function dropd()
     for arg in $@; do
       if [[ $arg =~ ^[0-9]+$ ]]; then
         unset __SAVED_DIRS__[$arg]
+      elif [[ $arg = "@" ]]; then
+        unset __SAVED_DIRS__
+        declare -a __SAVED_DIRS__
+        return
       else
         echo "$arg: invalid argument"
       fi
@@ -85,7 +88,7 @@ function cd()
       command cd ${__SAVED_DIRS__[$num]}
       add_to_hist ${__SAVED_DIRS__[$num]}
     fi
-  elif [[ $1 =~ ^-h ]]; then
+  elif [[ $1 =~ ^-h ]] || [[ $1 = "--" ]]; then
     local LIMIT
     if [[ ${1:2} =~ ^[0-9]+$ ]]; then
       LIMIT=${1:2}
@@ -96,7 +99,7 @@ function cd()
     local MIN=$(( $HIST_SIZE - $LIMIT ))
     MIN=$(( $MIN < 1 ? 1 : $MIN ))
     for (( i = $MIN ; i <= $HIST_SIZE ; ++i )); do
-      echo "$i: ${__CD_HISTORY__[$i]}"
+      echo "$i ${__CD_HISTORY__[$i]}"
     done
   elif [[ $1 =~ ^--[0-9]+$ ]]; then
     local num=${1:2}

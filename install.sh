@@ -11,40 +11,60 @@ read ANS
 if [[ $ANS = 'y' ]]; then
   DEST=$HOME/.dotfiles
 else
-  echo -n "Provide dir to clone to: "
+  echo -n "Dir to clone to: "
   read DEST
+  DEST=`realpath $DEST`
 fi
 
 echo_and_call "git clone --recursive http://github.com/lazyasgarfield/.dotfiles $DEST"
 
 echo_and_call "ln -s $DEST/.vim/.vimrc $HOME/.vimrc"
 
-echo_and_call "ln -s $DEST/.vim $HOME/.vim"
+echo_and_call "ln -s $DEST/.vim $HOME"
 
 if [[ -d "$HOME/.byobu" ]]; then
-  echo_and_call "mv $HOME/.byobu/.tmux.conf $HOME/.byobu/.tmux.conf.old"
-  echo_and_call "ln -s $DEST/.tmux.conf $HOME/.byobu"
+  echo -n "Configure byobu? y/[n]: "
+  read ANS
+
+  if [[ $ANS = 'y' ]]; then
+    if [[ -f "$HOME/.byobu/.tmux.conf.old" ]]; then
+      echo -n "Backup of .tmux.conf found, skipping, you can configure it manually by running: "
+      echo "ln -s $DEST/.tmux.conf $HOME/.byobu"
+    else
+      echo_and_call "mv $HOME/.byobu/.tmux.conf $HOME/.byobu/.tmux.conf.old"
+      echo_and_call "ln -s $DEST/.tmux.conf $HOME/.byobu"
+    fi
+  fi
 fi
 
-command -v git >/dev/null 2>&1 && GIT=1
-if [[ $GIT = 1 ]]; then
-  echo -n "Configure git? y/[n]: "
-  read ANS
-  if [[ $ANS = 'y' ]]; then
-    echo_and_call "git config --global --add include.path $DEST/.gitconfig"
-    if [[ -z "`git config --global user.name`" ]]; then
-      echo -n "Username for git: "
-      read UNAME
-      if [[ -n "$UNAME" ]]; then
-        echo_and_call "git config --global user.name $UNAME"
-      fi
+echo -n "Source $DEST/.bashrc and $DEST/improved_cd.sh in .bashrc? y/[n]: "
+read ANS
+
+if [[ $ANS = 'y' ]]; then
+  echo "echo \". $DEST/.bashrc\" >> $HOME/.bashrc"
+  echo ". $DEST/.bashrc" >> $HOME/.bashrc
+  echo "echo \". $DEST/improved_cd.sh\" >> $HOME/.bashrc"
+  echo ". $DEST/improved_cd.sh" >> $HOME/.bashrc
+else
+  echo "Skipping"
+fi
+
+echo -n "Configure git? y/[n]: "
+read ANS
+if [[ $ANS = 'y' ]]; then
+  echo_and_call "git config --global --add include.path $DEST/.gitconfig"
+  if [[ -z "`git config --global user.name`" ]]; then
+    echo -n "Username for git: "
+    read UNAME
+    if [[ -n "$UNAME" ]]; then
+      echo_and_call "git config --global user.name $UNAME"
     fi
-    if [[ -z "`git config --global user.email`" ]]; then
-      echo -n "Email for git: "
-      read EMAIL
-      if [[ -n "$EMAIL" ]]; then
-        echo_and_call "git config --global user.email $EMAIL"
-      fi
+  fi
+  if [[ -z "`git config --global user.email`" ]]; then
+    echo -n "Email for git: "
+    read EMAIL
+    if [[ -n "$EMAIL" ]]; then
+      echo_and_call "git config --global user.email $EMAIL"
     fi
   fi
 fi
@@ -61,7 +81,7 @@ else
   echo_and_call "vim -c VundleInstall -c qall"
 fi
 
-echo -n "Install build tools? (requires sudo) y/[n]: "
+echo -n "Install build tools? (requires sudo, needed for YCM compilation) y/[n]: "
 read ANS
 if [[ $ANS = 'y' ]]; then
   echo "Installing build tools"
