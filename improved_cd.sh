@@ -97,9 +97,9 @@ function cd()
       LIMIT=15
     fi
     local HIST_SIZE=${#__CD_HISTORY__[@]}
-    local MIN=$(( $HIST_SIZE - $LIMIT ))
+    local MIN=$(( $HIST_SIZE - $LIMIT + 1 ))
     MIN=$(( $MIN < 1 ? 1 : $MIN ))
-    for (( i = $MIN + 1 ; i <= $HIST_SIZE ; ++i )); do
+    for (( i = $MIN ; i <= $HIST_SIZE ; ++i )); do
       echo "$i ${__CD_HISTORY__[$i]}"
     done
   elif [[ $1 =~ ^--[0-9]+$ ]]; then
