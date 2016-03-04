@@ -22,6 +22,10 @@ echo_and_call "ln -s $DEST/.vim/.vimrc $HOME/.vimrc"
 
 echo_and_call "ln -s $DEST/.vim $HOME"
 
+if [[ ! -d "$DEST/.vim/.undodir" ]]; then
+  echo_and_call "mkdir $DEST/.vim/.undodir"
+fi
+
 if [[ -d "$HOME/.byobu" ]]; then
   echo -n "Configure byobu? y/[n]: "
   read ANS
@@ -53,6 +57,7 @@ echo -n "Configure git? y/[n]: "
 read ANS
 if [[ $ANS = 'y' ]]; then
   echo_and_call "git config --global --add include.path $DEST/.gitconfig"
+  echo_and_call "git config --global --add core.excludesfile $DEST/.gitignore"
   if [[ -z "`git config --global user.name`" ]]; then
     echo -n "Username for git: "
     read UNAME

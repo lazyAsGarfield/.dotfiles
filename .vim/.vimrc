@@ -115,7 +115,7 @@ set smarttab
 if has("persistent_undo")
   set undolevels=15000
   set undofile
-  set undodir=/home/garfield/.vim/.undodir/
+  set undodir=$HOME/.vim/.undodir/
 endif
 
 " completion options
@@ -306,6 +306,14 @@ nmap <silent> <leader>sv :so $MYVIMRC<CR>
 " resizing splits more easily
 nmap + :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
 nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
+
+" registers
+nmap cr "
+
+nmap cry "0
+vmap cry "0
+nmap crc "+
+vmap crc "+
 
 " easier yank/paste from clipboard 
 nmap cy "+y

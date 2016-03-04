@@ -27,12 +27,13 @@ function saved()
         dir=`realpath $dir`
       fi
       if [[ -d $dir ]]; then
-        for i in `seq 1 ${#__SAVED_DIRS__[@]}`; do
-          if [[ ${__SAVED_DIRS__[$i]} = $dir ]]; then
-            unset __SAVED_DIRS__[$i]
+        for saved_dir in ${__SAVED_DIRS__[@]}; do
+          if [[ $saved_dir = $dir ]]; then
+            return
           fi
         done
-        __SAVED_DIRS__=([1]=$dir "${__SAVED_DIRS__[@]}")
+        __SAVED_DIRS__=([0]="" "${__SAVED_DIRS__[@]}" $dir)
+        unset __SAVED_DIRS__[0]
       else
         echo "$dir: No such directory" >&2
       fi
@@ -93,12 +94,12 @@ function cd()
     if [[ ${1:2} =~ ^[0-9]+$ ]]; then
       LIMIT=${1:2}
     else
-      LIMIT=10
+      LIMIT=15
     fi
     local HIST_SIZE=${#__CD_HISTORY__[@]}
     local MIN=$(( $HIST_SIZE - $LIMIT ))
     MIN=$(( $MIN < 1 ? 1 : $MIN ))
-    for (( i = $MIN ; i <= $HIST_SIZE ; ++i )); do
+    for (( i = $MIN + 1 ; i <= $HIST_SIZE ; ++i )); do
       echo "$i ${__CD_HISTORY__[$i]}"
     done
   elif [[ $1 =~ ^--[0-9]+$ ]]; then

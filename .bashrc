@@ -1,9 +1,11 @@
 #!/bin/sh
 
-alias ll='ls -l'
-alias la='ls -A'
+alias ll='ls -alF'
+alias la='ls -A --color=auto'
 alias l='ls -CF'
+
 alias tmux='tmux -2'
+
 alias rm='rm -i'
 alias cp='cp -i'
 
