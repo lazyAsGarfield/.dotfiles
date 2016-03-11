@@ -75,21 +75,42 @@ function cd()
   function add_to_hist()
   {
     local HIST_SIZE=${#__CD_HISTORY__[@]}
-    if [[ ${__CD_HISTORY__[HIST_SIZE]} != $1 ]]; then
+    if [[ ${__CD_HISTORY__[HIST_SIZE]} != $1 ]] && ! [[ -z $1 ]]; then
       __CD_HISTORY__[$(( HIST_SIZE + 1 ))]=$1
     fi
   }
 
-  if [[ $# -gt 0 ]] && [[ $1 =~ ^-[0-9]+$ ]]; then
-    local num=${1:1}
+  # $ cd --<num> 
+  # go to dir saved on postition num
+  if [[ $1 =~ ^--[0-9]+$ ]]; then
+    local num=${1:2}
     if [[ $num > ${#__SAVED_DIRS__[@]} ]]; then
       echo "No entry $num in saved directories"
     else
-      echo "${__SAVED_DIRS__[$num]}"
-      command cd ${__SAVED_DIRS__[$num]}
-      add_to_hist ${__SAVED_DIRS__[$num]}
+      local dir=${__SAVED_DIRS__[$num]}
+      command cd $dir 
+      if [[ -d $dir ]]; then
+        echo "${__SAVED_DIRS__[$num]}"
+        add_to_hist ${__SAVED_DIRS__[$num]}
+      fi
     fi
-  elif [[ $1 =~ ^-h ]] || [[ $1 = "--" ]]; then
+  # $ cd -<num>
+  # go to dir on position num in history
+  elif [[ $1 =~ ^-[0-9]+$ ]]; then
+    local num=${1:1}
+    if [[ $num -gt ${#__CD_HISTORY__[@]} ]]; then
+      echo "No entry $num in history"
+    else
+      local dir=${__CD_HISTORY__[$num]}
+      command cd $dir
+      if [[ -d $dir ]]; then
+        echo $dir
+        add_to_hist $dir
+      fi
+    fi
+  # $ cd -h[num]|--
+  # show cd history
+  elif [[ $1 =~ ^-h[0-9]*$ ]] || [[ $1 = "--" ]]; then
     local LIMIT
     if [[ ${1:2} =~ ^[0-9]+$ ]]; then
       LIMIT=${1:2}
@@ -102,16 +123,7 @@ function cd()
     for (( i = $MIN ; i <= $HIST_SIZE ; ++i )); do
       echo "$i ${__CD_HISTORY__[$i]}"
     done
-  elif [[ $1 =~ ^--[0-9]+$ ]]; then
-    local num=${1:2}
-    if [[ $num -gt ${#__CD_HISTORY__[@]} ]]; then
-      echo "No entry $num in history"
-    else
-      local dir=${__CD_HISTORY__[$num]}
-      echo $dir
-      command cd $dir
-      add_to_hist $dir
-    fi
+  # just pass args (and add dir to history if needed)
   else
     for arg in $@; do
       if [[ -d $arg ]]; then
