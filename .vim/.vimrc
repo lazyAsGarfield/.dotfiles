@@ -195,6 +195,9 @@ autocmd GUIEnter * set vb t_vb=
 " CtrlP plugin 
 " let g:ctrlp_working_path_mode = 0 
 
+" NERDTree plugin options
+let NERDTreeMouseMode = 3
+
 " vim-commentary settings
 autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
 autocmd FileType cmake setlocal commentstring=#\ %s
