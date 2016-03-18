@@ -84,14 +84,16 @@ function cd()
   # go to dir saved on postition num
   if [[ $1 =~ ^--[0-9]+$ ]]; then
     local num=${1:2}
-    if [[ $num > ${#__SAVED_DIRS__[@]} ]]; then
+    if [[ $num > ${#__SAVED_DIRS__[@]} ]] || [[ $num -eq 0 ]]; then
       echo "No entry $num in saved directories"
     else
       local dir=${__SAVED_DIRS__[$num]}
+      if [[ $PWD != $dir ]]; then
+        add_to_hist $PWD
+      fi
       command cd $dir 
       if [[ -d $dir ]]; then
         echo "${__SAVED_DIRS__[$num]}"
-        add_to_hist ${__SAVED_DIRS__[$num]}
       fi
     fi
   # $ cd -<num>
@@ -102,10 +104,12 @@ function cd()
       echo "No entry $num in history"
     else
       local dir=${__CD_HISTORY__[$num]}
+      if [[ $PWD != $dir ]]; then
+        add_to_hist $PWD
+      fi
       command cd $dir
       if [[ -d $dir ]]; then
         echo $dir
-        add_to_hist $dir
       fi
     fi
   # $ cd -h[num]|--
@@ -125,18 +129,11 @@ function cd()
     done
   # just pass args (and add dir to history if needed)
   else
-    for arg in $@; do
-      if [[ -d $arg ]]; then
-        add_to_hist `realpath $arg`
-        break
-      fi
-    done
-    if [[ $# = 0 ]]; then
-      add_to_hist $HOME
-    elif [[ $1 = '-' ]]; then
-      add_to_hist $OLDPWD
-    fi
+    local prev=$PWD
     command cd $@
+    if [[ $PWD != $prev ]]; then
+      add_to_hist $prev
+    fi
   fi
 
   unset -f add_to_hist
