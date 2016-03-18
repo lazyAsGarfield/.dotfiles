@@ -1,4 +1,5 @@
-" --------------- VUNDLE --------------- {{{
+" ---------- PLUGINS -------------- {{{
+
 set nocompatible
 filetype off
 
@@ -23,18 +24,17 @@ Plug 'tpope/vim-fugitive'
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'Raimondi/delimitMate'
 Plug 'junegunn/vim-easy-align'
-Plug 'tpope/vim-vividchalk'
 Plug 'mbbill/undotree'
 Plug 'junegunn/fzf', { 'dir': '`realpath ~/.vim`/../.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
 
 call plug#end()
 
 filetype plugin indent on
                                  
-" --------------- VUNDLE END --------------- }}}
+" --------------- PLUGINS END --------------- }}}
 
-" --------------- MISC ----------------- {{{
-set nocompatible
+" ---------- VIM OPTS ------------- {{{
 
 silent! colorscheme atom-dark-256-mine
 
@@ -57,6 +57,7 @@ if has('mouse')
   set mouse+=a
 endif
 
+" tmux options
 if &term =~ '^screen' && exists('$TMUX')
   " tmux knows the extended mouse mode
   set ttymouse=xterm2
@@ -140,9 +141,6 @@ set autoread
 " number of command line history lines kept
 set history=500
 
-" autochange directory to the one opened file is in
-" set autochdir
-
 " default encoding
 set encoding=utf-8
 
@@ -156,21 +154,17 @@ set backspace=indent,eol,start
 " show the cursor position all the time
 set ruler
 
-" highlight cursor column/line - now done with 'cox' from vim-unimpaired
-" set cursorcolumn
-" set cursorline
-
 " display incomplete commands
 set showcmd
 
 " do incremental searching
 set incsearch
 
-" set search highlighting, bo do not highlight now 
+" set search highlighting, bo do not highlight for now 
 set hlsearch
 noh
 
-" line endings
+" line endings settings
 set fileformats=unix,dos
 
 " always show status line
@@ -188,8 +182,9 @@ set fillchars=""
 " disable that annoying beeping
 autocmd GUIEnter * set vb t_vb=
 
-" CtrlP plugin 
-" let g:ctrlp_working_path_mode = 0 
+" --------------- VIM OPTS END ------------- }}}
+
+" ---------- PLUGIN OPTS ---------- {{{
 
 " NERDTree plugin options
 let NERDTreeMouseMode = 3
@@ -213,6 +208,9 @@ let g:jedi#usages_command = "<leader>u"
 " let g:jedi#completions_command = "<Tab>"
 let g:jedi#completions_command = ""
 let g:jedi#rename_command = "<leader>r"
+
+" disable completions from jedi-vim, using YCM instead
+let g:jedi#completions_enabled = 0
 
 " YCM settings
 " default flags file for c-like langs for YCM
@@ -238,9 +236,6 @@ let g:ycm_semantic_triggers =  {
   \   'erlang' : [':'],
   \ }
 
-" disable completions from jedi-vim, using YCM instead
-let g:jedi#completions_enabled = 0
-
 " disable youcompleteme
 " let g:loaded_youcompleteme = 1
 
@@ -251,9 +246,12 @@ let delimitMate_balance_matchpairs=1
 let delimitMate_matchpairs = "(:),[:],{:}"
 let delimitMate_smart_matchpairs = '^\%(\w\|[£$]\|[^[:space:][:punct:]]\)'
 
-"}}}
+" Undotree settings
+let g:undotree_SetFocusWhenToggle = 1
 
-" --------------- MAPPINGS ------------- {{{
+" --------------- PLUGIN OPTS END ---------- }}}
+
+" ---------- VIM MAPPINGS --------- {{{
 
 " change leader key 
 let mapleader=","
@@ -263,21 +261,6 @@ noremap \Q :copen<CR>
 noremap \q :cclose<CR>
 noremap \L :lopen<CR>
 noremap \l :lclose<CR>
-" close preview window
-noremap \p <C-w>z
-
-" YCM mappings
-nnoremap ygt :YcmCompleter GoTo<CR>
-nnoremap yc :YcmForceCompileAndDiagnostics<CR>
-nnoremap <leader>fi :YcmCompleter FixIt<CR>
-nnoremap <leader>gt :YcmCompleter GetType<CR>
-vnoremap <leader>gt :<BS><BS><BS><BS><BS>YcmCompleter GetType<CR>
-
-" delimitMate mappings
-imap <C-k> <Plug>delimitMateJumpMany
-imap <C-l> <Plug>delimitMateS-Tab
-imap <C-h> <Plug>delimitMateS-BS
-imap <C-j> <C-k><CR>
 
 " moving around wrapped lines more naturally
 noremap j gj
@@ -336,6 +319,101 @@ map <leader>r :redraw!<CR>
 vnoremap <C-r><C-r> "hy:%s/<C-r>h//g<left><left>
 vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>//g<left><left>
 
+" moving around splits more easily
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+" it's handy to have those when using byobu, as Shift + arrows moves around
+" byobu's splits
+nnoremap <C-Left> <C-w>h
+nnoremap <C-Down> <C-w>j
+nnoremap <C-Up> <C-w>k
+nnoremap <C-Right> <C-w>l
+
+" foldenable + foldcolumn
+silent! set nofoldenable
+silent! set foldcolumn=0
+
+func! ChangeFold()
+  if (&foldenable == 1)
+    set nofoldenable
+    set foldcolumn=0
+    echo 'Folding disabled'
+  else
+    set foldenable
+    set foldcolumn=1
+    echo 'Folding enabled'
+  endif
+endfunc
+
+map zi :call ChangeFold()<CR>
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+" --------------- VIM MAPPINGS END -------------- }}}
+
+" ---------- PLUGIN MAPPINGS ------ {{{
+
+" YCM mappings
+nnoremap ygt :YcmCompleter GoTo<CR>
+nnoremap yc :YcmForceCompileAndDiagnostics<CR>
+nnoremap <leader>fi :YcmCompleter FixIt<CR>
+nnoremap <leader>gt :YcmCompleter GetType<CR>
+vnoremap <leader>gt :<BS><BS><BS><BS><BS>YcmCompleter GetType<CR>
+
+" delimitMate mappings
+imap <C-k> <Plug>delimitMateJumpMany
+imap <C-l> <Plug>delimitMateS-Tab
+imap <C-h> <Plug>delimitMateS-BS
+imap <C-j> <C-k><CR>
+
+" Undotree plugin
+nnoremap <C-t> :UndotreeToggle<CR>
+
+" NERDTree plugin 
+function! NERDTreeEnableOrToggle() 
+  try 
+    NERDTreeToggle 
+  catch 
+    silent! NERDTree 
+  endtry 
+endfunction 
+
+map <C-n> :call NERDTreeEnableOrToggle()<CR> 
+map <leader><leader>n :NERDTreeFind<CR> 
+
+" FZF list
+nmap <C-f> :Files<CR>
+nmap <C-b> :Buffers<CR>
+
+" CtrlP plugin
+let g:ctrlp_cmd = 'call CallCtrlP()'
+
+func! CallCtrlP()
+    if exists('g:called_ctrlp')
+        CtrlPLastMode
+    else
+        let g:called_ctrlp = 1
+        " CtrlPMRU
+        CtrlP
+    endif
+endfunc
+
+" Easymotion mappings
+nmap <leader><leader>t <Plug>(easymotion-t2)
+nmap <leader><leader>f <Plug>(easymotion-f2)
+nmap <leader><leader>T <Plug>(easymotion-T2)
+nmap <leader><leader>F <Plug>(easymotion-F2)
+
+nmap <leader>t <Plug>(easymotion-t)
+nmap <leader>f <Plug>(easymotion-f)
+nmap <leader>T <Plug>(easymotion-T)
+nmap <leader>F <Plug>(easymotion-F)
+
 " tab as omnicomplete key, but not at beginning of
 " file and not on non-letter char
 " YCM overrides tab mapping, therefore it's not needed
@@ -364,95 +442,9 @@ vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>//g<left><left>
 " inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
 " inoremap <S-Tab> <C-p>
 
-" moving around splits more easily
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
+" --------------- PLUGIN MAPPINGS END -------------- }}}
 
-" it's handy to have those when using byobu, as Shift + arrows moves around
-" byobu's splits
-nnoremap <C-Left> <C-w>h
-nnoremap <C-Down> <C-w>j
-nnoremap <C-Up> <C-w>k
-nnoremap <C-Right> <C-w>l
-
-" scroll by whole pages
-map <a-u> <PageUp>
-map <a-d> <PageDown>
-
-" foldenable + foldcolumn
-silent! set nofoldenable
-silent! set foldcolumn=0
-
-func! ChangeFold()
-  if (&foldenable == 1)
-    set nofoldenable
-    set foldcolumn=0
-    echo 'Folding disabled'
-  else
-    set foldenable
-    set foldcolumn=1
-    echo 'Folding enabled'
-  endif
-endfunc
-
-map zi :call ChangeFold()<CR>
-
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
-
-" Undotree plugin
-nnoremap <C-t> :UndotreeToggle<CR>
-
-" NERDTree plugin 
-" if exists('g:loaded_nerd_tree')
-
-  function! NERDTreeEnableOrToggle() 
-    try 
-      NERDTreeToggle 
-    catch 
-      silent! NERDTree 
-    endtry 
-  endfunction 
-
-  map <C-n> :call NERDTreeEnableOrToggle()<CR> 
-  map <leader><leader>n :NERDTreeFind<CR> 
-
-" endif
-
-" CtrlP plugin
-" if exists('g:loaded_ctrlp')
-
-  let g:ctrlp_cmd = 'call CallCtrlP()'
-
-  func! CallCtrlP()
-      if exists('g:called_ctrlp')
-          CtrlPLastMode
-      else
-          let g:called_ctrlp = 1
-          " CtrlPMRU
-          CtrlP
-      endif
-  endfunc
-
-" endif
-
-" Easymotion mappings
-nmap <leader><leader>t <Plug>(easymotion-t2)
-nmap <leader><leader>f <Plug>(easymotion-f2)
-nmap <leader><leader>T <Plug>(easymotion-T2)
-nmap <leader><leader>F <Plug>(easymotion-F2)
-
-nmap <leader>t <Plug>(easymotion-t)
-nmap <leader>f <Plug>(easymotion-f)
-nmap <leader>T <Plug>(easymotion-T)
-nmap <leader>F <Plug>(easymotion-F)
-
-" --------------- MAPPINGS END -------------- }}}
-
-" --------------- COMMANDS ------------ {{{
+" ---------- VIM COMMANDS --------- {{{
 
 " open buffer [number] in vertical split
 command! -nargs=? VB vert sb <args>
@@ -496,5 +488,28 @@ endfunction
 
 command! -bang BD call LastUsedBufferOrPrevious(<bang>0) 
 
-" --------------- COMMANDS END -------------- }}}
+" --------------- VIM COMMANDS END -------------- }}}
+
+" ---------- PLUGIN COMMANDS ------ {{{
+
+function! s:ag_in(bang, ...)
+  let tokens  = a:000
+  let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
+  let query   = (filter(copy(tokens), 'v:val !~ "^-"'))
+  call fzf#vim#ag(join(query[1:], ' '), ag_opts, extend({'dir': a:1}, a:bang ? {} : g:fzf#vim#default_layout))
+endfunction
+
+command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
+command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
+
+function! s:ag_with_opts(arg, bang)
+  let tokens  = split(a:arg)
+  let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
+  let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
+  call fzf#vim#ag(query, ag_opts, a:bang ? {} : g:fzf#vim#default_layout)
+endfunction
+
+command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
+
+" --------------- PLUGIN COMMANDS END -------------- }}}
 
