@@ -2,36 +2,32 @@
 set nocompatible
 filetype off
 
-" check if Vundle exists
-if isdirectory($HOME . '/.vim/bundle/')
+set rtp+=~/.vim/vim-plug
+let path='~/.vim/plugged'
 
-  set rtp+=~/.vim/bundle/Vundle.vim
-  let path='~/.vim/bundle'
+call plug#begin(path)
 
-  call vundle#begin(path)
+Plug 'gmarik/Vundle.vim'
+Plug 'tpope/vim-surround'
+Plug 'scrooloose/nerdtree'
+Plug 'tpope/vim-commentary'
+Plug 'kien/ctrlp.vim'
+Plug 'bling/vim-airline'
+Plug 'hynek/vim-python-pep8-indent'
+Plug 'rking/ag.vim'
+Plug 'easymotion/vim-easymotion'
+Plug 'davidhalter/jedi-vim'
+Plug 'tpope/vim-unimpaired'
+Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+Plug 'tpope/vim-fugitive'
+Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'Raimondi/delimitMate'
+Plug 'junegunn/vim-easy-align'
+Plug 'tpope/vim-vividchalk'
+Plug 'mbbill/undotree'
+Plug 'junegunn/fzf', { 'dir': '`realpath ~/.vim`/../.fzf', 'do': './install --all' }
 
-  Plugin 'gmarik/Vundle.vim'
-  Plugin 'tpope/vim-surround'
-  Plugin 'scrooloose/nerdtree'
-  Plugin 'tpope/vim-commentary' 
-  Plugin 'kien/ctrlp.vim'
-  Plugin 'bling/vim-airline'
-  Plugin 'hynek/vim-python-pep8-indent'
-  Plugin 'rking/ag.vim'
-  Plugin 'easymotion/vim-easymotion'
-  Plugin 'davidhalter/jedi-vim'
-  Plugin 'tpope/vim-unimpaired'
-  Plugin 'Valloric/YouCompleteMe'
-  Plugin 'tpope/vim-fugitive'
-  Plugin 'octol/vim-cpp-enhanced-highlight'
-  Plugin 'Raimondi/delimitMate'
-  Plugin 'junegunn/vim-easy-align'
-  Plugin 'tpope/vim-vividchalk'
-  Plugin 'mbbill/undotree'
-
-  call vundle#end()
-
-endif
+call plug#end()
 
 filetype plugin indent on
                                  

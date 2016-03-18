@@ -16,7 +16,9 @@ else
   DEST=`realpath $DEST`
 fi
 
-echo_and_call "git clone --recursive http://github.com/lazyasgarfield/.dotfiles $DEST"
+echo_and_call "git clone http://github.com/lazyasgarfield/.dotfiles $DEST"
+
+echo_and_call "curl -fLo $DEST/.vim/vim-plug/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
 
 echo_and_call "ln -s $DEST/.vim/.vimrc $HOME/.vimrc"
 
@@ -57,7 +59,7 @@ echo -n "Configure git? y/[n]: "
 read ANS
 if [[ $ANS = 'y' ]]; then
   echo_and_call "git config --global --add include.path $DEST/.gitconfig"
-  echo_and_call "git config --global --add core.excludesfile $DEST/.gitignore"
+  echo_and_call "git config --global --add core.excludesfile $DEST/.globalgitignore"
   if [[ -z "`git config --global user.name`" ]]; then
     echo -n "Username for git: "
     read UNAME
@@ -74,18 +76,6 @@ if [[ $ANS = 'y' ]]; then
   fi
 fi
 
-command -v vim >/dev/null 2>&1 || NO_VIM=1
-command -v vimx >/dev/null 2>&1 || NO_VIMX=1
-if [[ $NO_VIM = 1 ]]; then
-  if [[ $NO_VIMX = 1 ]]; then
-    echo "Neither vim nor vimx command found, aborting."
-    exit 1
-  fi
-  echo_and_call "vimx -c VundleInstall -c qall"
-else
-  echo_and_call "vim -c VundleInstall -c qall"
-fi
-
 echo -n "Install build tools? (requires sudo, needed for YCM compilation) y/[n]: "
 read ANS
 if [[ $ANS = 'y' ]]; then
@@ -95,13 +85,15 @@ else
   echo "Skipping"
 fi
 
-echo -n "Install YCM? y/[n]: "
-read ANS
-if [[ $ANS = 'y' ]]; then
-  echo "Installing YCM"
-  echo_and_call "cd $DEST/.vim/bundle/YouCompleteMe"
-  echo_and_call "./install.py --clang-completer"
+command -v vim >/dev/null 2>&1 || NO_VIM=1
+command -v vimx >/dev/null 2>&1 || NO_VIMX=1
+if [[ $NO_VIM = 1 ]]; then
+  if [[ $NO_VIMX = 1 ]]; then
+    echo "Neither vim nor vimx command found, aborting."
+    exit 1
+  fi
+  echo_and_call "vimx -c PlugInstall -c qall"
 else
-  echo "Skipping"
+  echo_and_call "vim -c PlugInstall -c qall"
 fi
 
