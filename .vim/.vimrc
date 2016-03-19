@@ -390,7 +390,8 @@ map <C-n> :call NERDTreeEnableOrToggle()<CR>
 map <leader><leader>n :NERDTreeFind<CR> 
 
 " FZF list
-nmap <C-f> :Files<CR>
+" <C-f> is mapped in commands section deal more wisely with git repos
+" nmap <C-f> :Files<CR>
 nmap <C-b> :Buffers<CR>
 
 " CtrlP plugin
@@ -495,6 +496,16 @@ command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 
 " ---------- PLUGIN COMMANDS ------ {{{
 
+function! s:git_root_or_current_dir()
+  let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
+  return git_root == '' ? expand('%:p:h') : fnameescape('/'.git_root)
+endfunction
+
+command! -bang FilesGitRootOrCurrent call
+\ fzf#vim#files(s:git_root_or_current_dir(), <bang>0 ? {} : g:fzf#vim#default_layout)
+
+nnoremap <C-f> :FilesGitRootOrCurrent<CR>
+
 function! s:ag_in(bang, ...)
   let tokens  = a:000
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
@@ -514,13 +525,24 @@ endfunction
 
 command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
 
+" expands path relatively to current dir or git root if possible
+" (similar to CtrlP plugin)
+function! s:realpath(filepath_or_name)
+  let fullpath = fnamemodify(a:filepath_or_name, ':p')
+  let cwd = getcwd()
+  execute 'cd' . s:git_root_or_current_dir()
+  let ret = fnamemodify(fullpath, ':.')
+  execute 'cd' . fnameescape(cwd)
+  return ret
+endfunction
+
 command! Mru call fzf#run({
-\  'source':  ctrlp#mrufiles#list()[1:],
+\  'source':  map(ctrlp#mrufiles#list()[1:], 's:realpath(v:val)'),
 \  'sink':    'e',
-\  'options': '-m -x +s',
+\  'options': '-x +s',
 \  'down':    '40%'})
 
-nnoremap M :Mru<CR>
+nnoremap <C-p> :Mru<CR>
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
