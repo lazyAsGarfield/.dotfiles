@@ -43,6 +43,19 @@ if [[ -d "$HOME/.byobu" ]]; then
   fi
 fi
 
+echo -n "Configure tmux? y/[n]: "
+read ANS
+
+if [[ $ANS = 'y' ]]; then
+  if [[ -f "$HOME/.tmux.conf.old" ]]; then
+    echo -n "Backup of .tmux.conf found, skipping, you can configure it manually by running: "
+    echo "ln -s $DEST/.tmux.conf $HOME"
+  else
+    echo_and_call "mv $HOME/.tmux.conf $HOME/.tmux.conf.old"
+    echo_and_call "ln -s $DEST/.tmux.conf $HOME"
+  fi
+fi
+
 echo -n "Source $DEST/.bashrc and $DEST/improved_cd.sh in .bashrc? y/[n]: "
 read ANS
 
