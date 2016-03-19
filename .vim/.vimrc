@@ -391,8 +391,12 @@ map <leader><leader>n :NERDTreeFind<CR>
 
 " FZF list
 " <C-f> is mapped in commands section deal more wisely with git repos
+" <C-b> is mapped in commands for better prompt
 " nmap <C-f> :Files<CR>
-nmap <C-b> :Buffers<CR>
+" nmap <C-b> :Buffers<CR>
+
+" no need for mapping, using fzf instead
+let g:ctrlp_map = ''
 
 " CtrlP plugin
 let g:ctrlp_cmd = 'call CallCtrlP()'
@@ -496,15 +500,131 @@ command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 
 " ---------- PLUGIN COMMANDS ------ {{{
 
+function! s:git_files_if_in_repo(bang)
+  let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
+  if git_root == ''
+    let path = expand('%:p:h')
+    return fzf#vim#files(path, extend({
+          \ 'options': '--prompt "' . path . ' (Files)>"'
+          \ }, a:bang ? {} : g:fzf#vim#default_layout))
+  else
+    let git_root = '/' . git_root
+    let cwd = fnameescape(getcwd())
+    try
+      exec 'cd' . git_root
+      call fzf#vim#gitfiles(extend({
+            \ 'options': '--prompt "' . git_root . ' (GitFiles)> "'
+            \ }, a:bang ? {} : g:fzf#vim#default_layout))
+    finally
+      exec 'cd' . cwd
+    endtry
+  endif
+endfunction
+
+command! -bang GitFilesOrCurrent call s:git_files_if_in_repo(<bang>0)
+
+nnoremap <C-f> :GitFilesOrCurrent<CR>
+
+command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
+      \ 'options': '--prompt "Buffers> "'
+      \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
+
+nnoremap <C-b> :BuffersBetterPrompt<CR>
+
 function! s:git_root_or_current_dir()
   let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
   return git_root == '' ? expand('%:p:h') : fnameescape('/'.git_root)
 endfunction
 
-command! -bang FilesGitRootOrCurrent call
-\ fzf#vim#files(s:git_root_or_current_dir(), <bang>0 ? {} : g:fzf#vim#default_layout)
+function! s:all_files_git_root_or_current_dir(bang)
+  let path = s:git_root_or_current_dir()
+  call fzf#vim#files(path, extend({
+        \ 'options': '--prompt "' . path . ' (Files)> "'
+        \ }, a:bang ? {} : g:fzf#vim#default_layout))
+endfunction
 
-nnoremap <C-f> :FilesGitRootOrCurrent<CR>
+command! -bang FilesGitRootOrCurrent call s:all_files_git_root_or_current_dir(<bang>0)
+
+nnoremap <C-g> :FilesGitRootOrCurrent<CR>
+
+" expands path relatively to current dir or git root if possible
+" (similar to CtrlP plugin)
+function! s:relpath(filepath_or_name)
+  let fullpath = fnamemodify(a:filepath_or_name, ':p')
+  let cwd = fnameescape(getcwd())
+  execute 'cd' . s:git_root_or_current_dir()
+  let ret = fnamemodify(fullpath, ':.')
+  execute 'cd' . cwd
+  return ret
+endfunction
+
+let s:default_action = {
+  \ 'ctrl-t': 'tab split',
+  \ 'ctrl-x': 'split',
+  \ 'ctrl-v': 'vsplit' }
+
+" below function is used in order to get actions like ctrl-v etc.
+" and to transform path to proper version (as it may be relative to 
+" dir of current file, not necessarily to cwd)
+function! s:mru_sink(lines)
+  if len(a:lines) < 2
+    return
+  endif
+  let key = remove(a:lines, 0)
+  let cmd = get(s:default_action, key, 'e')
+  let cwd = fnameescape(getcwd())
+  try
+    execute 'cd' . s:git_root_or_current_dir()
+    let full_path_lines = map(a:lines, 'fnameescape(fnamemodify(v:val, ":p"))')
+  finally
+    execute 'cd' . cwd
+  endtry
+  augroup fzf_swap
+    autocmd SwapExists * let v:swapchoice='o'
+          \| call s:warn('E325: swap file exists: '.expand('<afile>'))
+  augroup END
+  let empty = empty(expand('%')) && line('$') == 1 && empty(getline(1)) && !&modified
+  try
+    for item in full_path_lines
+      if empty
+        execute 'e' item
+        let empty = 0
+      else
+        execute cmd item
+      endif
+    endfor
+  finally
+    silent! autocmd! fzf_swap
+  endtry
+endfunction
+
+let g:mru_full_path = 1
+
+nnoremap cof :let g:mru_full_path=!g:mru_full_path<CR>
+nnoremap [of :let g:mru_full_path=1<CR>
+nnoremap ]of :let g:mru_full_path=0<CR>
+
+function! s:fzf_mru(bang)
+  if g:mru_full_path == 0
+    call fzf#run({
+          \ 'source':  map(ctrlp#mrufiles#list()[1:], 's:relpath(v:val)'),
+          \ 'sink*': function("s:mru_sink"),
+          \ 'options': '-m -x +s --prompt "' . s:git_root_or_current_dir() .
+          \ ' (MRU)> " --expect='.join(keys(s:default_action), ','),
+          \ 'down':    '40%'
+          \ })
+  else
+    call fzf#run(extend({
+          \ 'source':  map(ctrlp#mrufiles#list()[1:], 'fnamemodify(v:val, ":p")'),
+          \ 'sink*': function("s:mru_sink"),
+          \ 'options': '-m -x +s --prompt "(MRU)> " --expect='.join(keys(s:default_action), ','),
+          \ }, a:bang ? {} : g:fzf#vim#default_layout ))
+  endif
+endfunction
+
+command! -bang Mru call s:fzf_mru(<bang>0)
+
+nnoremap <C-p> :Mru<CR>
 
 function! s:ag_in(bang, ...)
   let tokens  = a:000
@@ -520,29 +640,12 @@ function! s:ag_with_opts(arg, bang)
   let tokens  = split(a:arg)
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
-  call fzf#vim#ag(query, ag_opts, a:bang ? {} : g:fzf#vim#default_layout)
+  echo query
+  echo ag_opts
+  call fzf#vim#ag(query, ag_opts, extend({'dir': s:git_root_or_current_dir()}, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
 command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
-
-" expands path relatively to current dir or git root if possible
-" (similar to CtrlP plugin)
-function! s:realpath(filepath_or_name)
-  let fullpath = fnamemodify(a:filepath_or_name, ':p')
-  let cwd = getcwd()
-  execute 'cd' . s:git_root_or_current_dir()
-  let ret = fnamemodify(fullpath, ':.')
-  execute 'cd' . fnameescape(cwd)
-  return ret
-endfunction
-
-command! Mru call fzf#run({
-\  'source':  map(ctrlp#mrufiles#list()[1:], 's:realpath(v:val)'),
-\  'sink':    'e',
-\  'options': '-x +s',
-\  'down':    '40%'})
-
-nnoremap <C-p> :Mru<CR>
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
