@@ -262,6 +262,9 @@ noremap \q :cclose<CR>
 noremap \L :lopen<CR>
 noremap \l :lclose<CR>
 
+" close preview window
+noremap \p <C-w>z
+
 " moving around wrapped lines more naturally
 noremap j gj
 noremap k gk
@@ -510,6 +513,14 @@ function! s:ag_with_opts(arg, bang)
 endfunction
 
 command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
+
+command! Mru call fzf#run({
+\  'source':  ctrlp#mrufiles#list()[1:],
+\  'sink':    'e',
+\  'options': '-m -x +s',
+\  'down':    '40%'})
+
+nnoremap M :Mru<CR>
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
