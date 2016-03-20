@@ -550,7 +550,7 @@ endfunction
 
 command! -bang FilesGitRootOrCurrent call s:all_files_git_root_or_current_dir(<bang>0)
 
-nnoremap <C-g> :FilesGitRootOrCurrent<CR>
+nnoremap <C-g><C-g> :FilesGitRootOrCurrent<CR>
 
 " expands path relatively to current dir or git root if possible
 " (similar to CtrlP plugin)
@@ -561,6 +561,14 @@ function! s:relpath(filepath_or_name)
   let ret = fnamemodify(fullpath, ':.')
   execute 'cd' . cwd
   return ret
+endfunction
+
+function! s:color_path(path)
+  if a:path =~ '^/'
+    return a:path
+  else
+    return s:magenta(a:path)
+  endif
 endfunction
 
 let s:default_action = {
@@ -612,17 +620,17 @@ nnoremap ]of :let g:mru_full_path=0<CR>
 function! s:fzf_mru(bang)
   if g:mru_full_path == 0
     call fzf#run({
-          \ 'source':  map(ctrlp#mrufiles#list()[1:], 's:relpath(v:val)'),
+          \ 'source':  map(ctrlp#mrufiles#list()[1:], 's:color_path(s:relpath(v:val))'),
           \ 'sink*': function("s:mru_sink"),
           \ 'options': '-m -x +s --prompt "' . s:git_root_or_current_dir() .
-          \ ' (MRU)> " --expect='.join(keys(s:default_action), ','),
+          \ ' (MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
           \ 'down':    '40%'
           \ })
   else
     call fzf#run(extend({
           \ 'source':  map(ctrlp#mrufiles#list()[1:], 'fnamemodify(v:val, ":p")'),
           \ 'sink*': function("s:mru_sink"),
-          \ 'options': '-m -x +s --prompt "(MRU)> " --expect='.join(keys(s:default_action), ','),
+          \ 'options': '-m -x +s --prompt "(MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
           \ }, a:bang ? {} : g:fzf#vim#default_layout ))
   endif
 endfunction
@@ -649,6 +657,44 @@ function! s:ag_with_opts(arg, bang)
   echo ag_opts
   call fzf#vim#ag(query, ag_opts, extend({'dir': s:git_root_or_current_dir()}, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
+
+function! s:ansi(str, col, bold)
+  return printf("\x1b[%s%sm%s\x1b[m", a:col, a:bold ? ';1' : '', a:str)
+endfunction
+
+for [s:c, s:a] in items({'black': 30, 'red': 31, 'green': 32, 'yellow': 33, 'blue': 34, 'magenta': 35, 'cyan': 36})
+  execute "function! s:".s:c."(str, ...)\n"
+        \ "  return s:ansi(a:str, ".s:a.", get(a:, 1, 0))\n"
+        \ "endfunction"
+endfor
+
+function! s:get_all_registers()
+  let reg_names = '"-+0123456789abcdefghijklmnopqrstuvwxyz=*:.%~/'
+  let res = []
+  for name in split(reg_names, '\zs')
+    let content = eval('@' . name)
+    let reg_str = s:blue('["' . name . ']') . ' ' . content
+    let reg_str = substitute(reg_str, '\n', s:yellow('\\n', 1), 'g')
+    if ! empty(content)
+      call add(res, reg_str)
+    endif
+  endfor
+  return res
+endfunction
+
+function! s:paste_buffer(str)
+  let reg = a:str[1:2]
+  execute 'normal ' . reg . 'p'
+endfunction
+
+command! Regs call fzf#run({
+      \ 'source':  s:get_all_registers(),
+      \ 'sink': function('s:paste_buffer'),
+      \ 'options': '-n1 -e -x +s --prompt "(Regs)> " --ansi',
+      \ 'down':    '50%'
+      \ })
+
+nnoremap <C-g><C-r> :Reg<CR>
 
 command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
 

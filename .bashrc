@@ -15,3 +15,5 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 
+export FZF_DEFAULT_OPTS="--bind \"ctrl-u:page-up,ctrl-d:page-down\""
+
