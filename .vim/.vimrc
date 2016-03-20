@@ -27,6 +27,7 @@ Plug 'junegunn/vim-easy-align'
 Plug 'mbbill/undotree'
 Plug 'junegunn/fzf', { 'dir': '`realpath ~/.vim`/../.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'flazz/vim-colorschemes'
 
 call plug#end()
 
@@ -178,6 +179,14 @@ set hidden
 
 " no characters in separators
 set fillchars=""
+
+" foldenable + foldcolumn
+" silent! set nofoldenable
+if &foldenable
+  silent! set foldcolumn=1
+else
+  silent! set foldcolumn=0
+endif
 
 " disable that annoying beeping
 autocmd GUIEnter * set vb t_vb=
@@ -334,10 +343,6 @@ nnoremap <C-Left> <C-w>h
 nnoremap <C-Down> <C-w>j
 nnoremap <C-Up> <C-w>k
 nnoremap <C-Right> <C-w>l
-
-" foldenable + foldcolumn
-silent! set nofoldenable
-silent! set foldcolumn=0
 
 func! ChangeFold()
   if (&foldenable == 1)

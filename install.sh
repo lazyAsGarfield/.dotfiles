@@ -5,23 +5,46 @@ echo_and_call() {
   $1
 }
 
-echo -n "Cloning repo to dir: $HOME/.dotfiles, proceed? y/[n]: "
-read ANS
+check_and_ask_for_backup() {
+  if [[ -e "$1" ]]; then
+    echo -n "$1 found, back it up? [y]/n: "
+    read ANS
+    if [[ $ANS = 'n' ]]; then
+      rm -rf $1
+    else
+      if [[ ! -d $BACKUP_DIR ]]; then
+        mkdir $BACKUP_DIR
+        echo "Backup dir: $BACKUP_DIR"
+      fi
+      mv $1 $BACKUP_DIR
+    fi
+  fi
+}
 
-if [[ $ANS = 'y' ]]; then
-  DEST=$HOME/.dotfiles
+echo -n "Choose destination dir [$HOME/.dotfiles]: "
+read ANS
+if [[ -z $ANS ]]; then
+  DEST="$HOME/.dotfiles"
 else
-  echo -n "Dir to clone to: "
-  read DEST
-  DEST=`realpath $DEST`
+  DEST="$ANS"
 fi
 
-echo_and_call "git clone http://github.com/lazyasgarfield/.dotfiles $DEST"
+BACKUP_DIR="$DEST"/backup_`date +"%Y-%m-%d_%H_%M_%S"`
 
-echo_and_call "curl -fLo $DEST/.vim/vim-plug/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+echo -n "Clone repo? y/[n]: "
+read ANS
+if [[ $ANS = 'y' ]]; then
+  echo_and_call "git clone http://github.com/lazyasgarfield/.dotfiles $DEST"
+fi
 
+if [[ ! -d $DEST/.vim/vim-plug/autoload/plug.vim ]]; then
+  echo_and_call "curl -fLo $DEST/.vim/vim-plug/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
+fi
+
+check_and_ask_for_backup "$HOME/.vimrc"
 echo_and_call "ln -s $DEST/.vim/.vimrc $HOME/.vimrc"
 
+check_and_ask_for_backup "$HOME/.vim"
 echo_and_call "ln -s $DEST/.vim $HOME"
 
 if [[ ! -d "$DEST/.vim/.undodir" ]]; then
@@ -33,13 +56,8 @@ if [[ -d "$HOME/.byobu" ]]; then
   read ANS
 
   if [[ $ANS = 'y' ]]; then
-    if [[ -f "$HOME/.byobu/.tmux.conf.old" ]]; then
-      echo -n "Backup of .tmux.conf found, skipping, you can configure it manually by running: "
-      echo "ln -s $DEST/.tmux.conf $HOME/.byobu"
-    else
-      echo_and_call "mv $HOME/.byobu/.tmux.conf $HOME/.byobu/.tmux.conf.old"
-      echo_and_call "ln -s $DEST/.tmux.conf $HOME/.byobu"
-    fi
+    check_and_ask_for_backup "$HOME/.byobu/.tmux.conf"
+    echo_and_call "ln -s $DEST/.tmux.conf $HOME/.byobu/.tmux.conf"
   fi
 fi
 
@@ -47,13 +65,8 @@ echo -n "Configure tmux? y/[n]: "
 read ANS
 
 if [[ $ANS = 'y' ]]; then
-  if [[ -f "$HOME/.tmux.conf.old" ]]; then
-    echo -n "Backup of .tmux.conf found, skipping, you can configure it manually by running: "
-    echo "ln -s $DEST/.tmux.conf $HOME"
-  else
-    echo_and_call "mv $HOME/.tmux.conf $HOME/.tmux.conf.old"
-    echo_and_call "ln -s $DEST/.tmux.conf $HOME"
-  fi
+  check_and_ask_for_backup "$HOME/.tmux.conf"
+  echo_and_call "ln -s $DEST/.tmux.conf $HOME/.tmux.conf"
 fi
 
 echo -n "Source $DEST/.bashrc and $DEST/improved_cd.sh in .bashrc? y/[n]: "
@@ -64,8 +77,6 @@ if [[ $ANS = 'y' ]]; then
   echo ". $DEST/.bashrc" >> $HOME/.bashrc
   echo "echo \". $DEST/improved_cd.sh\" >> $HOME/.bashrc"
   echo ". $DEST/improved_cd.sh" >> $HOME/.bashrc
-else
-  echo "Skipping"
 fi
 
 echo -n "Configure git? y/[n]: "
@@ -92,10 +103,7 @@ fi
 echo -n "Install build tools? (requires sudo, needed for YCM compilation) y/[n]: "
 read ANS
 if [[ $ANS = 'y' ]]; then
-  echo "Installing build tools"
   echo_and_call "sudo dnf install automake gcc gcc-c++ kernel-devel cmake python-devel"
-else
-  echo "Skipping"
 fi
 
 command -v vim >/dev/null 2>&1 || NO_VIM=1
