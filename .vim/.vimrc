@@ -303,6 +303,7 @@ nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
 
 " registers
 nmap cr "
+vmap cr "
 
 nmap cry "0
 vmap cry "0
@@ -371,7 +372,7 @@ nnoremap ygt :YcmCompleter GoTo<CR>
 nnoremap yc :YcmForceCompileAndDiagnostics<CR>
 nnoremap <leader>fi :YcmCompleter FixIt<CR>
 nnoremap <leader>gt :YcmCompleter GetType<CR>
-vnoremap <leader>gt :<BS><BS><BS><BS><BS>YcmCompleter GetType<CR>
+vnoremap <leader>gt :<c-u>YcmCompleter GetType<CR>
 
 " delimitMate mappings
 imap <C-k> <Plug>delimitMateJumpMany
@@ -415,6 +416,10 @@ func! CallCtrlP()
         CtrlP
     endif
 endfunc
+
+" EasyAlign mappings
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
 
 " Easymotion mappings
 nmap <leader><leader>t <Plug>(easymotion-t2)
@@ -565,7 +570,7 @@ endfunction
 
 function! s:color_path(path)
   if a:path =~ '^/'
-    return a:path
+    return s:yellow(a:path)
   else
     return s:magenta(a:path)
   endif
@@ -580,9 +585,6 @@ let s:default_action = {
 " and to transform path to proper version (as it may be relative to 
 " dir of current file, not necessarily to cwd)
 function! s:mru_sink(lines)
-  if len(a:lines) < 2
-    return
-  endif
   let key = remove(a:lines, 0)
   let cmd = get(s:default_action, key, 'e')
   let cwd = fnameescape(getcwd())
@@ -611,7 +613,7 @@ function! s:mru_sink(lines)
   endtry
 endfunction
 
-let g:mru_full_path = 1
+let g:mru_full_path = 0
 
 nnoremap cof :let g:mru_full_path=!g:mru_full_path<CR>
 nnoremap [of :let g:mru_full_path=1<CR>
@@ -643,7 +645,10 @@ function! s:ag_in(bang, ...)
   let tokens  = a:000
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = (filter(copy(tokens), 'v:val !~ "^-"'))
-  call fzf#vim#ag(join(query[1:], ' '), ag_opts, extend({'dir': a:1}, a:bang ? {} : g:fzf#vim#default_layout))
+  call fzf#vim#ag(join(query[1:], ' '), ag_opts, extend({
+        \ 'dir': a:1,
+        \ 'options': '--prompt ' . a:1 . '" (Ag)> "'
+        \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
 command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
@@ -653,9 +658,11 @@ function! s:ag_with_opts(arg, bang)
   let tokens  = split(a:arg)
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
-  echo query
-  echo ag_opts
-  call fzf#vim#ag(query, ag_opts, extend({'dir': s:git_root_or_current_dir()}, a:bang ? {} : g:fzf#vim#default_layout))
+  let dir = s:git_root_or_current_dir()
+  call fzf#vim#ag(query, ag_opts, extend({
+        \ 'dir': dir,
+        \ 'options': '--prompt ' . dir . '" (Ag)> "'
+        \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
 function! s:ansi(str, col, bold)
@@ -682,19 +689,30 @@ function! s:get_all_registers()
   return res
 endfunction
 
-function! s:paste_buffer(str)
-  let reg = a:str[1:2]
-  execute 'normal ' . reg . 'p'
+function! s:paste_buffer(key_with_str, visual)
+  let [key, str] = a:key_with_str
+  let reg = str[1:2]
+  execute 'normal ' . (a:visual ? 'gv' : '') . reg . (empty(key) ? 'p' : 'P')
 endfunction
 
-command! Regs call fzf#run({
+function! s:registers_sink(key_with_str)
+  call s:paste_buffer(a:key_with_str, 0)
+endfunction
+
+function! s:registers_sink_visual(key_with_str)
+  call s:paste_buffer(a:key_with_str, 1)
+endfunction
+
+command! -nargs=? Regs call fzf#run({
       \ 'source':  s:get_all_registers(),
-      \ 'sink': function('s:paste_buffer'),
-      \ 'options': '-n1 -e -x +s --prompt "(Regs)> " --ansi',
-      \ 'down':    '50%'
+      \ 'sink*': function('s:registers_sink' . (<args>0 ? '_visual' : '')),
+      \ 'options': '-n1 -e -x +s --prompt "(Regs)> " --ansi --expect=alt-p',
+      \ 'down':    '40%'
       \ })
 
-nnoremap <C-g><C-r> :Reg<CR>
+" good way of detecting if in visual mode
+nnoremap <C-g><C-r> :Regs<CR>
+vnoremap <C-g><C-r> :<c-u>Regs 1<CR>
 
 command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
 

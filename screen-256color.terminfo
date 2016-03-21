@@ -3,14 +3,14 @@
 #
 # Install:
 #
-#   rm ~/.terminfo/s/screen
-#   tic screen.terminfo
+#   rm ~/.terminfo/s/screen-256color
+#   tic screen-256color.terminfo
 #
 
-screen|screen with italics and highlighting,
+screen-256color|screen-256color with italics and highlighting,
 	sitm=\E[3m, ritm=\E[23m,
   rmso=\E[27m,
   sgr=\E[0%?%p6%t;1%;%?%p1%t;7%;%?%p2%t;4%;%?%p3%t;7%;%?%p4%t;5%;m%?%p9%t\016%e\017%;,
   smso=\E[7m,
-	use=screen,
+	use=screen-256color,
 
