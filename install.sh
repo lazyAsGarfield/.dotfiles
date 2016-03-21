@@ -69,16 +69,6 @@ if [[ $ANS = 'y' ]]; then
   echo_and_call "ln -s $DEST/.tmux.conf $HOME/.tmux.conf"
 fi
 
-echo -n "Source $DEST/.bashrc and $DEST/improved_cd.sh in .bashrc? y/[n]: "
-read ANS
-
-if [[ $ANS = 'y' ]]; then
-  echo "echo \". $DEST/.bashrc\" >> $HOME/.bashrc"
-  echo ". $DEST/.bashrc" >> $HOME/.bashrc
-  echo "echo \". $DEST/improved_cd.sh\" >> $HOME/.bashrc"
-  echo ". $DEST/improved_cd.sh" >> $HOME/.bashrc
-fi
-
 echo -n "Configure git? y/[n]: "
 read ANS
 if [[ $ANS = 'y' ]]; then
@@ -116,5 +106,15 @@ if [[ $NO_VIM = 1 ]]; then
   echo_and_call "vimx -c PlugInstall -c qall"
 else
   echo_and_call "vim -c PlugInstall -c qall"
+fi
+
+echo -n "Source $DEST/.bashrc and $DEST/improved_cd.sh in .bashrc? y/[n]: "
+read ANS
+
+if [[ $ANS = 'y' ]]; then
+  echo "echo \". $DEST/.bashrc\" >> $HOME/.bashrc"
+  echo ". $DEST/.bashrc" >> $HOME/.bashrc
+  echo "echo \". $DEST/improved_cd.sh\" >> $HOME/.bashrc"
+  echo ". $DEST/improved_cd.sh" >> $HOME/.bashrc
 fi
 

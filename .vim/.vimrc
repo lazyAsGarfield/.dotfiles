@@ -510,6 +510,12 @@ command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 
 " ---------- PLUGIN COMMANDS ------ {{{
 
+command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, extend({
+      \ 'source': 'ag -g "" --hidden --ignore ".git"',
+      \ 'options': '--prompt "' . (<q-args> ? getcwd() :
+      \ fnamemodify(fnamemodify(<q-args>, ':p'), ':p')) . ' (Files)> "'
+      \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
+
 function! s:git_files_if_in_repo(bang)
   let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
   if git_root == ''
@@ -714,13 +720,14 @@ endfunction
 command! -nargs=? Regs call fzf#run({
       \ 'source':  s:get_all_registers(),
       \ 'sink*': function('s:registers_sink' . (<args>0 ? '_visual' : '')),
-      \ 'options': '-n1 -e -x +s --prompt "(Regs)> " --ansi --expect=alt-p',
+      \ 'options': '-e -x +s --prompt "(Regs)> " --ansi --expect=alt-p',
       \ 'down':    '40%'
       \ })
 
 " good way of detecting if in visual mode
 nnoremap <C-g><C-r> :Regs<CR>
 vnoremap <C-g><C-r> :<c-u>Regs 1<CR>
+inoremap <C-g><C-r> <ESC>:<C-u>Regs<CR>i
 
 command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
 
