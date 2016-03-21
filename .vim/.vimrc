@@ -549,6 +549,7 @@ endfunction
 function! s:all_files_git_root_or_current_dir(bang)
   let path = s:git_root_or_current_dir()
   call fzf#vim#files(path, extend({
+        \ 'source': 'ag -g "" --hidden --ignore ".git"',
         \ 'options': '--prompt "' . path . ' (Files)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
@@ -619,10 +620,17 @@ nnoremap cof :let g:mru_full_path=!g:mru_full_path<CR>
 nnoremap [of :let g:mru_full_path=1<CR>
 nnoremap ]of :let g:mru_full_path=0<CR>
 
+function! s:mru_list_without_nonexistent()
+  let mru_list = ctrlp#mrufiles#list()[1:]
+  let cwd = getcwd()
+  call filter(mru_list, 'findfile(v:val, cwd) == v:val')
+  return mru_list
+endfunction
+
 function! s:fzf_mru(bang)
   if g:mru_full_path == 0
     call fzf#run({
-          \ 'source':  map(ctrlp#mrufiles#list()[1:], 's:color_path(s:relpath(v:val))'),
+          \ 'source':  map(s:mru_list_without_nonexistent(), 's:color_path(s:relpath(v:val))'),
           \ 'sink*': function("s:mru_sink"),
           \ 'options': '-m -x +s --prompt "' . s:git_root_or_current_dir() .
           \ ' (MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
@@ -630,7 +638,7 @@ function! s:fzf_mru(bang)
           \ })
   else
     call fzf#run(extend({
-          \ 'source':  map(ctrlp#mrufiles#list()[1:], 'fnamemodify(v:val, ":p")'),
+          \ 'source':  map(s:mru_list_without_nonexistent(), 'fnamemodify(v:val, ":p")'),
           \ 'sink*': function("s:mru_sink"),
           \ 'options': '-m -x +s --prompt "(MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
           \ }, a:bang ? {} : g:fzf#vim#default_layout ))
