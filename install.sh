@@ -75,15 +75,15 @@ read ANS
 if [[ $ANS == "y" ]]; then
   check_and_ask_for_backup "$HOME/.vimrc"
   echo -n "Linking .vimrc... "
-  ln -s "$DEST/.vim/.vimrc" "$HOME/.vimrc" && echo "done" || echo "FAIL"
+  run ln -s "$DEST/.vim/.vimrc" "$HOME/.vimrc"
 
   check_and_ask_for_backup "$HOME/.vim"
   echo -n "Linking .vim... "
-  ln -s "$DEST/.vim" "$HOME" && echo "done" || echo "FAIL"
+  run ln -s "$DEST/.vim" "$HOME"
 
   if [[ ! -d "$DEST/.vim/.undodir" ]]; then
     echo -n "Creating $DEST/.vim/.undodir... "
-    mkdir "$DEST/.vim/.undodir" && echo "done" || echo "FAIL"
+    run mkdir "$DEST/.vim/.undodir"
   fi
 
   PLUG_VIM_EXISTS=1
@@ -120,7 +120,7 @@ if [[ -d "$HOME/.byobu" ]]; then
   if [[ $ANS == "y" ]]; then
     check_and_ask_for_backup "$HOME/.byobu/.tmux.conf" "/byobu"
     echo -n "Linking $HOME/.byobu/.tmux.conf... "
-    ln -s "$DEST/.tmux.conf" "$HOME/.byobu/.tmux.conf" && echo "done" || echo "FAIL"
+    run ln -s "$DEST/.tmux.conf" "$HOME/.byobu/.tmux.conf"
   fi
 fi
 
@@ -129,8 +129,16 @@ read ANS
 
 if [[ $ANS == "y" ]]; then
   check_and_ask_for_backup "$HOME/.tmux.conf"
-    echo -n "Linking $HOME/.tmux.conf... "
-  ln -s "$DEST/.tmux.conf" "$HOME/.tmux.conf" && echo "done" || echo "FAIL"
+  echo -n "Linking $HOME/.tmux.conf... "
+  run ln -s "$DEST/.tmux.conf" "$HOME/.tmux.conf"
+fi
+
+echo -n "Compile screen-256color.terminfo? y/[n]: "
+read ANS
+
+if [[ $ANS == "y" ]]; then
+  echo -n "Compiling... "
+  run tic "$DEST/screen-256color.terminfo"
 fi
 
 echo -n "Configure git? y/[n]: "

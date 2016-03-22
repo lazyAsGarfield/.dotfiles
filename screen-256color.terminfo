@@ -1,12 +1,3 @@
-# A screen TERMINFO that adds the escape sequences for italic.
-# Overwrites system 'screen' TERMINFO
-#
-# Install:
-#
-#   rm ~/.terminfo/s/screen-256color
-#   tic screen-256color.terminfo
-#
-
 screen-256color|screen-256color with italics and highlighting,
 	sitm=\E[3m, ritm=\E[23m,
   rmso=\E[27m,
