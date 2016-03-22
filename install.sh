@@ -31,10 +31,20 @@ fi
 
 BACKUP_DIR="$DEST"/backup_`date +"%Y-%m-%d_%H_%M_%S"`
 
-echo -n "Clone repo? y/[n]: "
-read ANS
-if [[ $ANS = 'y' ]]; then
-  echo_and_call "git clone http://github.com/lazyasgarfield/.dotfiles $DEST"
+if [[ -d $DEST/.git ]]; then
+  echo -n "Pull from remote repo? y/[n]: "
+  read ANS
+  if [[ $ANS = 'y' ]]; then
+    echo_and_call "cd $DEST"
+    echo_and_call "git pull"
+    echo_and_call "cd -"
+  fi
+else
+  echo -n "Clone repo? y/[n]: "
+  read ANS
+  if [[ $ANS = 'y' ]]; then
+    echo_and_call "git clone http://github.com/lazyasgarfield/.dotfiles $DEST"
+  fi
 fi
 
 if [[ ! -f $DEST/.vim/vim-plug/autoload/plug.vim ]]; then
