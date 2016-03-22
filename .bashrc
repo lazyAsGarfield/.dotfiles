@@ -36,3 +36,6 @@ function version_lt()
   version_lte $n1 $n2 && [[ "$n1" != "$n2" ]]
 }
 
+export -f version_lte
+export -f version_lt
+
