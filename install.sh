@@ -32,12 +32,13 @@ fi
 BACKUP_DIR="$DEST"/backup_`date +"%Y-%m-%d_%H_%M_%S"`
 
 if [[ -d $DEST/.git ]]; then
-  echo -n "Pull from remote repo? y/[n]: "
+  echo -n "Pull from remote repo (script will be restarted)? y/[n]: "
   read ANS
   if [[ $ANS = 'y' ]]; then
-    echo_and_call "cd $DEST"
-    echo_and_call "git pull"
-    echo_and_call "cd -"
+    cd $DEST
+    git pull
+    cd - > /dev/null
+    exec $DEST/install.sh
   fi
 else
   echo -n "Clone repo? y/[n]: "
