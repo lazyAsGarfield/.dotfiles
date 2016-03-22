@@ -98,6 +98,30 @@ if [[ $ANS == "y" ]]; then
   read ANS
 
   if [[ $ANS == "y" ]] && [[ $PLUG_VIM_EXISTS -eq 1 ]]; then
+
+    echo -n "Install YCM? [y]/n:"
+    read ANS
+
+    if [[ $ANS == "n" ]]; then
+      __NO_YCM__=1
+      export __NO_YCM__
+    else
+      echo -n "Install build tools? (requires sudo, needed for YCM compilation) y/[n]: "
+      read ANS
+
+      if [[ $ANS == "y" ]]; then
+        echo_and_call sudo dnf install automake gcc gcc-c++ kernel-devel cmake python-devel
+      fi
+
+      echo -n "Install with --clang-completer option? [y]/n: "
+      read ANS
+
+      if [[ $ANS == "n" ]]; then
+        __NO_CLANG_COMPL__=1
+        export __NO_CLANG_COMPL__
+      fi
+    fi
+
     if command -v vim >/dev/null 2>&1 ; then
       echo "Installing plugins..."
       echo_and_call vim -c PlugInstall -c qall
@@ -171,12 +195,6 @@ if [[ -z $INCL ]] || [[ -z $GIT_IGNORE ]] || [[ -z $USERNAME ]] || [[ -z $EMAIL 
       fi
     fi
   fi
-fi
-
-echo -n "Install build tools? (requires sudo, needed for YCM compilation) y/[n]: "
-read ANS
-if [[ $ANS == "y" ]]; then
-  echo_and_call sudo dnf install automake gcc gcc-c++ kernel-devel cmake python-devel
 fi
 
 STR=". $DEST/.bashrc"

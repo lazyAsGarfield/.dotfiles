@@ -19,7 +19,13 @@ Plug 'rking/ag.vim'
 Plug 'easymotion/vim-easymotion'
 Plug 'davidhalter/jedi-vim'
 Plug 'tpope/vim-unimpaired'
-Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+if empty($__NO_YCM__)
+  if empty($__NO_CLANG_COMPL__)
+    Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+  else
+    Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
+  endif
+endif
 Plug 'tpope/vim-fugitive'
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'Raimondi/delimitMate'
