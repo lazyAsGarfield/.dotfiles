@@ -37,7 +37,7 @@ if [[ $ANS = 'y' ]]; then
   echo_and_call "git clone http://github.com/lazyasgarfield/.dotfiles $DEST"
 fi
 
-if [[ ! -d $DEST/.vim/vim-plug/autoload/plug.vim ]]; then
+if [[ ! -f $DEST/.vim/vim-plug/autoload/plug.vim ]]; then
   echo_and_call "curl -fLo $DEST/.vim/vim-plug/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim"
 fi
 
