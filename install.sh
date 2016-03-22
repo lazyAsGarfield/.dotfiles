@@ -8,7 +8,7 @@ echo_and_call()
 
 run()
 {
-  msg=$("$@" 2>&1 >/dev/null) && echo "done" || (echo "FAIL"; echo $msg; return 1)
+  MSG=$("$@" 2>&1 >/dev/null) && echo "done" || (echo "FAIL"; echo $MSG; return 1)
 }
 
 check_and_ask_for_backup()
@@ -141,23 +141,34 @@ if [[ $ANS == "y" ]]; then
   run tic "$DEST/screen-256color.terminfo"
 fi
 
-echo -n "Configure git? y/[n]: "
-read ANS
-if [[ $ANS == "y" ]]; then
-  echo_and_call git config --global --add include.path "$DEST/.gitconfig"
-  echo_and_call git config --global --add core.excludesfile "$DEST/.globalgitignore"
-  if [[ -z $(git config --global user.name) ]]; then
-    echo -n "Username for git (emtpy to skip setting it): "
-    read UNAME
-    if [[ -n $UNAME ]]; then
-      echo_and_call git config --global user.name "$UNAME"
+INCL=$(git config --global --get-all include.path | grep "$DEST/.gitconfig")
+GIT_IGNORE=$(git config --global --get-all core.excludesfile | grep "$DEST/.globalgitignore")
+USERNAME=$(git config --global --get user.name)
+EMAIL=$(git config --global --get user.email)
+
+if [[ -z $INCL ]] || [[ -z $GIT_IGNORE ]] || [[ -z $USERNAME ]] || [[ -z $EMAIL ]]; then
+  echo -n "Configure git? y/[n]: "
+  read ANS
+  if [[ $ANS == "y" ]]; then
+    if [[ -z $INCL ]]; then
+      echo_and_call git config --global --add include.path "$DEST/.gitconfig"
     fi
-  fi
-  if [[ -z $(git config --global user.email) ]]; then
-    echo -n "Email for git (emtpy to skip setting it): "
-    read EMAIL
-    if [[ -n $EMAIL ]]; then
-      echo_and_call git config --global user.email "$EMAIL"
+    if [[ -z $GIT_IGNORE ]]; then
+      echo_and_call git config --global --add core.excludesfile "$DEST/.globalgitignore"
+    fi
+    if [[ -z $USERNAME ]]; then
+      echo -n "Username for git (emtpy to skip setting it): "
+      read UNAME
+      if [[ -n $UNAME ]]; then
+        echo_and_call git config --global user.name "$UNAME"
+      fi
+    fi
+    if [[ -z $EMAIL ]]; then
+      echo -n "Email for git (emtpy to skip setting it): "
+      read EMAIL
+      if [[ -n $EMAIL ]]; then
+        echo_and_call git config --global user.email "$EMAIL"
+      fi
     fi
   fi
 fi
@@ -168,26 +179,26 @@ if [[ $ANS == "y" ]]; then
   echo_and_call sudo dnf install automake gcc gcc-c++ kernel-devel cmake python-devel
 fi
 
-str=". $DEST/.bashrc" 
+STR=". $DEST/.bashrc"
 
-if [[ -f $HOME/.bashrc ]] && [[ -z $(cat $HOME/.bashrc | grep "$str") ]]; then
+if [[ -f $HOME/.bashrc ]] && [[ -z $(cat $HOME/.bashrc | grep "$STR") ]]; then
   echo -n "Source $DEST/.bashrc in .bashrc? y/[n]: "
   read ANS
 
   if [[ $ANS == "y" ]]; then
-    echo -e "$str\n" >> "$HOME/.bashrc"
+    echo -e "$STR\n" >> "$HOME/.bashrc"
     echo "Done"
   fi
 fi
 
-str=". $DEST/improved_cd.sh" 
+STR=". $DEST/improved_cd.sh"
 
-if [[ -f $HOME/.bashrc ]] && [[ -z $(cat $HOME/.bashrc | grep "$str") ]]; then
+if [[ -f $HOME/.bashrc ]] && [[ -z $(cat $HOME/.bashrc | grep "$STR") ]]; then
   echo -n "Source $DEST/improved_cd.sh in .bashrc? y/[n]: "
   read ANS
 
   if [[ $ANS == "y" ]]; then
-    echo -e "$str\n" >> "$HOME/.bashrc"
+    echo -e "$STR\n" >> "$HOME/.bashrc"
     echo "Done"
   fi
 fi
@@ -207,13 +218,13 @@ if [[ $ANS == "y" ]]; then
   echo -n "Linking version_lte... "
   run ln -s "$DEST/.dotfiles/version_lte" "$HOME/.local/bin"
 
-  str="PATH=\"\$PATH\":$VERSION_UTILS_DEST_ESC"
+  STR="PATH=\"\$PATH\":$VERSION_UTILS_DEST_ESC"
 
-  if [[ -f $HOME/.bash_profile ]] && [[ -z $(cat $HOME/.bash_profile | grep $str) ]]; then
+  if [[ -f $HOME/.bash_profile ]] && [[ -z $(cat $HOME/.bash_profile | grep $STR) ]]; then
     echo -n "Add $VERSION_UTILS_DEST to \$PATH in .bash_profile? y/[n]: "
     read ANS
     if [[ $ANS == "y" ]]; then
-      echo -e "$str\nexport PATH\n" >> "$HOME/.bash_profile"
+      echo -e "$STR\nexport PATH\n" >> "$HOME/.bash_profile"
       echo "Done"
     fi
   fi
