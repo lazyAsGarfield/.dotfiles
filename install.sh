@@ -38,7 +38,7 @@ read ANS
 if [[ -z $ANS ]]; then
   DEST="$HOME/.dotfiles"
 else
-  DEST="$(echo "$ANS" | sed -r 's|/+$||')"
+  DEST="$(echo -n "$ANS" | sed -r 's|/+$||')"
 fi
 
 BACKUP_DIR="$DEST"/backup_$(date +"%Y-%m-%d_%H-%M-%S")
@@ -220,7 +220,7 @@ if [[ $ANS == "y" ]]; then
 
   STR="PATH=\"\$PATH\":$VERSION_UTILS_DEST_ESC"
 
-  if [[ -f $HOME/.bash_profile ]] && [[ -z $(cat $HOME/.bash_profile | grep $STR) ]]; then
+  if [[ -f $HOME/.bash_profile ]] && [[ -z $(cat $HOME/.bash_profile | grep -e $STR -e $(echo -n "$STR" | sed 's/"//g')) ]]; then
     echo -n "Add $VERSION_UTILS_DEST to \$PATH in .bash_profile? y/[n]: "
     read ANS
     if [[ $ANS == "y" ]]; then
