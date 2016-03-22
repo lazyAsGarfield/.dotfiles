@@ -214,9 +214,9 @@ if [[ $ANS == "y" ]]; then
     run mkdir -p "$VERSION_UTILS_DEST"
   fi
   echo -n "Linking version_lt... "
-  run ln -s "$DEST/.dotfiles/version_lt" "$HOME/.local/bin"
+  run ln -s "$DEST/version_lt" "$HOME/.local/bin"
   echo -n "Linking version_lte... "
-  run ln -s "$DEST/.dotfiles/version_lte" "$HOME/.local/bin"
+  run ln -s "$DEST/version_lte" "$HOME/.local/bin"
 
   STR="PATH=\"\$PATH\":$VERSION_UTILS_DEST_ESC"
 
