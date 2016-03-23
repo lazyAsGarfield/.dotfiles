@@ -502,7 +502,7 @@ command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 " ---------- PLUGIN COMMANDS ------ {{{
 
 command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, extend({
-      \ 'source': 'ag -g "" --hidden -u | grep -v ".git/"',
+      \ 'source': 'ag -g "" --hidden -U --ignore .git/',
       \ 'options': '--prompt "' . (<q-args> ? getcwd() :
       \ fnamemodify(fnamemodify(<q-args>, ':p'), ':p')) . ' (Files)> "'
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
@@ -512,7 +512,7 @@ function! s:git_files_if_in_repo(bang)
   if git_root == ''
     let path = expand('%:p:h')
     return fzf#vim#files(path, extend({
-          \ 'source': 'ag -g "" --hidden -u | grep -v ".git/"',
+          \ 'source': 'ag -g "" --hidden -U --ignore .git/',
           \ 'options': '--prompt "' . path . ' (Files)>"'
           \ }, a:bang ? {} : g:fzf#vim#default_layout))
   else
@@ -543,7 +543,7 @@ endfunction
 function! s:all_files_git_root_or_current_dir(bang)
   let path = s:git_root_or_current_dir()
   call fzf#vim#files(path, extend({
-        \ 'source': 'ag -g "" --hidden -u | grep -v ".git/"',
+        \ 'source': 'ag -g "" --hidden -U --ignore .git/',
         \ 'options': '--prompt "' . path . ' (Files)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
@@ -639,7 +639,7 @@ function! s:ag_in(bang, ...)
   let tokens  = a:000
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = (filter(copy(tokens), 'v:val !~ "^-"'))
-  call fzf#vim#ag(join(query[1:], ' '), ag_opts, extend({
+  call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --hidden -U --ignore .git/', extend({
         \ 'dir': a:1,
         \ 'options': '--prompt ' . a:1 . '" (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
@@ -650,7 +650,7 @@ function! s:ag_with_opts(arg, bang)
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
   let dir = s:git_root_or_current_dir()
-  call fzf#vim#ag(query, ag_opts, extend({
+  call fzf#vim#ag(query, ag_opts . ' --hidden -U --ignore .git/', extend({
         \ 'dir': dir,
         \ 'options': '--prompt ' . dir . '" (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
