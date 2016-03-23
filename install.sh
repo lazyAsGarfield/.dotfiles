@@ -228,7 +228,7 @@ read ans
 
 if [[ $ans == "y" ]]; then
   if [[ ! -d $version_utils_dest ]]; then
-    echo -n "Creating $VERSION_UTILS_DEST... "
+    echo -n "Creating $version_utils_dest... "
     run mkdir -p "$version_utils_dest"
   fi
   echo -n "Linking version_lt... "
