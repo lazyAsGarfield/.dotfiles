@@ -1,39 +1,39 @@
 #!/bin/bash
 
-declare -a __SAVED_DIRS__
-declare -a __CD_HISTORY__
+declare -a __saved_dirs__
+declare -a __cd_history__
 
 function saved()
 {
   if [[ $# = 0 ]]; then
-    if [[ ${#__SAVED_DIRS__[@]} = 0 ]]; then
+    if [[ ${#__saved_dirs__[@]} = 0 ]]; then
       echo "No directories saved"
     fi
-    for ((i = 1 ; i <= ${#__SAVED_DIRS__[@]} ; ++i)) ; do
-      echo "$i ${__SAVED_DIRS__[$i]} "
+    for ((i = 1 ; i <= ${#__saved_dirs__[@]} ; ++i)) ; do
+      echo "$i ${__saved_dirs__[$i]} "
     done
   else
     local dir
     for dir in $@; do
       if [[ $dir =~ ^--[0-9]+$ ]]; then
         local num=${dir:2}
-        if [[ $num -gt ${#__CD_HISTORY__[@]} ]]; then
+        if [[ $num -gt ${#__cd_history__[@]} ]]; then
           echo "No entry $num in history"
           return
         else
-          dir=${__CD_HISTORY__[$num]}
+          dir=${__cd_history__[$num]}
         fi
       else
         dir=`realpath $dir`
       fi
       if [[ -d $dir ]]; then
-        for saved_dir in ${__SAVED_DIRS__[@]}; do
+        for saved_dir in ${__saved_dirs__[@]}; do
           if [[ $saved_dir = $dir ]]; then
             return
           fi
         done
-        __SAVED_DIRS__=([0]="" "${__SAVED_DIRS__[@]}" $dir)
-        unset __SAVED_DIRS__[0]
+        __saved_dirs__=([0]="" "${__saved_dirs__[@]}" $dir)
+        unset __saved_dirs__[0]
       else
         echo "$dir: No such directory" >&2
       fi
@@ -45,20 +45,20 @@ function dropd()
 {
   function repair_indexes()
   {
-    __SAVED_DIRS__=([0]="" "${__SAVED_DIRS__[@]}")
-    unset __SAVED_DIRS__[0]
+    __saved_dirs__=([0]="" "${__saved_dirs__[@]}")
+    unset __saved_dirs__[0]
   }
 
   if [[ $# = 0 ]]; then
-    unset __SAVED_DIRS__[1]
+    unset __saved_dirs__[1]
     repair_indexes
   else
     for arg in $@; do
       if [[ $arg =~ ^[0-9]+$ ]]; then
-        unset __SAVED_DIRS__[$arg]
+        unset __saved_dirs__[$arg]
       elif [[ $arg = "@" ]]; then
-        unset __SAVED_DIRS__
-        declare -a __SAVED_DIRS__
+        unset __saved_dirs__
+        declare -a __saved_dirs__
         return
       else
         echo "$arg: invalid argument"
@@ -74,9 +74,9 @@ function cd()
 {
   function add_to_hist()
   {
-    local HIST_SIZE=${#__CD_HISTORY__[@]}
-    if [[ ${__CD_HISTORY__[HIST_SIZE]} != $1 ]] && ! [[ -z $1 ]]; then
-      __CD_HISTORY__[$(( HIST_SIZE + 1 ))]=$1
+    local hist_size=${#__cd_history__[@]}
+    if [[ ${__cd_history__[hist_size]} != $1 ]] && ! [[ -z $1 ]]; then
+      __cd_history__[$(( hist_size + 1 ))]=$1
     fi
   }
 
@@ -84,26 +84,26 @@ function cd()
   # go to dir saved on postition num
   if [[ $1 =~ ^--[0-9]+$ ]]; then
     local num=${1:2}
-    if [[ $num > ${#__SAVED_DIRS__[@]} ]] || [[ $num -eq 0 ]]; then
+    if [[ $num > ${#__saved_dirs__[@]} ]] || [[ $num -eq 0 ]]; then
       echo "No entry $num in saved directories"
     else
-      local dir=${__SAVED_DIRS__[$num]}
+      local dir=${__saved_dirs__[$num]}
       if [[ $PWD != $dir ]]; then
         add_to_hist $PWD
       fi
       command cd $dir 
       if [[ -d $dir ]]; then
-        echo "${__SAVED_DIRS__[$num]}"
+        echo "${__saved_dirs__[$num]}"
       fi
     fi
   # $ cd -<num>
   # go to dir on position num in history
   elif [[ $1 =~ ^-[0-9]+$ ]]; then
     local num=${1:1}
-    if [[ $num -gt ${#__CD_HISTORY__[@]} ]]; then
+    if [[ $num -gt ${#__cd_history__[@]} ]]; then
       echo "No entry $num in history"
     else
-      local dir=${__CD_HISTORY__[$num]}
+      local dir=${__cd_history__[$num]}
       if [[ $PWD != $dir ]]; then
         add_to_hist $PWD
       fi
@@ -115,17 +115,17 @@ function cd()
   # $ cd -h[num]|--
   # show cd history
   elif [[ $1 =~ ^-h[0-9]*$ ]] || [[ $1 = "--" ]]; then
-    local LIMIT
+    local limit
     if [[ ${1:2} =~ ^[0-9]+$ ]]; then
-      LIMIT=${1:2}
+      limit=${1:2}
     else
-      LIMIT=15
+      limit=15
     fi
-    local HIST_SIZE=${#__CD_HISTORY__[@]}
-    local MIN=$(( $HIST_SIZE - $LIMIT + 1 ))
-    MIN=$(( $MIN < 1 ? 1 : $MIN ))
-    for (( i = $MIN ; i <= $HIST_SIZE ; ++i )); do
-      echo "$i ${__CD_HISTORY__[$i]}"
+    local hist_size=${#__cd_history__[@]}
+    local min=$(( $hist_size - $limit + 1 ))
+    min=$(( $min < 1 ? 1 : $min ))
+    for (( i = $min ; i <= $hist_size ; ++i )); do
+      echo "$i ${__cd_history__[$i]}"
     done
   # just pass args (and add dir to history if needed)
   else

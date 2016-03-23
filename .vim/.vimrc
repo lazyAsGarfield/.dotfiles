@@ -316,21 +316,6 @@ vmap cry "0
 nmap crc "+
 vmap crc "+
 
-" easier yank/paste from clipboard 
-nmap cy "+y
-vmap cy "+y
-nmap cY "+Y
-vmap cY "+Y
-
-nmap cp "+p
-vmap cp "+p
-nmap cP "+P
-vmap cP "+P
-
-vmap <leader>0 "0p
-nmap yp "0p
-nmap yP "0P
-
 " easier redrawing - sometimes strange artifacts are visible
 map <leader>r :redraw!<CR>
 
@@ -517,7 +502,7 @@ command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 " ---------- PLUGIN COMMANDS ------ {{{
 
 command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, extend({
-      \ 'source': 'ag -g "" --hidden --ignore ".git"',
+      \ 'source': 'ag -g "" --hidden -u | grep -v ".git/"',
       \ 'options': '--prompt "' . (<q-args> ? getcwd() :
       \ fnamemodify(fnamemodify(<q-args>, ':p'), ':p')) . ' (Files)> "'
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
@@ -527,6 +512,7 @@ function! s:git_files_if_in_repo(bang)
   if git_root == ''
     let path = expand('%:p:h')
     return fzf#vim#files(path, extend({
+          \ 'source': 'ag -g "" --hidden -u | grep -v ".git/"',
           \ 'options': '--prompt "' . path . ' (Files)>"'
           \ }, a:bang ? {} : g:fzf#vim#default_layout))
   else
@@ -545,13 +531,9 @@ endfunction
 
 command! -bang GitFilesOrCurrent call s:git_files_if_in_repo(<bang>0)
 
-nnoremap <C-f> :GitFilesOrCurrent<CR>
-
 command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
       \ 'options': '--prompt "Buffers> "'
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
-
-nnoremap <C-b> :BuffersBetterPrompt<CR>
 
 function! s:git_root_or_current_dir()
   let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
@@ -561,14 +543,12 @@ endfunction
 function! s:all_files_git_root_or_current_dir(bang)
   let path = s:git_root_or_current_dir()
   call fzf#vim#files(path, extend({
-        \ 'source': 'ag -g "" --hidden --ignore ".git"',
+        \ 'source': 'ag -g "" --hidden -u | grep -v ".git/"',
         \ 'options': '--prompt "' . path . ' (Files)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
 command! -bang FilesGitRootOrCurrent call s:all_files_git_root_or_current_dir(<bang>0)
-
-nnoremap <C-g><C-g> :FilesGitRootOrCurrent<CR>
 
 " expands path relatively to current dir or git root if possible
 " (similar to CtrlP plugin)
@@ -628,10 +608,6 @@ endfunction
 
 let g:mru_full_path = 0
 
-nnoremap cof :let g:mru_full_path=!g:mru_full_path<CR>
-nnoremap [of :let g:mru_full_path=1<CR>
-nnoremap ]of :let g:mru_full_path=0<CR>
-
 function! s:mru_list_without_nonexistent()
   let mru_list = ctrlp#mrufiles#list()[1:]
   let cwd = getcwd()
@@ -659,8 +635,6 @@ endfunction
 
 command! -bang Mru call s:fzf_mru(<bang>0)
 
-nnoremap <C-p> :Mru<CR>
-
 function! s:ag_in(bang, ...)
   let tokens  = a:000
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
@@ -670,9 +644,6 @@ function! s:ag_in(bang, ...)
         \ 'options': '--prompt ' . a:1 . '" (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
-
-command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
-command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
 function! s:ag_with_opts(arg, bang)
   let tokens  = split(a:arg)
@@ -684,6 +655,11 @@ function! s:ag_with_opts(arg, bang)
         \ 'options': '--prompt ' . dir . '" (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
+
+command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
+command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
+
+command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
 
 function! s:ansi(str, col, bold)
   return printf("\x1b[%s%sm%s\x1b[m", a:col, a:bold ? ';1' : '', a:str)
@@ -715,27 +691,53 @@ function! s:paste_buffer(key_with_str, visual)
   execute 'normal ' . (a:visual ? 'gv' : '') . reg . (empty(key) ? 'p' : 'P')
 endfunction
 
+let s:yank_key = 'alt-c'
+
+function! s:yank_to_buffer(key_with_str, visual)
+  let [key, str] = a:key_with_str
+  let reg = str[1:2]
+  execute 'normal ' . (a:visual ? 'gv'.reg.'y' : reg.'yy')
+endfunction
+
 function! s:registers_sink(key_with_str)
-  call s:paste_buffer(a:key_with_str, 0)
+  let [key, str] = a:key_with_str
+  if tolower(key) == s:yank_key
+    call s:yank_to_buffer(a:key_with_str, 0)
+  else
+    call s:paste_buffer(a:key_with_str, 0)
+  endif
 endfunction
 
 function! s:registers_sink_visual(key_with_str)
-  call s:paste_buffer(a:key_with_str, 1)
+  let [key, str] = a:key_with_str
+  if tolower(key) == s:yank_key
+    call s:yank_to_buffer(a:key_with_str, 1)
+  else
+    call s:paste_buffer(a:key_with_str, 1)
+  endif
 endfunction
 
 command! -nargs=? Regs call fzf#run({
       \ 'source':  s:get_all_registers(),
       \ 'sink*': function('s:registers_sink' . (<args>0 ? '_visual' : '')),
-      \ 'options': '-e -x +s --prompt "(Regs)> " --ansi --expect=alt-p',
+      \ 'options': '-e -x +s --prompt "(Regs)> " --ansi --expect=alt-p,' .  s:yank_key,
       \ 'down':    '40%'
       \ })
 
-" good way of detecting if in visual mode
-nnoremap <C-g><C-r> :Regs<CR>
-vnoremap <C-g><C-r> :<c-u>Regs 1<CR>
-inoremap <C-g><C-r> <ESC>:<C-u>Regs<CR>i
+nnoremap cof :let g:mru_full_path=!g:mru_full_path<CR>
+nnoremap [of :let g:mru_full_path=1<CR>
+nnoremap ]of :let g:mru_full_path=0<CR>
 
-command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
+nnoremap <C-f> :GitFilesOrCurrent<CR>
+nnoremap <C-b> :BuffersBetterPrompt<CR>
+nnoremap <C-g> :FilesGitRootOrCurrent<CR>
+nnoremap <C-p> :Mru<CR>
+
+" good way of detecting if in visual mode
+" a bit experimental mappings
+nnoremap RR :Regs<CR>
+vnoremap RR :<c-u>Regs 1<CR>
+inoremap RR  <ESC>:<C-u>Regs<CR>i
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
