@@ -50,5 +50,11 @@ precmd()
   prompt_command
 }
 
+zmodload zsh/complist
+
 bindkey '^[[Z' reverse-menu-complete
+# bindkey '^I' menu-complete
+bindkey '^[' undo
+bindkey -M menuselect '^[' undo
+bindkey -M menuselect '^M' .accept-line
 
