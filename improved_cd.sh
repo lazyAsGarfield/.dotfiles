@@ -91,7 +91,7 @@ function cd()
       if [[ $PWD != $dir ]]; then
         add_to_hist $PWD
       fi
-      command cd $dir 
+      builtin cd $dir
       if [[ -d $dir ]]; then
         echo "${__saved_dirs__[$num]}"
       fi
@@ -107,7 +107,7 @@ function cd()
       if [[ $PWD != $dir ]]; then
         add_to_hist $PWD
       fi
-      command cd $dir
+      builtin cd $dir
       if [[ -d $dir ]]; then
         echo $dir
       fi
@@ -130,7 +130,7 @@ function cd()
   # just pass args (and add dir to history if needed)
   else
     local prev=$PWD
-    command cd $@
+    builtin cd $@
     if [[ $PWD != $prev ]]; then
       add_to_hist $prev
     fi
