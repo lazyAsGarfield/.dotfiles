@@ -501,10 +501,16 @@ command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 
 " ---------- PLUGIN COMMANDS ------ {{{
 
+function! s:full_path(dir_or_file)
+  " if fnamemodify() applied once, full_path may look like /blah/../
+  " if a:dir_or_file is '..'
+  return fnamemodify(fnamemodify(a:dir_or_file, ':p'), ':p')
+endfunction
+
 command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, extend({
       \ 'source': 'ag -g "" --hidden -U --ignore .git/',
       \ 'options': '--prompt "' . (<q-args> ? getcwd() :
-      \ fnamemodify(fnamemodify(<q-args>, ':p'), ':p')) . ' (Files)> "'
+      \ s:full_path(<q-args>) . ' (Files)> "'
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
 
 function! s:git_files_if_in_repo(bang)
@@ -639,9 +645,9 @@ function! s:ag_in(bang, ...)
   let tokens  = a:000
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = (filter(copy(tokens), 'v:val !~ "^-"'))
-  call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --hidden -U --ignore .git/', extend({
+  call fzf#vim#ag(join(query[1:], ' '), ag_opts . '--ignore .git/', extend({
         \ 'dir': a:1,
-        \ 'options': '--prompt ' . a:1 . '" (Ag)> "'
+        \ 'options': '--prompt ' . s:full_path(a:1) . '" (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
@@ -650,7 +656,7 @@ function! s:ag_with_opts(arg, bang)
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
   let dir = s:git_root_or_current_dir()
-  call fzf#vim#ag(query, ag_opts . ' --hidden -U --ignore .git/', extend({
+  call fzf#vim#ag(query, ag_opts . ' --ignore .git/', extend({
         \ 'dir': dir,
         \ 'options': '--prompt ' . dir . '" (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
@@ -659,7 +665,8 @@ endfunction
 command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
 command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
-command! -nargs=* -bang Ag call s:ag_with_opts(<q-args>, <bang>0)
+command! -nargs=* -bang AgGitRootOrCurrent call s:ag_with_opts(<q-args>, <bang>0)
+command! -nargs=* -bang Ag AgGitRootOrCurrent<bang> <args>
 
 function! s:ansi(str, col, bold)
   return printf("\x1b[%s%sm%s\x1b[m", a:col, a:bold ? ';1' : '', a:str)
