@@ -22,3 +22,48 @@ export FZF_DEFAULT_OPTS="--color fg:187,bg:233,hl:103,fg+:222,bg+:234,hl+:104 \
 export FZF_ALT_C_COMMAND='find -L . -type d | grep -v ".git" | sed 1d | cut -b3-'
 export FZF_CTRL_T_COMMAND='find -L . -type d -o -type f -o -type l | grep -v ".git/" | sed 1d | cut -b3-'
 
+prompt_command()
+{
+  local NORMAL="\[\e[0m\]"
+  local BOLD="\[\e[0;1;39m\]"
+  local BOLD_NORMAL="\[\e[0;1;2;39m\]"
+
+  local RED="\[\e[0;31m\]"
+  local LIGHT_RED="\[\e[0;1;31m\]"
+  local DARK_BOLD_RED="\[\e[1;2;31m\]"
+
+  local GREEN="\[\e[0;32m\]"
+  local LIGHT_GREEN="\[\e[0;1;32m\]"
+  local DARK_BOLD_GREEN="\[\e[1;2;32m\]"
+
+  local YELLOW="\[\e[0;33m\]"
+  local LIGHT_YELLOW="\[\e[0;1;33m\]"
+  local DARK_BOLD_YELLOW="\[\e[1;2;33m\]"
+
+  local BLUE="\[\e[0;34m\]"
+  local LIGHT_BLUE="\[\e[0;1;34m\]"
+  local DARK_BOLD_BLUE="\[\e[1;2;34m\]"
+
+  local MAGENTA="\[\e[0;35m\]"
+  local LIGHT_MAGENTA="\[\e[0;1;35m\]"
+  local DARK_BOLD_MAGENTA="\[\e[1;2;35m\]"
+
+  local CYAN="\[\e[0;36m\]"
+  local LIGHT_CYAN="\[\e[0;1;36m\]"
+  local DARK_BOLD_CYAN="\[\e[1;2;36m\]"
+
+  git_branch=$(git branch 2> /dev/null | grep '*\ ' | cut -d' ' -f2)
+  if [[ -n $git_branch ]]; then
+    if [[ -z $(git st | grep "nothing to commit") ]]; then
+      git_mod="*"
+    else
+      git_mod=""
+    fi
+    git_branch="($git_branch$git_mod)"
+  fi
+
+  PS1="$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE]$GREEN $git_branch$BOLD$ $NORMAL"
+}
+
+PROMPT_COMMAND=prompt_command
+

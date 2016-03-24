@@ -737,7 +737,7 @@ nnoremap <C-p> :Mru<CR>
 " a bit experimental mappings
 nnoremap RR :Regs<CR>
 vnoremap RR :<c-u>Regs 1<CR>
-inoremap RR  <ESC>:<C-u>Regs<CR>i
+" inoremap RR  <ESC>:<C-u>Regs<CR>i
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
