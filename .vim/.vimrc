@@ -69,28 +69,28 @@ if &term =~ '^screen' && exists('$TMUX')
   " tmux knows the extended mouse mode
   set ttymouse=xterm2
   " tmux will send xterm-style keys when xterm-keys is on
-  execute "set <xUp>=\e[1;*A"
-  execute "set <xDown>=\e[1;*B"
-  execute "set <xRight>=\e[1;*C"
-  execute "set <xLeft>=\e[1;*D"
-  execute "set <xHome>=\e[1;*H"
-  execute "set <xEnd>=\e[1;*F"
-  execute "set <Insert>=\e[2;*~"
-  execute "set <Delete>=\e[3;*~"
-  execute "set <PageUp>=\e[5;*~"
-  execute "set <PageDown>=\e[6;*~"
-  execute "set <xF1>=\e[1;*P"
-  execute "set <xF2>=\e[1;*Q"
-  execute "set <xF3>=\e[1;*R"
-  execute "set <xF4>=\e[1;*S"
-  execute "set <F5>=\e[15;*~"
-  execute "set <F6>=\e[17;*~"
-  execute "set <F7>=\e[18;*~"
-  execute "set <F8>=\e[19;*~"
-  execute "set <F9>=\e[20;*~"
-  execute "set <F10>=\e[21;*~"
-  execute "set <F11>=\e[23;*~"
-  execute "set <F12>=\e[24;*~"
+  exec "set <xUp>=\e[1;*A"
+  exec "set <xDown>=\e[1;*B"
+  exec "set <xRight>=\e[1;*C"
+  exec "set <xLeft>=\e[1;*D"
+  exec "set <xHome>=\e[1;*H"
+  exec "set <xEnd>=\e[1;*F"
+  exec "set <Insert>=\e[2;*~"
+  exec "set <Delete>=\e[3;*~"
+  exec "set <PageUp>=\e[5;*~"
+  exec "set <PageDown>=\e[6;*~"
+  exec "set <xF1>=\e[1;*P"
+  exec "set <xF2>=\e[1;*Q"
+  exec "set <xF3>=\e[1;*R"
+  exec "set <xF4>=\e[1;*S"
+  exec "set <F5>=\e[15;*~"
+  exec "set <F6>=\e[17;*~"
+  exec "set <F7>=\e[18;*~"
+  exec "set <F8>=\e[19;*~"
+  exec "set <F9>=\e[20;*~"
+  exec "set <F10>=\e[21;*~"
+  exec "set <F11>=\e[23;*~"
+  exec "set <F12>=\e[24;*~"
 endif
 
 " when editing a file, always jump to the last known cursor position.
@@ -523,14 +523,15 @@ function! s:git_files_if_in_repo(bang)
           \ }, a:bang ? {} : g:fzf#vim#default_layout))
   else
     let git_root = '/' . git_root
-    let cwd = fnameescape(getcwd())
+    let save_cwd = fnameescape(getcwd())
+    let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
     try
-      exec 'cd' . git_root
+      exec cdCmd . fnameescape(git_root)
       call fzf#vim#gitfiles(extend({
             \ 'options': '--prompt "' . git_root . ' (GitFiles)> "'
             \ }, a:bang ? {} : g:fzf#vim#default_layout))
     finally
-      exec 'cd' . cwd
+      exec cdCmd . save_cwd
     endtry
   endif
 endfunction
@@ -543,7 +544,7 @@ command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
 
 function! s:git_root_or_current_dir()
   let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
-  return git_root == '' ? expand('%:p:h') : fnameescape('/'.git_root)
+  return git_root == '' ? expand('%:p:h') : '/'.git_root
 endfunction
 
 function! s:all_files_git_root_or_current_dir(bang)
@@ -560,10 +561,14 @@ command! -bang FilesGitRootOrCurrent call s:all_files_git_root_or_current_dir(<b
 " (similar to CtrlP plugin)
 function! s:relpath(filepath_or_name)
   let fullpath = fnamemodify(a:filepath_or_name, ':p')
-  let cwd = fnameescape(getcwd())
-  execute 'cd' . s:git_root_or_current_dir()
-  let ret = fnamemodify(fullpath, ':.')
-  execute 'cd' . cwd
+  let save_cwd = fnameescape(getcwd())
+  let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
+  try
+    exec cdCmd . fnameescape(s:git_root_or_current_dir())
+    let ret = fnamemodify(fullpath, ':.')
+  finally
+    exec cdCmd . save_cwd
+  endtry
   return ret
 endfunction
 
@@ -586,12 +591,13 @@ let s:default_action = {
 function! s:mru_sink(lines)
   let key = remove(a:lines, 0)
   let cmd = get(s:default_action, key, 'e')
-  let cwd = fnameescape(getcwd())
+  let save_cwd = fnameescape(getcwd())
+  let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
   try
-    execute 'cd' . s:git_root_or_current_dir()
+    exec cdCmd . fnameescape(s:git_root_or_current_dir())
     let full_path_lines = map(a:lines, 'fnameescape(fnamemodify(v:val, ":p"))')
   finally
-    execute 'cd' . cwd
+    exec cdCmd . save_cwd
   endtry
   augroup fzf_swap
     autocmd SwapExists * let v:swapchoice='o'
@@ -601,10 +607,10 @@ function! s:mru_sink(lines)
   try
     for item in full_path_lines
       if empty
-        execute 'e' item
+        exec 'e' item
         let empty = 0
       else
-        execute cmd item
+        exec cmd item
       endif
     endfor
   finally
@@ -645,9 +651,19 @@ function! s:ag_in(bang, ...)
   let tokens  = a:000
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = (filter(copy(tokens), 'v:val !~ "^-"'))
+  let save_cwd = fnameescape(getcwd())
+  let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
+  " in case path is relative:
+  " we want it to be relative to dir of current file, not cwd
+  try
+    exec cdCmd . fnameescape(expand('%:p:h'))
+    let dir = s:full_path(a:1)
+  finally
+    exec cdCmd . save_cwd
+  endtry
   call fzf#vim#ag(join(query[1:], ' '), ag_opts . '--ignore .git/', extend({
-        \ 'dir': a:1,
-        \ 'options': '--prompt ' . s:full_path(a:1) . '" (Ag)> "'
+        \ 'dir': dir,
+        \ 'options': '--prompt "' . dir . ' (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
@@ -658,7 +674,7 @@ function! s:ag_with_opts(arg, bang)
   let dir = s:git_root_or_current_dir()
   call fzf#vim#ag(query, ag_opts . ' --ignore .git/', extend({
         \ 'dir': dir,
-        \ 'options': '--prompt ' . dir . '" (Ag)> "'
+        \ 'options': '--prompt "' . dir . ' (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
@@ -673,7 +689,7 @@ function! s:ansi(str, col, bold)
 endfunction
 
 for [s:c, s:a] in items({'black': 30, 'red': 31, 'green': 32, 'yellow': 33, 'blue': 34, 'magenta': 35, 'cyan': 36})
-  execute "function! s:".s:c."(str, ...)\n"
+  exec "function! s:".s:c."(str, ...)\n"
         \ "  return s:ansi(a:str, ".s:a.", get(a:, 1, 0))\n"
         \ "endfunction"
 endfor
@@ -695,7 +711,7 @@ endfunction
 function! s:paste_buffer(key_with_str, visual)
   let [key, str] = a:key_with_str
   let reg = str[1:2]
-  execute 'normal ' . (a:visual ? 'gv' : '') . reg . (empty(key) ? 'p' : 'P')
+  exec 'normal ' . (a:visual ? 'gv' : '') . reg . (empty(key) ? 'p' : 'P')
 endfunction
 
 let s:yank_key = 'alt-c'
@@ -703,7 +719,7 @@ let s:yank_key = 'alt-c'
 function! s:yank_to_buffer(key_with_str, visual)
   let [key, str] = a:key_with_str
   let reg = str[1:2]
-  execute 'normal ' . (a:visual ? 'gv'.reg.'y' : reg.'yy')
+  exec 'normal ' . (a:visual ? 'gv'.reg.'y' : reg.'yy')
 endfunction
 
 function! s:registers_sink(key_with_str)

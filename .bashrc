@@ -56,8 +56,15 @@ prompt_command()
     git_branch="($git_branch$git_mod)"
   fi
 
-  PS1="$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE]$GREEN $git_branch$BOLD$ $NORMAL"
+  virtual_env=""
+  if [[ -z $VIRTUAL_ENV_DIABLE_PROMPT ]]; then
+    if [[ -n $VIRTUAL_ENV ]]; then
+      virtual_env="($(basename $VIRTUAL_ENV)) "
+    fi
+  fi
+
+  PS1="$BLUE$virtual_env$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE]$GREEN $git_branch$BOLD$ $NORMAL"
 }
 
-PROMPT_COMMAND=prompt_command
+PROMPT_COMMAND="prompt_command $PROMPT_COMMAND"
 
