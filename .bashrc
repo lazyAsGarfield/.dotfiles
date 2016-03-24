@@ -46,7 +46,7 @@ prompt_command()
   local CYAN="\[\e[0;36m\]"
   local LIGHT_CYAN="\[\e[0;1;36m\]"
 
-  git_branch=$(git branch 2> /dev/null | grep '* ' | cut -d' ' -f2)
+  git_branch=$(git branch 2> /dev/null | grep '* ' | cut -c3-)
   if [[ -n $git_branch ]]; then
     if [[ -z $(git st | grep "nothing to commit") ]]; then
       git_mod="*"
