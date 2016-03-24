@@ -13,7 +13,7 @@ run()
 
 check_and_ask_for_backup()
 {
-  if [[ -e "$1" ]]; then
+  if [[ -e "$1" ]] || [[ -h "$1" ]]; then
     echo -n "$1 found, will be overwritten, back it up? [y]/n: "
     read ans
     if [[ $ans == "n" ]]; then
@@ -144,7 +144,7 @@ if [[ -d "$HOME/.byobu" ]]; then
   if [[ $ans == "y" ]]; then
     check_and_ask_for_backup "$HOME/.byobu/.tmux.conf" "/byobu"
     echo -n "Linking $HOME/.byobu/.tmux.conf... "
-    run ln -s "$dest/.tmux.conf" "$HOME/.byobu/.tmux.conf"
+    run ln -s "$dest/.tmux-common.conf" "$HOME/.byobu/.tmux.conf"
   fi
 fi
 
@@ -154,7 +154,7 @@ read ans
 if [[ $ans == "y" ]]; then
   check_and_ask_for_backup "$HOME/.tmux.conf"
   echo -n "Linking $HOME/.tmux.conf... "
-  run ln -s "$dest/.tmux.conf" "$HOME/.tmux.conf"
+  run ln -s "$dest/.non-byobu-tmux.conf" "$HOME/.tmux.conf"
 fi
 
 echo -n "Compile screen-256color.terminfo? y/[n]: "
@@ -195,6 +195,11 @@ if [[ -z $incl ]] || [[ -z $git_ignore ]] || [[ -z $username ]] || [[ -z $email 
       fi
     fi
   fi
+fi
+
+if [[ -z $(cat $HOME/.bashrc | grep "DOTFILES_DIR") ]]; then
+  echo -n "Adding \$DOTFILES_DIR settings to .bashrc... "
+  echo -e "\nDOTFILES_DIR=$dest\nexport DOTFILES_DIR" >> $HOME/.bashrc && echo "done"
 fi
 
 str=". $dest/.bashrc"
@@ -242,7 +247,7 @@ if [[ $ans == "y" ]]; then
     echo -n "Add $version_utils_dest to \$PATH in .bash_profile? y/[n]: "
     read ans
     if [[ $ans == "y" ]]; then
-      echo -e "$str\nexport PATH\n" >> "$HOME/.bash_profile"
+      echo -e "\n$str\nexport PATH" >> "$HOME/.bash_profile"
       echo "Done"
     fi
   fi
