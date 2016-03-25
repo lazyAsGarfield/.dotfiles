@@ -107,6 +107,9 @@ let &colorcolumn="80,120"
 " enable syntax highlighting
 syntax on
 
+" timeout for key codes (delayed ESC is annoying)
+set ttimeoutlen=0
+
 " indentation options
 set autoindent
 set expandtab
