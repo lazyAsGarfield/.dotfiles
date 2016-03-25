@@ -9,7 +9,7 @@ function saved()
     if [[ ${#__saved_dirs__[@]} = 0 ]]; then
       echo "No directories saved"
     fi
-    for ((i = 1 ; i <= "${#__saved_dirs__[@]}" ; ++i)) ; do
+    for ((i = 1 ; i <= ${#__saved_dirs__[@]} ; ++i)) ; do
       echo "$i ${__saved_dirs__[$i]} "
     done
   else
@@ -23,18 +23,26 @@ function saved()
         else
           dir="${__cd_history__[$num]}"
         fi
-      else
+      elif [[ $dir == "-" ]] && [[ -n $OLDPWD ]]; then
+        dir="$(realpath "$OLDPWD")"
+      elif [[ $1 =~ ^-[0-9]+$ ]]; then
+        local num="${1:1}"
+        if [[ $num -gt ${#__cd_history__[@]} ]]; then
+          echo "No entry $num in history"
+        else
+          dir="${__cd_history__[$num]}"
+        fi
+      elif [[ -n $dir ]]; then
         dir="$(realpath "$dir")"
       fi
-      echo "$dir"
       if [[ -d $dir ]]; then
+        echo "$dir"
         for saved_dir in "${__saved_dirs__[@]}"; do
           if [[ $saved_dir = $dir ]]; then
             return
           fi
         done
-        __saved_dirs__=([0]="" "${__saved_dirs__[@]}" "$dir")
-        unset __saved_dirs__[0]
+        __saved_dirs__[$(( ${#__saved_dirs__[@]} + 1 ))]="$dir"
       else
         echo "$dir: No such directory" >&2
       fi
@@ -46,17 +54,30 @@ function dropd()
 {
   function repair_indexes()
   {
-    __saved_dirs__=([0]="" "${__saved_dirs__[@]}")
-    unset __saved_dirs__[0]
+    if [[ -n $ZSH_VERSION ]]; then
+      for (( i = 1 ; i <= ${#__saved_dirs__[@]} ; ++i )); do
+        if [[ -z $__saved_dirs__[$i] ]]; then
+          __saved_dirs__[$i]=()
+          (( --i ))
+        fi
+      done
+    else
+      __saved_dirs__=([0]="" "${__saved_dirs__[@]}")
+      unset __saved_dirs__[0]
+    fi
   }
 
   if [[ $# = 0 ]]; then
-    unset __saved_dirs__[1]
+    if [[ -n $ZSH_VERSION ]]; then
+      __saved_dirs__[1]=()
+    else
+      unset __saved_dirs__[1]
+    fi
     repair_indexes
   else
     for arg in "$@"; do
       if [[ $arg =~ ^[0-9]+$ ]]; then
-        unset __saved_dirs__["$arg"]
+        unset '__saved_dirs__[$arg]'
       elif [[ $arg = "@" ]]; then
         unset __saved_dirs__
         declare -a __saved_dirs__
@@ -76,8 +97,8 @@ function cd()
   function add_to_hist()
   {
     local hist_size="${#__cd_history__[@]}"
-    if [[ ${__cd_history__[hist_size]} != $1 ]] && ! [[ -z $1 ]]; then
-      __cd_history__["$(( hist_size + 1 ))"]="$1"
+    if [[ ${__cd_history__[$hist_size]} != $1 ]] && ! [[ -z $1 ]]; then
+      __cd_history__[$(( $hist_size + 1 ))]="$1"
     fi
   }
 
@@ -89,12 +110,12 @@ function cd()
       echo "No entry $num in saved directories"
     else
       local dir="${__saved_dirs__[$num]}"
-      if [[ $PWD != $dir ]]; then
-        add_to_hist "$PWD"
-      fi
-      builtin cd "$dir"
       if [[ -d $dir ]]; then
-        echo "${__saved_dirs__[$num]}"
+        local saved_pwd="$PWD"
+        if [[ $PWD != $dir ]] && builtin cd "$dir"; then
+          add_to_hist "$saved_pwd"
+          echo "$dir"
+        fi
       fi
     fi
   # $ cd -<num>
@@ -105,12 +126,12 @@ function cd()
       echo "No entry $num in history"
     else
       local dir="${__cd_history__[$num]}"
-      if [[ $PWD != $dir ]]; then
-        add_to_hist "$PWD"
-      fi
-      builtin cd "$dir"
       if [[ -d $dir ]]; then
-        echo "$dir"
+        local saved_pwd="$PWD"
+        if [[ $PWD != $dir ]] && builtin cd "$dir"; then
+          add_to_hist "$saved_pwd"
+          echo "$dir"
+        fi
       fi
     fi
   # $ cd -h[num]|--
@@ -125,15 +146,15 @@ function cd()
     local hist_size="${#__cd_history__[@]}"
     local min="$(( $hist_size - $limit + 1 ))"
     min="$(( $min < 1 ? 1 : $min ))"
-    for (( i = "$min" ; i <= "$hist_size" ; ++i )); do
+    for (( i = $min ; i <= $hist_size ; ++i )); do
       echo "$i ${__cd_history__[$i]}"
     done
   # just pass args (and add dir to history if needed)
   else
-    local prev="$PWD"
+    local saved_pwd="$PWD"
     builtin cd "$@"
     if [[ $PWD != $prev ]]; then
-      add_to_hist "$prev"
+      add_to_hist "$saved_pwd"
     fi
   fi
 
