@@ -323,8 +323,8 @@ vmap crc "+
 map <leader>r :redraw!<CR>
 
 " substitute all occurences of text selected in visual mode 
-vnoremap <C-r><C-r> "hy:%s/<C-r>h//g<left><left>
-vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>//g<left><left>
+vnoremap <C-r><C-r> "hy:%s/<C-r>h/<C-r>h/g<left><left>
+vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>/<C-r>h/g<left><left>
 
 " moving around splits more easily
 nnoremap <C-h> <C-w>h
