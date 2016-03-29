@@ -67,5 +67,11 @@ prompt_command()
 
 PROMPT_COMMAND="prompt_command $PROMPT_COMMAND"
 
-eval $(dircolors -b)
+if [ -x /usr/bin/dircolors ]; then
+    eval "$(dircolors -b)"
+    alias ls='ls --color=auto'
+    alias grep='grep --color=auto'
+fi
+
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
