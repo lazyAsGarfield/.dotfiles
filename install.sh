@@ -65,7 +65,7 @@ add_lines()
   IFS=$'\n' lines=($1)
   # echo "$1" | sed -e 's/^/  >> /'
   for line in "${lines[@]}"; do
-    echo "  >> $line"
+    echo "  \"$line\""
     line_nr=$(cat "$2" | grep -n -e "$line" -e "$(sed 's/"//g' <<< "$line")" | cut -d":" -f1 | paste -sd ',')
     ret=0
     if [[ -n $line_nr ]]; then
@@ -85,7 +85,7 @@ remove_lines()
   IFS=$'\n' lines=($1)
   ret=0
   for line in "${lines[@]}"; do
-    echo "  << $line"
+    echo "  \"$line\""
     line_nr=$(cat "$2" | grep -n -e "$line" | cut -d":" -f1)
     if [[ -z $line_nr ]]; then
       echo "    - Not found"
@@ -235,6 +235,7 @@ auto=
 target_dir=
 uninstall=
 no_backup=
+xterm=
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -246,6 +247,8 @@ while [[ $# -gt 0 ]]; do
       uninstall=1 ;;
     -n|--no-backup)
       no_backup=1 ;;
+    -x|--xterm)
+      xterm=1 ;;
     -*)
       echo "$0: Unrecognized option $1"; exit 1 ;;
     *)
@@ -302,9 +305,9 @@ if [[ -n $uninstall ]]; then
     fi
   fi
   echo -e "\nRemoving compiled terminfo..."
-  path=$(find "$HOME/.terminfo" -name "screen-256color")
+  path=$(find "$HOME/.terminfo" -name "screen-256color" -o -name "xterm-256color" | head -n1)
   if [[ -n $path ]]; then
-    find "$HOME/.terminfo" -name "screen-256color" -delete -printf "  Removed %p\n"
+    find "$HOME/.terminfo" \( -name "screen-256color" -o -name "xterm-256color" \) -delete -printf "  Removed %p\n"
     if [[ -n $(find "$HOME/.terminfo" -type d -empty) ]]; then
       echo "  Removing empty dirs:"
       find "$HOME/.terminfo" -type d -empty -delete -printf "    - %p\n"
@@ -363,14 +366,13 @@ if [[ $(read_or_yes "Configure vim? y/[n]: ") == "y" ]]; then
   echo
 fi
 
-if [[ -d "$target_dir"/.fzf ]] && [[ ! $(read_or_yes "Install fzf? y/[n]: ") == "n" ]]; then
+if [[ -d "$target_dir"/.fzf ]] && [[ $(read_or_yes "Install fzf? y/[n]: ") == "y" ]]; then
   echo "Installing fzf..."
   "$target_dir"/.fzf/install --all
   echo
 fi
 
 changed=
-
 if [[ -d "$HOME/.byobu" ]] && [[ $(read_or_yes "Configure byobu? y/[n]: ") == "y" ]]; then
   backup_and_link "$target_dir/.tmux-common.conf" "$HOME/.byobu/.tmux.conf" "/byobu"
   changed=1
@@ -380,17 +382,26 @@ if [[ $(read_or_yes "Configure tmux? y/[n]: ") == "y" ]]; then
   backup_and_link "$target_dir/.non-byobu-tmux.conf" "$HOME/.tmux.conf"
   changed=1
 fi
-
 [[ -n $changed ]] && echo
 
 setup_git
 
 setup_bashrc
 
+changed=
 if [[ $(read_or_yes "Compile screen-256color.terminfo? y/[n]: ") == "y" ]]; then
   msg_and_run "Compiling $target_dir/screen-256color.terminfo" tic -o "$HOME"/.terminfo "$target_dir/screen-256color.terminfo"
-  echo
+  changed=1
 fi
+
+if [[ -n $xterm ]]; then
+  if [[ $(read_or_yes "Compile xterm-256color.terminfo? y/[n]: ") == "y" ]]; then
+    cat screen-256color.terminfo | sed 's/screen/xterm/g' > "/tmp/xterm-256color.terminfo"
+    msg_and_run "Compiling /tmp/xterm-256color.terminfo" tic -o "$HOME"/.terminfo "/tmp/xterm-256color.terminfo"
+    changed=1
+  fi
+fi
+[[ -n $changed ]] && echo
 
 q="Create link to version compare utils in $(eval "echo $version_utils_dest")? y/[n]: "
 if [[ $(read_or_yes "$q") == "y" ]]; then
