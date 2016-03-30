@@ -129,13 +129,9 @@ setup_vim()
           __NO_YCM__=1
           export __NO_YCM__
         else
-          q="Install build tools? (requires sudo, needed for YCM compilation) y/[n]: "
-          if [[ $(read_or_no "$q") == "y" ]]; then
-            echo_and_call sudo dnf install automake gcc gcc-c++ kernel-devel cmake python-devel
-          fi
-          if [[ $(read_or_no "Install with --clang-completer option? [y]/n: ") == "n" ]]; then
-            __NO_CLANG_COMPL__=1
-            export __NO_CLANG_COMPL__
+          if [[ $(read_or_no "With semantic completers? [y]/n: ") == "n" ]]; then
+            __NO_COMPL__=1
+            export __NO_COMPL__
           fi
         fi
 
@@ -207,9 +203,9 @@ setup_bashrc()
     fi
   fi
 
-  if [[ -z $(cat $HOME/.bashrc 2>/dev/null | grep "$improved_cd_line") ]]; then
-    if [[ $(read_or_yes "Source $target_dir/improved_cd.sh in .bashrc? y/[n]: ") == "y" ]]; then
-      add_lines "$improved_cd_line" "$HOME/.bashrc"
+  if [[ -z $(cat $HOME/.bashrc 2>/dev/null | grep "$dir_utils_line") ]]; then
+    if [[ $(read_or_yes "Source $target_dir/dir_utils.sh in .bashrc? y/[n]: ") == "y" ]]; then
+      add_lines "$dir_utils_line" "$HOME/.bashrc"
       changed=1
     fi
   fi
@@ -233,9 +229,9 @@ setup_zshrc()
     fi
   fi
 
-  if [[ -z $(cat $HOME/.zshrc 2>/dev/null | grep "$improved_cd_line") ]]; then
-    if [[ $(read_or_yes "Source $target_dir/improved_cd.sh in .zshrc? y/[n]: ") == "y" ]]; then
-      add_lines "$improved_cd_line" "$HOME/.zshrc"
+  if [[ -z $(cat $HOME/.zshrc 2>/dev/null | grep "$dir_utils_line") ]]; then
+    if [[ $(read_or_yes "Source $target_dir/dir_utils.sh in .zshrc? y/[n]: ") == "y" ]]; then
+      add_lines "$dir_utils_line" "$HOME/.zshrc"
       changed=1
     fi
   fi
@@ -250,6 +246,7 @@ install_version_utils()
   fi
   msg_and_run "Linking version_lt" ln -s "$target_dir/version_lt" "$HOME/.local/bin"
   msg_and_run "Linking version_lte" ln -s "$target_dir/version_lte" "$HOME/.local/bin"
+  msg_and_run "Linking version_cmp" ln -s "$target_dir/version_cmp" "$HOME/.local/bin"
 
   if [[ $(read_or_yes "Add $1 to \$PATH in $HOME/.bash_profile? y/[n]: ") == "y" ]]; then
     add_lines "$PATH_lines" "$HOME/.bash_profile"
@@ -282,7 +279,7 @@ while [[ $# -gt 0 ]]; do
     -*)
       echo "$0: Unrecognized option $1"; exit 1 ;;
     *)
-      target_dir="$(realpath "$1")" ;;
+      target_dir="$(readlink -f -- "$1")" ;;
   esac
   shift
 done
@@ -313,22 +310,22 @@ fi
 DOTFILES_DIR_lines="DOTFILES_DIR=$target_dir"$'\n'"export DOTFILES_DIR"
 bashrc_line="source \$DOTFILES_DIR/.bashrc"
 zshrc_line="source \$DOTFILES_DIR/.zshrc"
-improved_cd_line="source \$DOTFILES_DIR/improved_cd.sh"
+dir_utils_line="source \$DOTFILES_DIR/dir_utils.sh"
 
 version_utils_dest='$HOME/.local/bin'
 
-PATH_lines="PATH=\"\$PATH\":$version_utils_dest"$'\n'"export PATH"
+PATH_lines="PATH=\"\$PATH\":\"$version_utils_dest\""$'\n'"export PATH"
 
 if [[ -n $uninstall ]]; then
   msg_and_run "Restoring backup" "$target_dir"/restore_backup.sh --auto --remove
   echo
   msg_and_run "Uninstalling fzf" "$target_dir"/.fzf/uninstall
   echo
-  remove_lines "$DOTFILES_DIR_lines"$'\n'"$bashrc_line"$'\n'"$improved_cd_line" "$HOME/.bashrc" 
-  remove_lines "$DOTFILES_DIR_lines"$'\n'"$zshrc_line"$'\n'"$improved_cd_line" "$HOME/.zshrc" 
+  remove_lines "$DOTFILES_DIR_lines"$'\n'"$bashrc_line"$'\n'"$dir_utils_line" "$HOME/.bashrc"
+  remove_lines "$DOTFILES_DIR_lines"$'\n'"$zshrc_line"$'\n'"$dir_utils_line" "$HOME/.zshrc"
   echo
   echo "Removing version utils..."
-  rm -rf "$HOME/.local/bin/version_lt" "$HOME/.local/bin/version_lte"
+  rm -rf "$HOME/.local/bin/version_lt" "$HOME/.local/bin/version_lte" "$HOME/.local/bin/version_cmp"
   find "$HOME/.local/bin" -type d -empty -delete
   echo
   if [[ ! -d $HOME/.local/bin ]]; then
@@ -401,12 +398,6 @@ if [[ $(read_or_yes "Configure vim? y/[n]: ") == "y" ]]; then
   echo
 fi
 
-if [[ -d "$target_dir"/.fzf ]] && [[ $(read_or_yes "Install fzf? y/[n]: ") == "y" ]]; then
-  echo "Installing fzf..."
-  "$target_dir"/.fzf/install --all
-  echo
-fi
-
 changed=
 if [[ -d "$HOME/.byobu" ]] && [[ $(read_or_yes "Configure byobu? y/[n]: ") == "y" ]]; then
   backup_and_link "$target_dir/.tmux-common.conf" "$HOME/.byobu/.tmux.conf" "/byobu"
@@ -424,6 +415,12 @@ setup_git
 setup_bashrc
 
 setup_zshrc
+
+if [[ -d "$target_dir"/.fzf ]] && [[ $(read_or_yes "Install fzf? y/[n]: ") == "y" ]]; then
+  echo "Installing fzf..."
+  "$target_dir"/.fzf/install --all
+  echo
+fi
 
 changed=
 if [[ $(read_or_yes "Compile screen-256color.terminfo? y/[n]: ") == "y" ]]; then

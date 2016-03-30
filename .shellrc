@@ -15,6 +15,21 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 
+alias s='saved'
+alias c='local_cd_hist'
+
+command -v vim >/dev/null 2>&1 &&
+  EDITOR=vim
+command -v vimx >/dev/null 2>&1 &&
+  EDITOR=vimx
+
+# in order to keep aliases in one place
+if [[ -n $ZSH_VERSION ]]; then
+  alias sr="source $HOME/.zshrc"
+else
+  alias sr="source $HOME/.bashrc"
+fi
+
 export FZF_DEFAULT_OPTS="--color fg:187,bg:233,hl:103,fg+:222,bg+:234,hl+:104 \
 --color info:183,prompt:110,spinner:107,pointer:167,marker:215 \
 --bind \"ctrl-u:page-up,ctrl-d:page-down\""
@@ -30,4 +45,33 @@ if [ -x /usr/bin/dircolors ]; then
 fi
 
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+__get_git_branch()
+{
+  if [[ $(git rev-parse --is-bare-repository 2>/dev/null) =~ true ]]; then
+    git_branch="/bare repo/"
+  else
+    git_branch=$(git branch 2> /dev/null | grep '* ' | cut -c3-)
+    if [[ -n $git_branch ]]; then
+      if [[ -z $(git status 2>/dev/null | grep "nothing to commit") ]]; then
+        git_mod="*"
+      else
+        git_mod=""
+      fi
+      git_branch="($git_branch$git_mod) "
+    fi
+  fi
+  echo $git_branch
+}
+
+__get_virtual_env()
+{
+  virtual_env=""
+  if [[ -z $VIRTUAL_ENV_DIABLE_PROMPT ]]; then
+    if [[ -n $VIRTUAL_ENV ]]; then
+      virtual_env="($(basename $VIRTUAL_ENV)) "
+    fi
+  fi
+  echo $virtual_env
+}
 

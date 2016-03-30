@@ -1,0 +1,68 @@
+_compadd() {
+  args=()
+  declare -a groups
+  declare -A apre hpre hsuf asuf
+
+  zparseopts -a args -E F U O A D P:=apre p:=hpre S:=asuf s:=hsuf J+:=groups
+
+  if [[ -z $was_F ]]; then
+    was_F=${args[(I)-F]}
+  fi
+
+  if (( ${args[(I)-(O|A|D)]} )); then
+    builtin compadd "$@"
+    return $?
+  fi
+
+  if (( ${args[(I)-U]} )) || ( [[ $was_F -gt 0 && ${args[(I)-F]} -eq 0 ]] ); then
+    builtin compadd -A dummy "$@"
+    return $?
+  fi
+
+  while (( ${groups[(I)-J]} )); do
+    groups[${groups[(I)-J]}]=()
+  done
+
+  [[ $prev_groups != "___" && -z ${groups:*prev_groups} && -n $__hit ]] &&
+    prev_groups=($groups) &&
+    return
+
+  prev_groups=($groups)
+
+  typeset -a _hits
+  if (( $@[(I)-d] )); then
+    i=$@[(I)-d]
+    set -- "${@:1:$i-1}" "${@:$i+2:$#}"
+  else
+    new_args=($@)
+  fi
+
+  if (( $@[(I)-ld] )); then
+    i=$@[(I)-ld]
+    set -- "${@:1:$i-1}" "${@:$i+2:$#}"
+  fi
+
+  pref_for_len=$IPREFIX$PREFIX
+
+  builtin compadd -A _hits "$@"
+
+  ret=$?
+  [[ -n $_hits ]] ||
+    return $ret
+
+  first=$_hits[1]
+
+  for hit in "${_hits[@]}"; do
+    both=($first $hit)
+    first=${${(o)both}[1]}
+  done
+  
+  both=($first $__hit)
+  both=(${(o)both})
+  if [[ -z $__hit || $both[1] == $first ]]; then
+    __hit=$IPREFIX$apre$hpre$first$hsuf$asuf
+  fi
+
+  return $ret
+}
+

@@ -19,8 +19,8 @@ Plug 'easymotion/vim-easymotion'
 Plug 'davidhalter/jedi-vim'
 Plug 'tpope/vim-unimpaired'
 if empty($__NO_YCM__)
-  if empty($__NO_CLANG_COMPL__)
-    Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
+  if empty($__NO_COMPL__)
+    Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --omnisharp-completer' }
   else
     Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
   endif
@@ -30,14 +30,19 @@ Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'lazyAsGarfield/delimitMate'
 Plug 'junegunn/vim-easy-align'
 Plug 'mbbill/undotree'
-Plug 'junegunn/fzf', { 'dir': '`realpath ~/.vim`/../.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'flazz/vim-colorschemes'
+Plug 'junegunn/goyo.vim'
+Plug 'christoomey/vim-tmux-navigator'
+Plug 'Shougo/unite.vim'
+Plug 'Shougo/neossh.vim'
+Plug 'Shougo/vimfiler.vim'
 
 call plug#end()
 
 filetype plugin indent on
-                                 
+
 " --------------- PLUGINS END --------------- }}}
 
 " ---------- VIM OPTS ------------- {{{
@@ -99,8 +104,8 @@ autocmd BufReadPost *
       \ endif
 
 " 80/120 columns marker
-" let &colorcolumn="80,".join(range(120,999),",")
-let &colorcolumn="80,120"
+" silent! let &colorcolumn="80,".join(range(120,999),",")
+silent! let &colorcolumn="80,120"
 " call matchadd('ColorColumn', '\%=80v', -10)
 
 " enable syntax highlighting
@@ -169,7 +174,7 @@ set showcmd
 " do incremental searching
 set incsearch
 
-" set search highlighting, bo do not highlight for now 
+" set search highlighting, bo do not highlight for now
 set hlsearch
 noh
 
@@ -198,6 +203,9 @@ endif
 
 " disable that annoying beeping
 autocmd GUIEnter * set vb t_vb=
+
+" set filetype for .shellrc file
+autocmd BufRead $DOTFILES_DIR/.shellrc set ft=sh
 
 " --------------- VIM OPTS END ------------- }}}
 
@@ -228,10 +236,6 @@ let g:jedi#rename_command = "<leader>r"
 
 " disable completions from jedi-vim, using YCM instead
 let g:jedi#completions_enabled = 0
-
-" YCM settings
-" default flags file for c-like langs for YCM
-let g:ycm_global_ycm_extra_conf = "~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py"
 
 let g:ycm_complete_in_comments = 1
 let g:ycm_seed_identifiers_with_syntax = 1
@@ -270,7 +274,7 @@ let g:undotree_SetFocusWhenToggle = 1
 
 " ---------- VIM MAPPINGS --------- {{{
 
-" change leader key 
+" change leader key
 let mapleader=","
 
 " open/close quickfix/location-list window
@@ -286,8 +290,10 @@ noremap \p <C-w>z
 noremap j gj
 noremap k gk
 
-" insert :q easier
+" easier quitting
 map <leader>q :q<CR>
+" typing in wrong order may be annoying
+map q<leader> :q<CR>
 
 " save current file
 map <leader>w :w<CR>
@@ -301,7 +307,7 @@ map <leader>b :b#<CR>
 " delete current buffer without closing split
 map <leader>D :BD<CR>
 
-" quickly edit/reload the vimrc file 
+" quickly edit/reload the vimrc file
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
 
@@ -321,7 +327,7 @@ vmap crc "+
 " easier redrawing - sometimes strange artifacts are visible
 map <leader>r :redraw!<CR>
 
-" substitute all occurences of text selected in visual mode 
+" substitute all occurences of text selected in visual mode
 vnoremap <C-r><C-r> "hy:%s/<C-r>h/<C-r>h/g<left><left>
 vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>/<C-r>h/g<left><left>
 
@@ -383,7 +389,7 @@ nnoremap ycf :YcmCompleter FixIt<CR>
 nnoremap ycd :YcmCompleter GetDoc<CR>
 nnoremap yci :YcmShowDetailedDiagnostic<CR>
 nnoremap yct :YcmCompleter GetType<CR>
-vnoremap yct :<c-u>YcmCompleter GetType<CR>
+" vnoremap yct :<c-u>YcmCompleter GetType<CR>
 
 " delimitMate mappings
 imap <C-k> <Plug>delimitMateJumpMany
@@ -394,17 +400,17 @@ imap <C-j> <C-k><CR>
 " Undotree plugin
 nnoremap <C-t> :UndotreeToggle<CR>
 
-" NERDTree plugin 
-function! NERDTreeEnableOrToggle() 
-  try 
-    NERDTreeToggle 
-  catch 
-    silent! NERDTree 
-  endtry 
-endfunction 
+" NERDTree plugin
+function! NERDTreeEnableOrToggle()
+  try
+    NERDTreeToggle
+  catch
+    silent! NERDTree
+  endtry
+endfunction
 
-map <C-n> :call NERDTreeEnableOrToggle()<CR> 
-map <leader><leader>n :NERDTreeFind<CR> 
+map <C-n> :call NERDTreeEnableOrToggle()<CR>
+map <leader><leader>n :NERDTreeFind<CR>
 
 " FZF list
 " <C-f> is mapped in commands section deal more wisely with git repos
@@ -478,44 +484,44 @@ nmap <leader>F <Plug>(easymotion-F)
 " open buffer [number] in vertical split
 command! -nargs=? VB vert sb <args>
 
-" buffer delete without closing split 
-function! CountListedBuffers() 
-  let cnt = 0 
-  for nr in range(1, bufnr('$')) 
-    if buflisted(nr) 
-      let cnt += 1 
-    endif 
-  endfor 
-  return cnt 
-endfunction 
+" buffer delete without closing split
+function! CountListedBuffers()
+  let cnt = 0
+  for nr in range(1, bufnr('$'))
+    if buflisted(nr)
+      let cnt += 1
+    endif
+  endfor
+  return cnt
+endfunction
 
-function! LastUsedBufferOrPrevious(bang) 
+function! LastUsedBufferOrPrevious(bang)
   if a:bang
-    if CountListedBuffers() == 1 
+    if CountListedBuffers() == 1 || bufwinnr('#') > -1
       bd!
-    elseif buflisted(bufname("#")) 
-      b # 
+    elseif buflisted(bufnr("#"))
+      b #
       bd! #
-    else 
-      bp 
+    else
+      bp
       bd! #
-    endif 
-  elseif getbufvar(bufname("%"), "&mod")
+    endif
+  elseif getbufvar(bufnr("%"), "&mod")
     echoerr "Unsaved changes (add ! to override)"
   else
-    if CountListedBuffers() == 1 
+    if CountListedBuffers() == 1 || bufwinnr('#') > -1
       bd
-    elseif buflisted(bufname("#")) 
-      b # 
+    elseif buflisted(bufnr("#"))
+      b #
       bd #
-    else 
-      bp 
+    else
+      bp
       bd #
-    endif 
+    endif
   endif
-endfunction 
+endfunction
 
-command! -bang BD call LastUsedBufferOrPrevious(<bang>0) 
+command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 
 " --------------- VIM COMMANDS END -------------- }}}
 
@@ -534,12 +540,15 @@ command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, extend(
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
 
 function! s:git_files_if_in_repo(bang)
-  let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
+  let expanded = expand('%:p:h')
+  if expanded =~ '^\(scp\|ftp\)://'
+    let expanded = getcwd()
+  endif
+  let git_root = join(split(fugitive#extract_git_dir(expanded), '/')[:-2], '/')
   if git_root == ''
-    let path = expand('%:p:h')
-    return fzf#vim#files(path, extend({
+    return fzf#vim#files(expanded, extend({
           \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-          \ 'options': '--prompt "' . path . ' (Files)>"'
+          \ 'options': '--prompt "' . expanded . ' (Files)>"'
           \ }, a:bang ? {} : g:fzf#vim#default_layout))
   else
     let git_root = '/' . git_root
@@ -563,8 +572,12 @@ command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
 
 function! s:git_root_or_current_dir()
-  let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
-  return git_root == '' ? expand('%:p:h') : '/'.git_root
+  let expanded = expand('%:p:h')
+  if expanded =~ '^\(scp\|ftp\)://'
+    return getcwd()
+  endif
+  let git_root = join(split(fugitive#extract_git_dir(expanded), '/')[:-2], '/')
+  return git_root == '' ? expanded : '/'.git_root
 endfunction
 
 function! s:all_files_git_root_or_current_dir(bang)
@@ -578,9 +591,13 @@ endfunction
 command! -bang FilesGitRootOrCurrent call s:all_files_git_root_or_current_dir(<bang>0)
 
 " expands path relatively to current dir or git root if possible
+" or to cwd if editing over ssh/ftp
 " (similar to CtrlP plugin)
 function! s:relpath(filepath_or_name)
   let fullpath = fnamemodify(a:filepath_or_name, ':p')
+  " if fullpath =~ '^(ssh|ftp)://'
+  "   fullpath = getcwd()
+  " endif
   let save_cwd = fnameescape(getcwd())
   let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
   try
@@ -606,7 +623,7 @@ let s:default_action = {
   \ 'ctrl-v': 'vsplit' }
 
 " below function is used in order to get actions like ctrl-v etc.
-" and to transform path to proper version (as it may be relative to 
+" and to transform path to proper version (as it may be relative to
 " dir of current file, not necessarily to cwd)
 function! s:mru_sink(lines)
   let key = remove(a:lines, 0)
@@ -647,7 +664,7 @@ function! s:mru_list_without_nonexistent()
     let mru_list = ctrlp#mrufiles#list()[1:]
   endif
   let cwd = fnameescape(getcwd())
-  call filter(mru_list, 'findfile(v:val, cwd) == v:val')
+  call filter(mru_list, '!empty(findfile(v:val, cwd))')
   return mru_list
 endfunction
 
@@ -788,3 +805,74 @@ vnoremap RR :<c-u>Regs 1<CR>
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
+
+
+" new stuff, not categorized yet
+
+" default flags files for c-like langs for YCM
+autocmd filetype cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cpp/.ycm_extra_conf.py"
+autocmd filetype c let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/c/.ycm_extra_conf.py"
+
+set nowrap
+
+let g:goyo_width=120
+let g:goyo_height='95%'
+
+nmap goy :Goyo<CR>
+
+function! s:goyo_enter()
+  silent !tmux set -w status off
+  silent !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
+  set noshowmode
+  set noshowcmd
+  let g:scrolloff_saved=&scrolloff
+  set scrolloff=999
+endfunction
+
+function! s:goyo_leave()
+  silent !tmux set -w status on
+  silent !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
+  set showmode
+  set showcmd
+  exec 'set scrolloff=' . g:scrolloff_saved
+endfunction
+
+autocmd! User GoyoEnter nested call <SID>goyo_enter()
+autocmd! User GoyoLeave nested call <SID>goyo_leave()
+
+autocmd filetype help nnoremap <buffer> q :quit<CR>
+
+autocmd filetype nerdtree nmap <buffer> <C-v> s
+autocmd filetype nerdtree nmap <buffer> <C-x> i
+autocmd filetype nerdtree nmap <buffer> <C-j> j
+autocmd filetype nerdtree nmap <buffer> <C-k> k
+autocmd filetype nerdtree nmap <buffer> . I
+
+autocmd! filetype unite
+autocmd filetype unite nunmap <buffer> <C-h>
+autocmd filetype unite nunmap <buffer> <C-k>
+autocmd filetype unite imap <buffer> <C-j> <Plug>(unite_loop_cursor_up)
+autocmd filetype unite imap <buffer> <C-k> <Plug>(unite_loop_cursor_down)
+
+autocmd! filetype vimfiler
+autocmd filetype vimfiler nunmap <buffer> <C-l>
+autocmd filetype vimfiler nmap <buffer> <C-k> <Plug>(vimfiler_loop_cursor_up)
+autocmd filetype vimfiler nmap <buffer> <C-j> <Plug>(vimfiler_loop_cursor_down)
+autocmd filetype vimfiler nmap <buffer> ? <Plug>(vimfiler_help)
+autocmd filetype vimfiler nmap <buffer> o <Plug>(vimfiler_expand_or_edit)
+autocmd filetype vimfiler nmap <buffer> u <Plug>(vimfiler_switch_to_parent_directory)
+autocmd filetype vimfiler nmap <buffer> i <Plug>(vimfiler_cd_input_directory)
+autocmd filetype vimfiler nmap <buffer> C <Plug>(vimfiler_cd_file)
+autocmd filetype vimfiler nmap <buffer> I <Plug>(vimfiler_toggle_visible_ignore_files)
+autocmd filetype vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
+autocmd filetype vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
+
+map TT :VimFilerExplorer<CR>
+map TC :exec 'VimFilerExplorer ' . substitute(expand('%:p:h'), 'scp', 'ssh', '')<CR>
+
+let g:tmux_navigator_no_mappings = 1
+
+nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
+nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
+nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
+nnoremap <silent> <C-l> :TmuxNavigateRight<cr>

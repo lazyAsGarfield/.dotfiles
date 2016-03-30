@@ -22,6 +22,8 @@
   br = branch
   co = checkout
   cm = commit
+  ch = cherry-pick
+  last = log -p -1
   lol = log --graph --decorate --pretty=oneline --abbrev-commit
   lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
 

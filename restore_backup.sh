@@ -81,7 +81,7 @@ if [[ -z $from ]]; then
       while [[ -z $from ]]; do
         echo -n "Enter backup directory: "
         read ans
-        ans=$(realpath "$ans")
+        ans=$(readlink -f "$ans")
         if [[ -d $ans ]]; then
           if ls "$ans" | grep -qE "$regex" >/dev/null 2>&1 ; then
             from=$ans

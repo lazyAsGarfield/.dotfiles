@@ -23,25 +23,11 @@ prompt_command()
   local CYAN="\[\e[0;36m\]"
   local LIGHT_CYAN="\[\e[0;1;36m\]"
 
-  git_branch=$(git branch 2> /dev/null | grep '* ' | cut -c3-)
-  if [[ -n $git_branch ]]; then
-    if [[ -z $(git status | grep "nothing to commit") ]]; then
-      git_mod="*"
-    else
-      git_mod=""
-    fi
-    git_branch="($git_branch$git_mod)"
-  fi
-
-  virtual_env=""
-  if [[ -z $VIRTUAL_ENV_DIABLE_PROMPT ]]; then
-    if [[ -n $VIRTUAL_ENV ]]; then
-      virtual_env="($(basename $VIRTUAL_ENV)) "
-    fi
-  fi
+  git_branch=$(__get_git_branch)
+  virtual_env=$(__get_virtual_env)
 
   PS1="$BLUE$virtual_env$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE]$GREEN $git_branch$BOLD$ $NORMAL"
 }
 
-PROMPT_COMMAND="prompt_command $PROMPT_COMMAND"
+PROMPT_COMMAND="history -a; prompt_command; $PROMPT_COMMAND"
 
