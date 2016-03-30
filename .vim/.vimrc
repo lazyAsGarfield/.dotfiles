@@ -28,7 +28,7 @@ if empty($__NO_YCM__)
 endif
 Plug 'tpope/vim-fugitive'
 Plug 'octol/vim-cpp-enhanced-highlight'
-Plug 'Raimondi/delimitMate'
+Plug 'lazyAsGarfield/delimitMate'
 Plug 'junegunn/vim-easy-align'
 Plug 'mbbill/undotree'
 Plug 'junegunn/fzf', { 'dir': '`realpath ~/.vim`/../.fzf', 'do': './install --all' }
@@ -357,16 +357,34 @@ map zi :call ChangeFold()<CR>
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
 
+function! GetUnityDoc()
+  if &filetype == "cs" && expand("%:p") =~ "Unity"
+    call system("git web--browse -b google-chrome " .
+          \ "https://docs.unity3d.com/ScriptReference/30_search.html?q=" .
+          \ @h . " >/dev/null 2>&1")
+    if v:shell_error
+      call system("git web--browse " .
+            \ "https://docs.unity3d.com/ScriptReference/30_search.html?q=" .
+            \ @h . " >/dev/null 2>&1")
+    endif
+  endif
+endfunction
+
+nnoremap <leader>ud "hyiw:call GetUnityDoc()<CR>
+vnoremap <leader>ud "hy:<C-u>call GetUnityDoc()<CR>
+
 " --------------- VIM MAPPINGS END -------------- }}}
 
 " ---------- PLUGIN MAPPINGS ------ {{{
 
 " YCM mappings
-nnoremap ygt :YcmCompleter GoTo<CR>
-nnoremap yc :YcmForceCompileAndDiagnostics<CR>
-nnoremap <leader>fi :YcmCompleter FixIt<CR>
-nnoremap <leader>gt :YcmCompleter GetType<CR>
-vnoremap <leader>gt :<c-u>YcmCompleter GetType<CR>
+nnoremap ycg :YcmCompleter GoTo<CR>
+nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
+nnoremap ycf :YcmCompleter FixIt<CR>
+nnoremap ycd :YcmCompleter GetDoc<CR>
+nnoremap yci :YcmShowDetailedDiagnostic<CR>
+nnoremap yct :YcmCompleter GetType<CR>
+vnoremap yct :<c-u>YcmCompleter GetType<CR>
 
 " delimitMate mappings
 imap <C-k> <Plug>delimitMateJumpMany
@@ -624,8 +642,12 @@ endfunction
 let g:mru_full_path = 0
 
 function! s:mru_list_without_nonexistent()
-  let mru_list = ctrlp#mrufiles#list()[1:]
-  let cwd = getcwd()
+  if empty(expand('%'))
+    let mru_list = ctrlp#mrufiles#list()
+  else
+    let mru_list = ctrlp#mrufiles#list()[1:]
+  endif
+  let cwd = fnameescape(getcwd())
   call filter(mru_list, 'findfile(v:val, cwd) == v:val')
   return mru_list
 endfunction
