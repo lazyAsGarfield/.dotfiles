@@ -8,7 +8,6 @@ let path='~/.vim/plugged'
 
 call plug#begin(path)
 
-Plug 'gmarik/Vundle.vim'
 Plug 'tpope/vim-surround'
 Plug 'scrooloose/nerdtree'
 Plug 'tpope/vim-commentary'
