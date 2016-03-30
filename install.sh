@@ -66,7 +66,7 @@ add_lines()
   # echo "$1" | sed -e 's/^/  >> /'
   for line in "${lines[@]}"; do
     echo "  \"$line\""
-    line_nr=$(cat "$2" | grep -n -e "$line" -e "$(sed 's/"//g' <<< "$line")" | cut -d":" -f1 | paste -sd ',')
+    line_nr=$(cat "$2" 2>/dev/null | grep -n -e "$line" -e "$(sed 's/"//g' <<< "$line")" | cut -d":" -f1 | paste -sd ',')
     ret=0
     if [[ -n $line_nr ]]; then
       echo "    - Already exists at line $line_nr"
@@ -86,7 +86,7 @@ remove_lines()
   ret=0
   for line in "${lines[@]}"; do
     echo "  \"$line\""
-    line_nr=$(cat "$2" | grep -n -e "$line" | cut -d":" -f1)
+    line_nr=$(cat "$2" 2>/dev/null | grep -n -e "$line" | cut -d":" -f1)
     if [[ -z $line_nr ]]; then
       echo "    - Not found"
       ret=1
@@ -195,21 +195,47 @@ setup_bashrc()
 {
   changed=
 
-  if [[ -z $(cat $HOME/.bashrc | grep "$DOTFILES_DIR_lines") ]]; then
+  if [[ -z $(cat $HOME/.bashrc 2>/dev/null | grep "$DOTFILES_DIR_lines") ]]; then
     add_lines "$DOTFILES_DIR_lines" "$HOME/.bashrc"
     changed=1
   fi
 
-  if [[ -f $HOME/.bashrc ]] && [[ -z $(cat $HOME/.bashrc | grep "$bashrc_line") ]]; then
+  if [[ -z $(cat $HOME/.bashrc 2>/dev/null | grep "$bashrc_line") ]]; then
     if [[ $(read_or_yes "Source $target_dir/.bashrc in .bashrc? y/[n]: ") == "y" ]]; then
       add_lines "$bashrc_line" "$HOME/.bashrc"
       changed=1
     fi
   fi
 
-  if [[ -f $HOME/.bashrc ]] && [[ -z $(cat $HOME/.bashrc | grep "$improved_cd_line") ]]; then
+  if [[ -z $(cat $HOME/.bashrc 2>/dev/null | grep "$improved_cd_line") ]]; then
     if [[ $(read_or_yes "Source $target_dir/improved_cd.sh in .bashrc? y/[n]: ") == "y" ]]; then
       add_lines "$improved_cd_line" "$HOME/.bashrc"
+      changed=1
+    fi
+  fi
+
+  [[ -n $changed ]] && echo
+}
+
+setup_zshrc()
+{
+  changed=
+
+  if [[ -z $(cat $HOME/.zshrc 2>/dev/null | grep "$DOTFILES_DIR_lines") ]]; then
+    add_lines "$DOTFILES_DIR_lines" "$HOME/.zshrc"
+    changed=1
+  fi
+
+  if [[ -z $(cat $HOME/.zshrc 2>/dev/null | grep "$zshrc_line") ]]; then
+    if [[ $(read_or_yes "Source $target_dir/.zshrc in .zshrc? y/[n]: ") == "y" ]]; then
+      add_lines "$zshrc_line" "$HOME/.zshrc"
+      changed=1
+    fi
+  fi
+
+  if [[ -z $(cat $HOME/.zshrc 2>/dev/null | grep "$improved_cd_line") ]]; then
+    if [[ $(read_or_yes "Source $target_dir/improved_cd.sh in .zshrc? y/[n]: ") == "y" ]]; then
+      add_lines "$improved_cd_line" "$HOME/.zshrc"
       changed=1
     fi
   fi
@@ -227,6 +253,10 @@ install_version_utils()
 
   if [[ $(read_or_yes "Add $1 to \$PATH in $HOME/.bash_profile? y/[n]: ") == "y" ]]; then
     add_lines "$PATH_lines" "$HOME/.bash_profile"
+  fi
+
+  if [[ $(read_or_yes "Add $1 to \$PATH in $HOME/.zshenv? y/[n]: ") == "y" ]]; then
+    add_lines "$PATH_lines" "$HOME/.zshenv"
   fi
 }
 
@@ -282,6 +312,7 @@ fi
 
 DOTFILES_DIR_lines="DOTFILES_DIR=$target_dir"$'\n'"export DOTFILES_DIR"
 bashrc_line="source \$DOTFILES_DIR/.bashrc"
+zshrc_line="source \$DOTFILES_DIR/.zshrc"
 improved_cd_line="source \$DOTFILES_DIR/improved_cd.sh"
 
 version_utils_dest='$HOME/.local/bin'
@@ -294,6 +325,7 @@ if [[ -n $uninstall ]]; then
   msg_and_run "Uninstalling fzf" "$target_dir"/.fzf/uninstall
   echo
   remove_lines "$DOTFILES_DIR_lines"$'\n'"$bashrc_line"$'\n'"$improved_cd_line" "$HOME/.bashrc" 
+  remove_lines "$DOTFILES_DIR_lines"$'\n'"$zshrc_line"$'\n'"$improved_cd_line" "$HOME/.zshrc" 
   echo
   echo "Removing version utils..."
   rm -rf "$HOME/.local/bin/version_lt" "$HOME/.local/bin/version_lte"
@@ -302,6 +334,9 @@ if [[ -n $uninstall ]]; then
   if [[ ! -d $HOME/.local/bin ]]; then
     if ! remove_lines "$PATH_lines" "$HOME/.bash_profile"; then
       remove_lines "$(sed 's/"//g' <<< "$PATH_lines")" "$HOME/.bash_profile"
+    fi
+    if ! remove_lines "$PATH_lines" "$HOME/.zshenv"; then
+      remove_lines "$(sed 's/"//g' <<< "$PATH_lines")" "$HOME/.zshenv"
     fi
   fi
   echo -e "\nRemoving compiled terminfo..."
@@ -387,6 +422,8 @@ fi
 setup_git
 
 setup_bashrc
+
+setup_zshrc
 
 changed=
 if [[ $(read_or_yes "Compile screen-256color.terminfo? y/[n]: ") == "y" ]]; then
