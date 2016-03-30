@@ -297,7 +297,7 @@ if [[ -n $uninstall ]]; then
   echo
   echo "Removing version utils..."
   rm -rf "$HOME/.local/bin/version_lt" "$HOME/.local/bin/version_lte"
-  find "$HOME/.local" -type d -empty -delete
+  find "$HOME/.local/bin" -type d -empty -delete
   echo
   if [[ ! -d $HOME/.local/bin ]]; then
     if ! remove_lines "$PATH_lines" "$HOME/.bash_profile"; then
