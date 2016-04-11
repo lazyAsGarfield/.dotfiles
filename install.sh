@@ -387,7 +387,7 @@ if [[ -z $offline ]]; then
     fi
   else
     if [[ $(read_or_yes "Clone repo? y/[n]: ") == "y" ]]; then
-      msg_and_run "Cloning" git clone http://github.com/lazyasgarfield/.dotfiles "$target_dir"
+      msg_and_run "Cloning" git clone --recursive http://github.com/lazyasgarfield/.dotfiles "$target_dir"
       echo
     fi
   fi
