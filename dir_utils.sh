@@ -120,9 +120,13 @@ function cd()
       local dir="${__saved_dirs__[$num]}"
       if [[ -d $dir ]]; then
         local saved_pwd="$PWD"
-        if [[ $PWD != $dir ]] && builtin cd "$dir"; then
-          add_to_hist "$saved_pwd"
-          echo "$dir"
+        if [[ $PWD != $dir ]]; then
+          if builtin cd "$dir"; then
+            add_to_hist "$saved_pwd"
+            echo "$dir"
+          else
+            return $?
+          fi
         fi
       fi
     fi
@@ -136,9 +140,13 @@ function cd()
       local dir="${__cd_history__[$num]}"
       if [[ -d $dir ]]; then
         local saved_pwd="$PWD"
-        if [[ $PWD != $dir ]] && builtin cd "$dir"; then
-          add_to_hist "$saved_pwd"
-          echo "$dir"
+        if [[ $PWD != $dir ]]; then
+          if builtin cd "$dir"; then
+            add_to_hist "$saved_pwd"
+            echo "$dir"
+          else
+            return $?
+          fi
         fi
       fi
     fi
@@ -156,9 +164,11 @@ function cd()
   else
     local saved_pwd="$PWD"
     builtin cd "$@"
+    ret=$?
     if [[ $PWD != $saved_pwd ]]; then
       add_to_hist "$saved_pwd"
     fi
+    return $ret
   fi
 
   unset -f add_to_hist

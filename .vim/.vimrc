@@ -292,8 +292,6 @@ noremap k gk
 
 " easier quitting
 map <leader>q :q<CR>
-" typing in wrong order may be annoying
-map q<leader> :q<CR>
 
 " save current file
 map <leader>w :w<CR>
@@ -818,7 +816,7 @@ set nowrap
 let g:goyo_width=120
 let g:goyo_height='95%'
 
-nmap goy :Goyo<CR>
+nmap MM :Goyo<CR>
 
 function! s:goyo_enter()
   silent !tmux set -w status off
@@ -827,6 +825,7 @@ function! s:goyo_enter()
   set noshowcmd
   let g:scrolloff_saved=&scrolloff
   set scrolloff=999
+  Goyo x95%
 endfunction
 
 function! s:goyo_leave()
@@ -840,8 +839,15 @@ endfunction
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
 autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
-autocmd filetype help nnoremap <buffer> q :quit<CR>
+autocmd filetype help nnoremap <nowait> <buffer> q :quit<CR>
+" autocmd filetype help nnoremap <buffer>  :quit<CR>
 
+autocmd filetype undotree nmap <nowait> <buffer> q :quit<CR>
+autocmd filetype undotree nmap <buffer> <C-j> j
+autocmd filetype undotree nmap <buffer> <C-k> k
+autocmd filetype undotree nmap <buffer>  :quit<CR>
+
+" autocmd filetype nerdtree nmap <buffer>  :quit<CR>
 autocmd filetype nerdtree nmap <buffer> <C-v> s
 autocmd filetype nerdtree nmap <buffer> <C-x> i
 autocmd filetype nerdtree nmap <buffer> <C-j> j
@@ -872,7 +878,38 @@ map TC :exec 'VimFilerExplorer ' . substitute(expand('%:p:h'), 'scp', 'ssh', '')
 
 let g:tmux_navigator_no_mappings = 1
 
-nnoremap <silent> <C-h> :TmuxNavigateLeft<cr>
-nnoremap <silent> <C-j> :TmuxNavigateDown<cr>
-nnoremap <silent> <C-k> :TmuxNavigateUp<cr>
-nnoremap <silent> <C-l> :TmuxNavigateRight<cr>
+function! Navigate(dir)
+  if a:dir == 'l'
+    if exists(':TmuxNavigateLeft')
+      TmuxNavigateLeft
+    else
+      normal h
+    endif
+  elseif a:dir == 'r'
+    if exists(':TmuxNavigateRight')
+      TmuxNavigateRight
+    else
+      normal l
+    endif
+  elseif a:dir == 'u'
+    if exists(':TmuxNavigateUp')
+      TmuxNavigateUp
+    else
+      normal k
+    endif
+  elseif a:dir == 'd'
+    if exists(':TmuxNavigateDown')
+      TmuxNavigateDown
+    else
+      normal j
+    endif
+  endif
+endfunction
+
+nnoremap <silent> <C-h> :call Navigate('l')<CR>
+nnoremap <silent> <C-j> :call Navigate('d')<CR>
+nnoremap <silent> <C-k> :call Navigate('u')<CR>
+nnoremap <silent> <C-l> :call Navigate('r')<CR>
+
+" typing in wrong order may be annoying
+" map q<leader> :q<CR>
