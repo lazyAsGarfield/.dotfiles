@@ -322,6 +322,16 @@ vmap cry "0
 nmap crc "+
 vmap crc "+
 
+nmap cy "+y
+vmap cy "+y
+nmap cY "+Y
+vmap cY "+Y
+
+nmap cp "+p
+vmap cp "+p
+nmap cP "+P
+vmap cP "+P
+
 " easier redrawing - sometimes strange artifacts are visible
 map <leader>r :redraw!<CR>
 
