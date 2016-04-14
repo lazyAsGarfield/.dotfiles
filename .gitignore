@@ -1,3 +1,4 @@
 .fzf/
 dotfiles_backup*/
 .antigen/
+.zgen/

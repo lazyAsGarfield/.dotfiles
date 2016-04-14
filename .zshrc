@@ -57,13 +57,20 @@ precmd()
 
 zmodload zsh/complist
 
-ADOTDIR=$DOTFILES_DIR/.antigen
+ZGEN_DIR=$DOTFILES_DIR/.zgen
 
-source $DOTFILES_DIR/antigen/antigen.zsh
-antigen bundle pip
-antigen bundle zsh-users/zsh-autosuggestions
-antigen bundle zsh-users/zsh-completions
-antigen apply
+source "$DOTFILES_DIR/zgen/zgen.zsh"
+
+if ! zgen saved; then
+
+  # zgen oh-my-zsh
+  zgen oh-my-zsh plugins/pip
+  zgen oh-my-zsh plugins/docker
+  zgen load zsh-users/zsh-autosuggestions
+  zgen load zsh-users/zsh-completions
+
+  zgen save
+fi
 
 alias -g ..='..'
 alias -g ...='../..'
@@ -273,7 +280,8 @@ ZLE_REMOVE_SUFFIX_CHARS=""
 # }}}
 
 # autosuggestions + completion based autosuggestions {{{
-dest_file="$DOTFILES_DIR/.antigen/repos/https-COLON--SLASH--SLASH-github.com-SLASH-zsh-users-SLASH-zsh-autosuggestions.git/zsh-autosuggestions.plugin.zsh"
+
+dest_file="$DOTFILES_DIR/.zgen/zsh-users/zsh-autosuggestions-master/zsh-autosuggestions.plugin.zsh"
 
 if [[ -f $dest_file ]]; then
 
