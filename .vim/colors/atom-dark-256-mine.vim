@@ -25,7 +25,7 @@ hi DiffChange     cterm=NONE      ctermfg=243 ctermbg=237  gui=NONE      guifg=#
 hi DiffDelete     cterm=NONE      ctermfg=89  ctermbg=16   gui=NONE      guifg=#960050 guibg=#1E0010
 hi DiffText       cterm=NONE      ctermfg=254 ctermbg=237  gui=NONE      guifg=#F9F0F3 guibg=#4C4745
 hi Directory      cterm=NONE      ctermfg=248              gui=NONE      guifg=#AAAAAA              
-hi Error          cterm=underline ctermfg=16  ctermbg=88   gui=NONE      guifg=#A8FF60 guibg=#1E0010
+hi Error          cterm=NONE      ctermfg=16  ctermbg=124  gui=NONE      guifg=#A8FF60 guibg=#1E0010
 hi ErrorMsg       cterm=NONE      ctermfg=117 ctermbg=235  gui=NONE      guifg=#92C5F7 guibg=#232526
 hi Exception      cterm=NONE      ctermfg=186              gui=NONE      guifg=#DAD085              
 hi Float          cterm=NONE      ctermfg=114              gui=NONE      guifg=#99CC99              
@@ -70,7 +70,7 @@ hi Underlined     cterm=underline ctermfg=244              gui=underline guifg=#
 hi VertSplit      cterm=reverse   ctermfg=232 ctermbg=244  gui=reverse   guifg=#808080 guibg=#080808
 hi VisualNOS      cterm=NONE                  ctermbg=59   gui=NONE                    guibg=#403D3D
 hi Visual         cterm=NONE                  ctermbg=59   gui=NONE                    guibg=#403D3D
-hi WarningMsg     cterm=underline ctermfg=16  ctermbg=196  gui=NONE      guifg=#FFFFFF guibg=#333333
+hi WarningMsg     cterm=NONE      ctermfg=16  ctermbg=130  gui=NONE      guifg=#FFFFFF guibg=#333333
 hi WildMenu       cterm=NONE      ctermfg=81  ctermbg=16   gui=NONE      guifg=#66D9EF guibg=#000000
 hi TabLineFill    cterm=reverse   ctermfg=234 ctermbg=234  gui=reverse   guifg=#1D1F21 guibg=#1D1F21
 hi TabLine        cterm=underline,bold        ctermbg=238  gui=NONE      guifg=#808080 guibg=#1D1F21

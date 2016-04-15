@@ -38,6 +38,10 @@ Plug 'christoomey/vim-tmux-navigator'
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/neossh.vim'
 Plug 'Shougo/vimfiler.vim'
+Plug 'tpope/vim-endwise'
+Plug 'airblade/vim-gitgutter'
+Plug 'moll/vim-bbye'
+Plug 'ntpeters/vim-better-whitespace'
 
 call plug#end()
 
@@ -303,7 +307,7 @@ map <silent> <leader>n :noh<CR>
 map <leader>b :b#<CR>
 
 " delete current buffer without closing split
-map <leader>D :BD<CR>
+" map <leader>D :BD<CR>
 
 " quickly edit/reload the vimrc file
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
@@ -331,6 +335,8 @@ nmap cp "+p
 vmap cp "+p
 nmap cP "+P
 vmap cP "+P
+
+imap CP +
 
 " easier redrawing - sometimes strange artifacts are visible
 map <leader>r :redraw!<CR>
@@ -503,33 +509,33 @@ function! CountListedBuffers()
   return cnt
 endfunction
 
-function! LastUsedBufferOrPrevious(bang)
-  if a:bang
-    if CountListedBuffers() == 1 || bufwinnr('#') > -1
-      bd!
-    elseif buflisted(bufnr("#"))
-      b #
-      bd! #
-    else
-      bp
-      bd! #
-    endif
-  elseif getbufvar(bufnr("%"), "&mod")
-    echoerr "Unsaved changes (add ! to override)"
-  else
-    if CountListedBuffers() == 1 || bufwinnr('#') > -1
-      bd
-    elseif buflisted(bufnr("#"))
-      b #
-      bd #
-    else
-      bp
-      bd #
-    endif
-  endif
-endfunction
+" function! LastUsedBufferOrPrevious(bang)
+"   if a:bang
+"     if CountListedBuffers() == 1 || bufwinnr('#') > -1
+"       bd!
+"     elseif buflisted(bufnr("#"))
+"       b #
+"       bd! #
+"     else
+"       bp
+"       bd! #
+"     endif
+"   elseif getbufvar(bufnr("%"), "&mod")
+"     echoerr "Unsaved changes (add ! to override)"
+"   else
+"     if CountListedBuffers() == 1 || bufwinnr('#') > -1
+"       bd
+"     elseif buflisted(bufnr("#"))
+"       b #
+"       bd #
+"     else
+"       bp
+"       bd #
+"     endif
+"   endif
+" endfunction
 
-command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
+" command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 
 " --------------- VIM COMMANDS END -------------- }}}
 
@@ -923,3 +929,22 @@ nnoremap <silent> <C-l> :call Navigate('r')<CR>
 
 " typing in wrong order may be annoying
 " map q<leader> :q<CR>
+
+let g:gitgutter_override_sign_column_highlight = 0
+
+hi GitGutterAdd          cterm=bold ctermfg=106 ctermbg=235
+hi GitGutterChange       cterm=bold ctermfg=105 ctermbg=235
+hi GitGutterDelete       cterm=bold ctermfg=196 ctermbg=235
+hi GitGutterChangeDelete cterm=bold ctermfg=126 ctermbg=235
+
+let g:gitgutter_sign_modified = '#'
+
+highlight ExtraWhitespace ctermbg=137
+
+nmap co<space> :ToggleWhitespace<CR>
+nmap <space>st :StripWhitespace<CR>
+
+map <leader>D :Bdelete<CR>
+
+autocmd filetype gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
+
