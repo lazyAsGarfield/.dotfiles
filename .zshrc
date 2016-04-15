@@ -95,7 +95,7 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=20000
 
-setopt appendhistory autocd nocdablevars
+setopt appendhistory autocd nocdablevars nomultios
 unsetopt beep nomatch
 # }}}
 
