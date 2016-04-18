@@ -932,16 +932,43 @@ nnoremap <silent> <C-l> :call Navigate('r')<CR>
 
 let g:gitgutter_override_sign_column_highlight = 0
 
-hi GitGutterAdd          cterm=bold ctermfg=106 ctermbg=235
+hi GitGutterAdd          cterm=bold ctermfg=46  ctermbg=235
 hi GitGutterChange       cterm=bold ctermfg=105 ctermbg=235
 hi GitGutterDelete       cterm=bold ctermfg=196 ctermbg=235
 hi GitGutterChangeDelete cterm=bold ctermfg=126 ctermbg=235
 
+" those are better visible
 let g:gitgutter_sign_modified = '#'
+let g:gitgutter_sign_removed = 'v'
+let g:gitgutter_sign_modified_removed = '#v'
+
+function! s:gitgutter_toggle_wrapper()
+  GitGutterToggle
+  if gitgutter#utility#is_active()
+    echo "GitGutter enabled"
+  else
+    echo "GitGutter disabled"
+  endif
+endfunction
+
+command! GitGutterToggleWrapper call s:gitgutter_toggle_wrapper()
+
+nmap <silent> cog :GitGutterToggleWrapper<CR>
 
 highlight ExtraWhitespace ctermbg=137
 
-nmap co<space> :ToggleWhitespace<CR>
+function! s:toggle_whitespace_wrapper()
+  ToggleWhitespace
+  if g:better_whitespace_enabled == 1
+    echo "BetterWhitespaces enabled"
+  else
+    echo "BetterWhitespaces disabled"
+  endif
+endfunction
+
+command! ToggleWhitespaceWrapper call s:toggle_whitespace_wrapper()
+
+nmap <silent> co<space> :ToggleWhitespaceWrapper<CR>
 nmap <space>st :StripWhitespace<CR>
 
 map <leader>D :Bdelete<CR>
