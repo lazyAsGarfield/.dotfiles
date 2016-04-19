@@ -256,6 +256,7 @@ bindkey '^H' disable_realtime_suggestions_once
 zstyle ':completion:*' completer _complete _match _correct _approximate
 zstyle ':completion:*' matcher-list '' \
   'm:{[:lower:]\-}={[:upper:]\_}' \
+  'm:{[:lower:][:upper:]\-\_}={[:upper:][:lower:]\_\-}' \
   'r:[^[:alpha:]]||[[:alpha:]]=** r:|=* m:{a-z\-}={A-Z\_}' \
   'r:[[:ascii:]]||[[:ascii:]]=** r:|=* m:{a-z\-}={A-Z\_}'
   # 'l:|=* r:|=*'
@@ -276,7 +277,7 @@ zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p
 autoload -Uz compinit
 compinit
 
-ZLE_REMOVE_SUFFIX_CHARS=""
+ZLE_REMOVE_SUFFIX_CHARS="*"
 # }}}
 
 # autosuggestions + completion based autosuggestions {{{
