@@ -42,6 +42,7 @@ Plug 'tpope/vim-endwise'
 Plug 'airblade/vim-gitgutter'
 Plug 'moll/vim-bbye'
 Plug 'ntpeters/vim-better-whitespace'
+Plug 'tpope/vim-sleuth'
 
 call plug#end()
 
@@ -829,6 +830,8 @@ autocmd filetype c let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/c/
 
 set nowrap
 
+set lazyredraw
+
 let g:goyo_width=120
 let g:goyo_height='95%'
 
@@ -889,8 +892,8 @@ autocmd filetype vimfiler nmap <buffer> I <Plug>(vimfiler_toggle_visible_ignore_
 autocmd filetype vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
 autocmd filetype vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
 
-map TT :VimFilerExplorer<CR>
-map TC :exec 'VimFilerExplorer ' . substitute(expand('%:p:h'), 'scp', 'ssh', '')<CR>
+map FF :VimFilerExplorer<CR>
+map FR :exec 'VimFilerExplorer "' . substitute(substitute(expand('%:p:h'), 'scp', 'ssh', ''), '/\~/', '/', '') . '"'<CR>
 
 let g:tmux_navigator_no_mappings = 1
 
@@ -974,4 +977,6 @@ nmap <space>st :StripWhitespace<CR>
 map <leader>D :Bdelete<CR>
 
 autocmd filetype gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
+
+nmap <leader>ss :source %<CR>
 
