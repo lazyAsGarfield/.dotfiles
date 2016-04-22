@@ -46,6 +46,8 @@ fi
 
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
+source $DOTFILES_DIR/z.sh
+
 __get_git_branch()
 {
   if [[ $(git rev-parse --is-bare-repository 2>/dev/null) =~ true ]]; then
