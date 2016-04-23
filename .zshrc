@@ -195,10 +195,15 @@ tog()
     #   -e 's/^ZSH_AUTOSUGGEST_STRATEGY=default$/ZSH_AUTOSUGGEST_STRATEGY=complete/q1' \
     #   -e 's/^ZSH_AUTOSUGGEST_STRATEGY=complete$/ZSH_AUTOSUGGEST_STRATEGY=default/q2' \
     #   "$DOTFILES_DIR"/.zshrc
-    ret=$?
-    if [[ $ret -eq 1 ]]; then
+    # ret=$?
+    # if [[ $ret -eq 1 ]]; then
+    #   ZSH_AUTOSUGGEST_STRATEGY=complete
+    # elif [[ $ret -eq 2 ]]; then
+    #   ZSH_AUTOSUGGEST_STRATEGY=default
+    # fi
+    if [[ $ZSH_AUTOSUGGEST_STRATEGY != complete ]]; then
       ZSH_AUTOSUGGEST_STRATEGY=complete
-    elif [[ $ret -eq 2 ]]; then
+    else
       ZSH_AUTOSUGGEST_STRATEGY=default
     fi
   fi

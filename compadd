@@ -50,13 +50,8 @@ _compadd() {
   [[ -n $_hits ]] ||
     return $ret
 
-  first=$_hits[1]
+  first=${${(o)_hits}[1]}
 
-  for hit in "${_hits[@]}"; do
-    both=($first $hit)
-    first=${${(o)both}[1]}
-  done
-  
   both=($first $__hit)
   both=(${(o)both})
   if [[ -z $__hit || $both[1] == $first ]]; then
