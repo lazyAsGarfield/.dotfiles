@@ -3,6 +3,26 @@
 declare -a __saved_dirs__
 declare -a __cd_history__
 
+function __go_to_saved()
+{
+  local num="$1"
+  if [[ $num > ${#__saved_dirs__[@]} || $num -eq 0 ]]; then
+    echo "No entry $num in saved directories"
+  else
+    local dir="${__saved_dirs__[$num]}"
+    if [[ -d $dir ]]; then
+      local saved_pwd="$PWD"
+      if [[ $PWD != $dir ]]; then
+        if builtin cd "$dir"; then
+          echo "$dir"
+        else
+          return $?
+        fi
+      fi
+    fi
+  fi
+}
+
 function saved()
 {
   if [[ $# = 0 ]]; then
@@ -14,6 +34,10 @@ function saved()
     done
   else
     local dir
+    if [[ $# -eq 1 && $1 =~ ^[1-9][0-9]*$ && $1 -le ${#__saved_dirs__[@]} ]]; then
+      __go_to_saved $1
+      return
+    fi
     for dir in "$@"; do
       if [[ $dir =~ ^-[0-9]+$ ]]; then
         local num="${dir:1}"
@@ -34,7 +58,7 @@ function saved()
       if [[ -d $dir ]]; then
         for saved_dir in "${__saved_dirs__[@]}"; do
           if [[ $saved_dir = $dir ]]; then
-            echo "$dir : already saved"
+            echo "$dir: already saved"
             return
           fi
         done
@@ -102,34 +126,10 @@ _list_cd_local_hist()
 
 function cd()
 {
-  function add_to_hist()
-  {
-    local hist_size="${#__cd_history__[@]}"
-    if [[ ${__cd_history__[$hist_size]} != $1 && ! -z $1 ]]; then
-      __cd_history__[$(( $hist_size + 1 ))]="$1"
-    fi
-  }
-
   # $ cd --<num> 
   # go to dir saved on postition num
   if [[ $1 =~ ^--[0-9]+$ ]]; then
-    local num="${1:2}"
-    if [[ $num > ${#__saved_dirs__[@]} || $num -eq 0 ]]; then
-      echo "No entry $num in saved directories"
-    else
-      local dir="${__saved_dirs__[$num]}"
-      if [[ -d $dir ]]; then
-        local saved_pwd="$PWD"
-        if [[ $PWD != $dir ]]; then
-          if builtin cd "$dir"; then
-            add_to_hist "$saved_pwd"
-            echo "$dir"
-          else
-            return $?
-          fi
-        fi
-      fi
-    fi
+    __go_to_saved ${1:2}
   # $ cd -<num>
   # go to dir on position num in history
   elif [[ $1 =~ ^-[0-9]+$ ]]; then
@@ -142,7 +142,6 @@ function cd()
         local saved_pwd="$PWD"
         if [[ $PWD != $dir ]]; then
           if builtin cd "$dir"; then
-            add_to_hist "$saved_pwd"
             echo "$dir"
           else
             return $?
@@ -162,16 +161,9 @@ function cd()
     _list_cd_local_hist $limit
   # just pass args (and add dir to history if needed)
   else
-    local saved_pwd="$PWD"
     builtin cd "$@"
-    ret=$?
-    if [[ $PWD != $saved_pwd ]]; then
-      add_to_hist "$saved_pwd"
-    fi
-    return $ret
+    return $?
   fi
-
-  unset -f add_to_hist
 }
 
 function local_cd_hist()

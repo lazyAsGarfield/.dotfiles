@@ -4,7 +4,7 @@ source "${0:a:h}/.shellrc"
 
 autoload -U colors && colors
 
-prompt_command()
+__prompt_command()
 {
   local NORMAL="%{%f%b%}"
   local BOLD="%{$fg_bold[white]%}"
@@ -50,10 +50,21 @@ prompt_command()
 
 precmd()
 {
+  # if in vi mode, prompt will be set other way
   [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
     PROMPT="" ||
-    prompt_command
+    __prompt_command
+  __dir_history
 }
+
+prompt_command_if_vi_mode()
+{
+  [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
+    __prompt_command
+}
+
+zle -N zle-line-init prompt_command_if_vi_mode
+zle -N zle-keymap-select prompt_command_if_vi_mode
 
 zmodload zsh/complist
 
@@ -164,15 +175,6 @@ bindkey -M vicmd '^U'                 kill-whole-line
 bindkey -M vicmd '^X^E'               edit-command-line
 bindkey -M vicmd '^W'                 backward-kill-word
 
-prompt_command_if_vi_mode()
-{
-  [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
-    prompt_command
-}
-
-zle -N zle-line-init prompt_command_if_vi_mode
-zle -N zle-keymap-select prompt_command_if_vi_mode
-
 KEYTIMEOUT=1
 
 ZSH_AUTOSUGGEST_STRATEGY=default
@@ -182,7 +184,7 @@ tog()
   if [[ $# -eq 0 ]]; then
     echo "No utility name given"
     return
-  elif [[ $1 == "vi" ]]; then 
+  elif [[ $1 == "vi" ]]; then
     # sed -i -e '/^en()$/q' \
     #   -e 's/^bindkey -v$/bindkey -e/' \
     #   -e 's/^bindkey -e$/bindkey -v/' \
@@ -214,7 +216,7 @@ en()
   if [[ $# -eq 0 ]]; then
     echo "No utility name given"
     return
-  elif [[ $1 == "vi" ]]; then 
+  elif [[ $1 == "vi" ]]; then
     bindkey -v
   elif [[ $1 == "as" ]]; then
     # sed -i -e '/^en()$/q' \
@@ -229,7 +231,7 @@ dis()
   if [[ $# -eq 0 ]]; then
     echo "No utility name given"
     return
-  elif [[ $1 == "vi" ]]; then 
+  elif [[ $1 == "vi" ]]; then
     bindkey -e
   elif [[ $1 == "as" ]]; then
     # sed -i -e '/^en()$/q' \
@@ -369,7 +371,7 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
   "complete-word"
   "expand-or-complete"
   "menu-complete"
-  "menu-complete" 
+  "menu-complete"
   "_accept-or-complete-word"
 )
 
