@@ -34,6 +34,13 @@ __prompt_command()
     fi
   fi
 
+  local branch_color=$GREEN
+  # local behind_color=$GREEN
+  # local ahead_color=$GREEN
+  # local untracked_color=$YELLOW
+  # local unstaged_color=$GREEN
+  # local staged_color=$YELLOW
+
   local git_branch=$(__get_git_branch)
   local virtual_env=$(__get_virtual_env)
 
@@ -43,7 +50,7 @@ __prompt_command()
     local vim_prompt="${${KEYMAP/vicmd/$vim_norm_prompt}/(main|viins)/$vim_ins_prompt}" ||
     local vim_prompt=""
 
-  PROMPT="${BLUE}${virtual_env}${LIGHT_BLUE}[${NORMAL}%n${GREEN}@${BLUE}%m${YELLOW}:${BOLD}%1~${LIGHT_BLUE}]${GREEN} ${git_branch}${vim_prompt}${BOLD}$ ${NORMAL}"
+  PROMPT="${BLUE}${virtual_env}${LIGHT_BLUE}[${NORMAL}%n${GREEN}@${BLUE}%m${YELLOW}:${BOLD}%1~${LIGHT_BLUE}] ${git_branch}${vim_prompt}${BOLD}$ ${NORMAL}"
 
   zle && zle reset-prompt
 }
