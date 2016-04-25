@@ -55,7 +55,7 @@ __get_git_branch()
   else
     git_branch=$(git branch 2> /dev/null | grep '* ' | cut -c3-)
     if [[ -n $git_branch ]]; then
-      local ahead_behind="$(git rev-list --left-right --count HEAD..@{u})"
+      local ahead_behind="$(git rev-list --left-right --count HEAD...@{u})"
       local ahead="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
       # local ahead=1
       local behind="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
@@ -83,10 +83,13 @@ __get_git_branch()
       local branch_icon=""
       [[ -f $HOME/.fonts/octicons-local.ttf ]] &&
         branch_icon="\uf020 "
-      git_info="$branch_color$branch_icon$git_info$branch_color "
+      git_info="$branch_color$branch_icon$git_info$branch_color"
+      if ((untracked + unstaged + staged)); then
+        git_info="$git_info "
+      fi
     fi
   fi
-  echo -e $git_info
+  echo -e "$git_info"
 }
 
 __get_virtual_env()

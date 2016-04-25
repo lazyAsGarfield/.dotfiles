@@ -23,10 +23,12 @@ prompt_command()
   local CYAN="\[\e[0;36m\]"
   local LIGHT_CYAN="\[\e[0;1;36m\]"
 
+  local branch_color=$GREEN
+
   git_branch=$(__get_git_branch)
   virtual_env=$(__get_virtual_env)
 
-  PS1="$BLUE$virtual_env$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE]$GREEN $git_branch$BOLD$ $NORMAL"
+  PS1="$BLUE$virtual_env$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE] $git_branch$BOLD$ $NORMAL"
 }
 
 PROMPT_COMMAND="history -a; prompt_command; $PROMPT_COMMAND"

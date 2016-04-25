@@ -34,7 +34,7 @@ __prompt_command()
     fi
   fi
 
-  local branch_color=$GREEN
+  local branch_color=$LIGHT_BLUE
   # local behind_color=$GREEN
   # local ahead_color=$GREEN
   # local untracked_color=$YELLOW
