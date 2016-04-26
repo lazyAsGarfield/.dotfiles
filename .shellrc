@@ -55,7 +55,7 @@ __get_git_branch()
   else
     git_branch=$(git branch 2> /dev/null | grep '* ' | cut -c3-)
     if [[ -n $git_branch ]]; then
-      local ahead_behind="$(git rev-list --left-right --count HEAD...@{u})"
+      local ahead_behind="$(git rev-list --left-right --count HEAD...@{u} 2>/dev/null)"
       local ahead="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
       # local ahead=1
       local behind="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"

@@ -122,7 +122,7 @@ _z() {
                        local fnd=".*"
                      fi
                  fi
-                 [ -z "$fnd" ] && local fnd="$fnd${fnd:+ }$1";;
+                 [ -z "$only" ] && local fnd="$fnd${fnd:+ }$1";;
         esac; local last=$1; [ "$#" -gt 0 ] && shift; done
         [ "$fnd" -a "$fnd" != "^$PWD " ] || local list=1
 
