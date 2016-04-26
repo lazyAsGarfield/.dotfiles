@@ -35,11 +35,11 @@ __prompt_command()
   fi
 
   local branch_color=$LIGHT_BLUE
-  # local behind_color=$GREEN
-  # local ahead_color=$GREEN
-  # local untracked_color=$YELLOW
-  # local unstaged_color=$GREEN
-  # local staged_color=$YELLOW
+  local ahead_color=$GREEN
+  local behind_color=$GREEN
+  local untracked_color=$LIGHT_BLUE
+  local unstaged_color=$LIGHT_BLUE
+  local staged_color=$LIGHT_BLUE
 
   local git_branch=$(__get_git_branch)
   local virtual_env=$(__get_virtual_env)

@@ -70,23 +70,23 @@ __get_git_branch()
       git_info="$git_info "
       local untracked="$(git ls-files --exclude-standard --others | wc -l)"
       if [[ $untracked -gt 0 ]]; then
-        git_info="$git_info$untracked_color\u25A1$untracked"
+        git_info="$git_info$untracked_color$untracked\u25A1 "
       fi
       local unstaged="$(git diff --numstat | wc -l)"
       if [[ $unstaged -gt 0 ]]; then
-        git_info="$git_info$unstaged_color\u25EA$unstaged"
+        git_info="$git_info$unstaged_color$unstaged\u25EA "
       fi
       local staged="$(git diff --cached --numstat | wc -l)"
       if [[ $staged -gt 0 ]]; then
-        git_info="$git_info$staged_color\u25A0$staged"
+        git_info="$git_info$staged_color$staged\u25A0 "
       fi
       local branch_icon=""
       [[ -f $HOME/.fonts/octicons-local.ttf ]] &&
         branch_icon="\uf020 "
       git_info="$branch_color$branch_icon$git_info$branch_color"
-      if ((untracked + unstaged + staged)); then
-        git_info="$git_info "
-      fi
+      # if ((untracked + unstaged + staged)); then
+      #   git_info="$git_info "
+      # fi
     fi
   fi
   echo -e "$git_info"
