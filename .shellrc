@@ -68,7 +68,7 @@ __get_git_branch()
         git_info="$git_info$ahead_color\u25B2$ahead"
       fi
       git_info="$git_info "
-      local untracked="$(git ls-files --exclude-standard --others | wc -l)"
+      local untracked="$(git ls-files "$(git rev-parse --show-toplevel)" --exclude-standard --others | wc -l)"
       if [[ $untracked -gt 0 ]]; then
         git_info="$git_info$untracked_color$untracked\u25A1 "
       fi
