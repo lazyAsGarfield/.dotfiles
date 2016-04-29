@@ -405,7 +405,7 @@ if [[ -d "$HOME/.byobu" ]] && [[ $(read_or_yes "Configure byobu? y/[n]: ") == "y
 fi
 
 if [[ $(read_or_yes "Configure tmux? y/[n]: ") == "y" ]]; then
-  backup_and_link "$target_dir/.non-byobu-tmux.conf" "$HOME/.tmux.conf"
+  backup_and_link "$target_dir/.tmux-non-byobu.conf" "$HOME/.tmux.conf"
   changed=1
 fi
 [[ -n $changed ]] && echo
