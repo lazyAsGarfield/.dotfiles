@@ -168,6 +168,7 @@ function cd()
 
 function local_cd_hist()
 {
+  local dir
   if [[ $# -eq 0 || $1 =~ ^-l[0-9]+$ ]]; then
     local limit
     if [[ ${1:2} =~ ^[0-9]+$ ]]; then
@@ -180,14 +181,24 @@ function local_cd_hist()
     unset __cd_history__
     declare -a __cd_history__
   else
-    dir=$(printf "%s\n" "${__cd_history__[@]}" | grep $(printf "%s" $1 | sed 's|\*\*|.*|g' | sed 's|\([^.]\)\*|\1[^/]*|g') \
+    local pat
+    [[ $1 == "--" ]] &&
+      while [[ $1 ]]; do
+        shift;
+        pat="$pat${pat:+ }$1";
+      done
+    [[ -z $pat ]] && pat="$@"
+    [[ $1 =~ ^[0-9]+$ ]] &&
+      dir="${__cd_history__[$1]}"
+    pat="$(sed 's/\./\\./g' <<< "$pat")"
+    pat="$(sed 's/\ /.*/g' <<< "$pat")"
+    [[ -z $dir ]] &&
+      dir=$(printf "%s\n" "${__cd_history__[@]}" | grep $pat \
       | tail -n1)
-    [[ -z $dir && $1 =~ ^[0-9]+$ ]] && dir="${__cd_history__[$1]}"
     [[ -z $dir ]] && return
     if [[ -d $dir ]]; then
-      echo "$dir"
+      cd "$dir" && echo "$dir"
     fi
-    cd "$dir"
   fi
 }
 

@@ -113,11 +113,16 @@ HISTFILE=~/.histfile
 HISTSIZE=10000
 SAVEHIST=20000
 
-setopt appendhistory autocd nocdablevars nomultios
-unsetopt beep nomatch
+setopt appendhistory
+setopt autocd
+setopt nocdablevars
+setopt nomultios
+setopt interactive_comments
+setopt no_beep
+setopt no_nomatch
 # }}}
 
-# bindings and stuff {{{
+# bindings and so on {{{
 
 ### emacs mode
 bindkey -e
