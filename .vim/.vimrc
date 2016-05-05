@@ -43,6 +43,7 @@ Plug 'airblade/vim-gitgutter'
 Plug 'moll/vim-bbye'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'tpope/vim-sleuth'
+Plug 'junegunn/limelight.vim'
 
 call plug#end()
 
@@ -52,165 +53,170 @@ filetype plugin indent on
 
 " ---------- VIM OPTS ------------- {{{
 
-silent! colorscheme atom-dark-256-mine
+if !exists("g:vimrc_init")
+  let g:vimrc_init = 1
 
-if has("gui_running")
+  silent! colorscheme atom-dark-256-mine
 
-  " set guifont=DejaVu\ Sans\ Mono\ for\ Powerline
-  " set guifont=Consolas:h10
+  if has("gui_running")
 
-  " start maximized
-  " autocmd GUIEnter * simalt ~s
+    " set guifont=DejaVu\ Sans\ Mono\ for\ Powerline
+    " set guifont=Consolas:h10
 
-  " just make window larger (if above dosn't work):
-  winpos 0 0
-  set lines=100 columns=420
+    " start maximized
+    " autocmd GUIEnter * simalt ~s
 
-endif
+    " just make window larger (if above dosn't work):
+    winpos 0 0
+    set lines=100 columns=420
 
-" enable mouse if possible
-if has('mouse')
-  set mouse+=a
-endif
+  endif
 
-" tmux options
-if &term =~ '^screen' && exists('$TMUX')
-  " tmux knows the extended mouse mode
-  set ttymouse=xterm2
-  " tmux will send xterm-style keys when xterm-keys is on
-  exec "set <xUp>=\e[1;*A"
-  exec "set <xDown>=\e[1;*B"
-  exec "set <xRight>=\e[1;*C"
-  exec "set <xLeft>=\e[1;*D"
-  exec "set <xHome>=\e[1;*H"
-  exec "set <xEnd>=\e[1;*F"
-  exec "set <Insert>=\e[2;*~"
-  exec "set <Delete>=\e[3;*~"
-  exec "set <PageUp>=\e[5;*~"
-  exec "set <PageDown>=\e[6;*~"
-  exec "set <xF1>=\e[1;*P"
-  exec "set <xF2>=\e[1;*Q"
-  exec "set <xF3>=\e[1;*R"
-  exec "set <xF4>=\e[1;*S"
-  exec "set <F5>=\e[15;*~"
-  exec "set <F6>=\e[17;*~"
-  exec "set <F7>=\e[18;*~"
-  exec "set <F8>=\e[19;*~"
-  exec "set <F9>=\e[20;*~"
-  exec "set <F10>=\e[21;*~"
-  exec "set <F11>=\e[23;*~"
-  exec "set <F12>=\e[24;*~"
-endif
+  " enable mouse if possible
+  if has('mouse')
+    set mouse+=a
+  endif
 
-" when editing a file, always jump to the last known cursor position.
-autocmd BufReadPost *
-      \ if line("'\"") > 1 && line("'\"") <= line("$") |
-      \   exe "normal! g`\"" |
-      \ endif
+  " tmux options
+  if &term =~ '^screen' && exists('$TMUX')
+    " tmux knows the extended mouse mode
+    set ttymouse=xterm2
+    " tmux will send xterm-style keys when xterm-keys is on
+    exec "set <xUp>=\e[1;*A"
+    exec "set <xDown>=\e[1;*B"
+    exec "set <xRight>=\e[1;*C"
+    exec "set <xLeft>=\e[1;*D"
+    exec "set <xHome>=\e[1;*H"
+    exec "set <xEnd>=\e[1;*F"
+    exec "set <Insert>=\e[2;*~"
+    exec "set <Delete>=\e[3;*~"
+    exec "set <PageUp>=\e[5;*~"
+    exec "set <PageDown>=\e[6;*~"
+    exec "set <xF1>=\e[1;*P"
+    exec "set <xF2>=\e[1;*Q"
+    exec "set <xF3>=\e[1;*R"
+    exec "set <xF4>=\e[1;*S"
+    exec "set <F5>=\e[15;*~"
+    exec "set <F6>=\e[17;*~"
+    exec "set <F7>=\e[18;*~"
+    exec "set <F8>=\e[19;*~"
+    exec "set <F9>=\e[20;*~"
+    exec "set <F10>=\e[21;*~"
+    exec "set <F11>=\e[23;*~"
+    exec "set <F12>=\e[24;*~"
+  endif
 
-" 80/120 columns marker
-" silent! let &colorcolumn="80,".join(range(120,999),",")
-silent! let &colorcolumn="80,120"
-" call matchadd('ColorColumn', '\%=80v', -10)
+  " when editing a file, always jump to the last known cursor position.
+  autocmd BufReadPost *
+        \ if line("'\"") > 1 && line("'\"") <= line("$") |
+        \   exe "normal! g`\"" |
+        \ endif
 
-" enable syntax highlighting
-syntax on
+  " 80/120 columns marker
+  " silent! let &colorcolumn="80,".join(range(120,999),",")
+  silent! let &colorcolumn="80,120"
+  " call matchadd('ColorColumn', '\%=80v', -10)
 
-" timeout for key codes (delayed ESC is annoying)
-set ttimeoutlen=0
+  " enable syntax highlighting
+  syntax on
 
-" indentation options
-set autoindent
-set expandtab
-set shiftwidth=2
-set softtabstop=2
-set tabstop=2
-set smarttab
+  " timeout for key codes (delayed ESC is annoying)
+  set ttimeoutlen=0
 
-" enable persistent undo + its settings
-if has("persistent_undo")
-  set undolevels=15000
-  set undofile
-  set undodir=$HOME/.vim/.undodir/
-endif
+  " indentation options
+  set autoindent
+  set expandtab
+  set shiftwidth=2
+  set softtabstop=2
+  set tabstop=2
+  set smarttab
 
-" completion options
-set completeopt=menuone,preview
+  " enable persistent undo + its settings
+  if has("persistent_undo")
+    set undolevels=15000
+    set undofile
+    set undodir=$HOME/.vim/.undodir/
+  endif
 
-" do not indent visibility keywords in C++ classes, indent lambdas
-" set cindent
-set cinoptions=g0,j1
+  " completion options
+  set completeopt=menuone,preview
 
-" display line numbers
-set number
+  " do not indent visibility keywords in C++ classes, indent lambdas
+  " set cindent
+  set cinoptions=g0,j1
 
-" set folding method
-set foldmethod=marker
+  " display line numbers
+  set number
 
-" diff options
-set diffopt+=vertical
+  " set folding method
+  set foldmethod=marker
 
-" do not create a backup file
-set nobackup
-set noswapfile
+  " diff options
+  set diffopt+=vertical
 
-" Automatically read a file that has changed on disk
-set autoread
+  " do not create a backup file
+  set nobackup
+  set noswapfile
 
-" number of command line history lines kept
-set history=500
+  " Automatically read a file that has changed on disk
+  set autoread
 
-" default encoding
-set encoding=utf-8
+  " number of command line history lines kept
+  set history=500
 
-" split settings
-set splitbelow
-set splitright
+  " default encoding
+  set encoding=utf-8
 
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
+  " split settings
+  set splitbelow
+  set splitright
 
-" show the cursor position all the time
-set ruler
+  " allow backspacing over everything in insert mode
+  set backspace=indent,eol,start
 
-" display incomplete commands
-set showcmd
+  " show the cursor position all the time
+  set ruler
 
-" do incremental searching
-set incsearch
+  " display incomplete commands
+  set showcmd
 
-" set search highlighting, bo do not highlight for now
-set hlsearch
-noh
+  " do incremental searching
+  set incsearch
 
-" line endings settings
-set fileformats=unix,dos
+  " set search highlighting, bo do not highlight for now
+  set hlsearch
+  noh
 
-" always show status line
-set laststatus=2
+  " line endings settings
+  set fileformats=unix,dos
 
-" show at least 5 lines below/above cursor
-set scrolloff=5
+  " always show status line
+  set laststatus=2
 
-" allow to hide buffer with unsaved changes
-set hidden
+  " show at least 5 lines below/above cursor
+  set scrolloff=5
 
-" no characters in separators
-set fillchars=""
+  " allow to hide buffer with unsaved changes
+  set hidden
 
-" foldenable + foldcolumn
-" silent! set nofoldenable
-if &foldenable
-  silent! set foldcolumn=1
-else
-  silent! set foldcolumn=0
-endif
+  " no characters in separators
+  set fillchars=""
 
-" disable that annoying beeping
-autocmd GUIEnter * set vb t_vb=
+  " foldenable + foldcolumn
+  " silent! set nofoldenable
+  if &foldenable
+    silent! set foldcolumn=1
+  else
+    silent! set foldcolumn=0
+  endif
 
-" set filetype for .shellrc file
-autocmd BufRead $DOTFILES_DIR/.shellrc set ft=sh
+  " disable that annoying beeping
+  autocmd GUIEnter * set vb t_vb=
+
+  " set filetype for .shellrc file
+  autocmd BufRead $DOTFILES_DIR/.shellrc set ft=sh
+
+endif " exists("g:vimrc_init")
 
 " --------------- VIM OPTS END ------------- }}}
 
@@ -837,6 +843,9 @@ let g:goyo_height='95%'
 
 nmap MM :Goyo<CR>
 
+nmap LL :Limelight<CR>
+let g:limelight_default_coefficient = 0.6
+
 function! s:goyo_enter()
   silent !tmux set -w status off
   silent !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
@@ -845,6 +854,7 @@ function! s:goyo_enter()
   let g:scrolloff_saved=&scrolloff
   set scrolloff=999
   Goyo x95%
+  Limelight
 endfunction
 
 function! s:goyo_leave()
@@ -853,6 +863,8 @@ function! s:goyo_leave()
   set showmode
   set showcmd
   exec 'set scrolloff=' . g:scrolloff_saved
+  Limelight!
+  call SetGitGutterColors()
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
@@ -935,10 +947,14 @@ nnoremap <silent> <C-l> :call Navigate('r')<CR>
 
 let g:gitgutter_override_sign_column_highlight = 0
 
-hi GitGutterAdd          cterm=bold ctermfg=46  ctermbg=235
-hi GitGutterChange       cterm=bold ctermfg=105 ctermbg=235
-hi GitGutterDelete       cterm=bold ctermfg=196 ctermbg=235
-hi GitGutterChangeDelete cterm=bold ctermfg=126 ctermbg=235
+function! SetGitGutterColors()
+  hi GitGutterAdd          cterm=bold ctermfg=46  ctermbg=235
+  hi GitGutterChange       cterm=bold ctermfg=105 ctermbg=235
+  hi GitGutterDelete       cterm=bold ctermfg=196 ctermbg=235
+  hi GitGutterChangeDelete cterm=bold ctermfg=126 ctermbg=235
+endfunction
+
+call SetGitGutterColors()
 
 " those are better visible
 let g:gitgutter_sign_modified = '#'
@@ -979,4 +995,3 @@ map <leader>D :Bdelete<CR>
 autocmd filetype gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
 
 nmap <leader>ss :source %<CR>
-
