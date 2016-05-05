@@ -843,8 +843,10 @@ let g:goyo_height='95%'
 
 nmap MM :Goyo<CR>
 
-nmap LL :Limelight<CR>
-let g:limelight_default_coefficient = 0.6
+nmap LL :Limelight!!<CR>
+
+let g:limelight_default_coefficient = 0.7
+let g:limelight_conceal_ctermfg = 238
 
 function! s:goyo_enter()
   silent !tmux set -w status off
