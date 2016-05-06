@@ -577,7 +577,9 @@ function! s:git_files_if_in_repo(bang)
     let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
     try
       exec cdCmd . fnameescape(git_root)
-      call fzf#vim#gitfiles(extend({
+      let z = { 'options': '--prompt "' . git_root . ' (GitFiles)> "' }
+      echo z
+      call fzf#vim#gitfiles('', extend({
             \ 'options': '--prompt "' . git_root . ' (GitFiles)> "'
             \ }, a:bang ? {} : g:fzf#vim#default_layout))
     finally

@@ -1,4 +1,3 @@
-
 # misc shell stuff {{{
 source "${0:a:h}/.shellrc"
 
@@ -33,13 +32,6 @@ __prompt_command()
       virtual_env="($(basename $VIRTUAL_ENV)) "
     fi
   fi
-
-  local branch_color=$LIGHT_BLUE
-  local ahead_color=$GREEN
-  local behind_color=$GREEN
-  local untracked_color=$LIGHT_BLUE
-  local unstaged_color=$LIGHT_BLUE
-  local staged_color=$LIGHT_BLUE
 
   local git_branch=$(__get_git_branch)
   local virtual_env=$(__get_virtual_env)
@@ -110,8 +102,8 @@ alias -g N12=' > /dev/null 2>&1'
 alias -g M21=' 2>&1'
 
 HISTFILE=~/.histfile
-HISTSIZE=10000
-SAVEHIST=20000
+HISTSIZE=100000
+SAVEHIST=100000
 
 setopt appendhistory
 setopt autocd
