@@ -289,13 +289,13 @@ let g:undotree_SetFocusWhenToggle = 1
 let mapleader=","
 
 " open/close quickfix/location-list window
-noremap \Q :copen<CR>
-noremap \q :cclose<CR>
-noremap \L :lopen<CR>
-noremap \l :lclose<CR>
+noremap [wq :copen<CR>
+noremap ]wq :cclose<CR>
+noremap [wl :lopen<CR>
+noremap ]wl :lclose<CR>
 
 " close preview window
-noremap \p <C-w>z
+noremap ]wp <C-w>z
 
 " moving around wrapped lines more naturally
 noremap j gj
@@ -383,22 +383,6 @@ map zi :call ChangeFold()<CR>
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
 
-function! GetUnityDoc()
-  if &filetype == "cs" && expand("%:p") =~ "Unity"
-    call system("git web--browse -b google-chrome " .
-          \ "https://docs.unity3d.com/ScriptReference/30_search.html?q=" .
-          \ @h . " >/dev/null 2>&1")
-    if v:shell_error
-      call system("git web--browse " .
-            \ "https://docs.unity3d.com/ScriptReference/30_search.html?q=" .
-            \ @h . " >/dev/null 2>&1")
-    endif
-  endif
-endfunction
-
-nnoremap <leader>ud "hyiw:call GetUnityDoc()<CR>
-vnoremap <leader>ud "hy:<C-u>call GetUnityDoc()<CR>
-
 " --------------- VIM MAPPINGS END -------------- }}}
 
 " ---------- PLUGIN MAPPINGS ------ {{{
@@ -408,7 +392,7 @@ nnoremap ycg :YcmCompleter GoTo<CR>
 nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
 nnoremap ycf :YcmCompleter FixIt<CR>
 nnoremap ycd :YcmCompleter GetDoc<CR>
-nnoremap yci :YcmShowDetailedDiagnostic<CR>
+nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
 nnoremap yct :YcmCompleter GetType<CR>
 " vnoremap yct :<c-u>YcmCompleter GetType<CR>
 
@@ -909,7 +893,7 @@ autocmd filetype vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
 autocmd filetype vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
 
 map FF :VimFilerExplorer<CR>
-map FR :exec 'VimFilerExplorer "' . substitute(substitute(expand('%:p:h'), 'scp', 'ssh', ''), '/\~/', '/', '') . '"'<CR>
+map FR :exec 'VimFilerExplorer ' . substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')<CR>
 
 let g:tmux_navigator_no_mappings = 1
 
@@ -965,6 +949,9 @@ let g:gitgutter_sign_modified = '#'
 let g:gitgutter_sign_removed = 'v'
 let g:gitgutter_sign_modified_removed = '#v'
 
+nmap [h <Plug>GitGutterPrevHunk
+nmap ]h <Plug>GitGutterNextHunk
+
 function! s:gitgutter_toggle_wrapper()
   GitGutterToggle
   if gitgutter#utility#is_active()
@@ -999,3 +986,22 @@ map <leader>D :Bdelete<CR>
 autocmd filetype gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
 
 nmap <leader>ss :source %<CR>
+
+function! GetUnityDoc()
+  if &filetype == "cs" && expand("%:p") =~ "Unity"
+    call system("git web--browse -b google-chrome " .
+          \ "https://docs.unity3d.com/ScriptReference/30_search.html?q=" .
+          \ @h . " >/dev/null 2>&1")
+    if v:shell_error
+      call system("git web--browse " .
+            \ "https://docs.unity3d.com/ScriptReference/30_search.html?q=" .
+            \ @h . " >/dev/null 2>&1")
+    endif
+  endif
+endfunction
+
+nnoremap <leader>ud "hyiw:call GetUnityDoc()<CR>
+vnoremap <leader>ud "hy:<C-u>call GetUnityDoc()<CR>
+
+" jedi vim overrides <leader>r mapping
+map <leader><leader>r :redraw!<CR>

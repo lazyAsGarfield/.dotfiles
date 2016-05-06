@@ -63,7 +63,7 @@ __get_git_branch()
         branch_icon="\uf020 "
       git_info="$LIGHT_BLUE$branch_icon$git_info"
       local ahead_behind
-      ahead_behind="$(timeout 0.2s bash -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
+      ahead_behind="$(timeout 0.3s bash -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
       ret=$?
       if [[ $ret -eq 124 || $ret -eq 137 ]]; then
         killed=1
@@ -81,7 +81,7 @@ __get_git_branch()
 
       if ! (( $killed )); then
         local untracked
-        untracked="$(timeout 0.2s bash -c "git ls-files \"$(git rev-parse --show-toplevel)\" --exclude-standard --others | wc -l")"
+        untracked="$(timeout 0.3s bash -c "git ls-files \"$(git rev-parse --show-toplevel)\" --exclude-standard --others | wc -l")"
         ret=$?
         if [[ $ret -eq 124 || $ret -eq 137 ]]; then
           killed=1
@@ -94,7 +94,7 @@ __get_git_branch()
 
       if ! (( $killed )); then
         local unstaged
-        unstaged="$(timeout 0.2s bash -c "git diff --numstat | wc -l")"
+        unstaged="$(timeout 0.3s bash -c "git diff --numstat | wc -l")"
         ret=$?
         if [[ $ret -eq 124 || $ret -eq 137 ]]; then
           killed=1
@@ -107,7 +107,7 @@ __get_git_branch()
 
       if ! (( $killed )); then
         local staged
-        staged="$(timeout 0.2s bash -c "git diff --cached --numstat | wc -l")"
+        staged="$(timeout 0.3s bash -c "git diff --cached --numstat | wc -l")"
         ret=$?
         if [[ $ret -eq 124 || $ret -eq 137 ]]; then
           killed=1
