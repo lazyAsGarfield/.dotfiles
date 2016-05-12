@@ -67,20 +67,24 @@ zle -N zle-keymap-select prompt_command_if_vi_mode
 
 zmodload zsh/complist
 
-ZGEN_DIR=$DOTFILES_DIR/.zgen
+zstyle ":zplug:tag" lazy true
 
-source "$DOTFILES_DIR/zgen/zgen.zsh"
+source $DOTFILES_DIR/.zplug/init.zsh
 
-if ! zgen saved; then
+ZPLUG_HOME=$DOTFILES_DIR/.zplug
 
-  # zgen oh-my-zsh
-  zgen oh-my-zsh plugins/pip
-  zgen oh-my-zsh plugins/docker
-  zgen load zsh-users/zsh-autosuggestions
-  zgen load zsh-users/zsh-completions
+zplugs=()
 
-  zgen save
+zplug "plugins/pip", from:oh-my-zsh
+zplug "plugins/docker", from:oh-my-zsh
+zplug "zsh-users/zsh-autosuggestions"
+zplug "zsh-users/zsh-completions"
+
+if ! zplug check; then
+    zplug install
 fi
+
+zplug load
 
 alias -g ..='..'
 alias -g ...='../..'
@@ -381,4 +385,3 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=245,underline'
 # }}}
-
