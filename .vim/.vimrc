@@ -53,6 +53,95 @@ filetype plugin indent on
 
 " ---------- VIM OPTS ------------- {{{
 
+" enable mouse if possible
+if has('mouse')
+  set mouse+=a
+endif
+
+" tmux options
+if &term =~ '^screen' && exists('$TMUX')
+  " tmux knows the extended mouse mode
+  set ttymouse=xterm2
+  " tmux will send xterm-style keys when xterm-keys is on
+  exec "set <xUp>=\e[1;*A"
+  exec "set <xDown>=\e[1;*B"
+  exec "set <xRight>=\e[1;*C"
+  exec "set <xLeft>=\e[1;*D"
+  exec "set <xHome>=\e[1;*H"
+  exec "set <xEnd>=\e[1;*F"
+  exec "set <Insert>=\e[2;*~"
+  exec "set <Delete>=\e[3;*~"
+  exec "set <PageUp>=\e[5;*~"
+  exec "set <PageDown>=\e[6;*~"
+  exec "set <xF1>=\e[1;*P"
+  exec "set <xF2>=\e[1;*Q"
+  exec "set <xF3>=\e[1;*R"
+  exec "set <xF4>=\e[1;*S"
+  exec "set <F5>=\e[15;*~"
+  exec "set <F6>=\e[17;*~"
+  exec "set <F7>=\e[18;*~"
+  exec "set <F8>=\e[19;*~"
+  exec "set <F9>=\e[20;*~"
+  exec "set <F10>=\e[21;*~"
+  exec "set <F11>=\e[23;*~"
+  exec "set <F12>=\e[24;*~"
+endif
+
+" enable syntax highlighting
+syntax on
+
+" timeout for key codes (delayed ESC is annoying)
+set ttimeoutlen=0
+
+" enable persistent undo + its settings
+if has("persistent_undo")
+  set undolevels=15000
+  set undofile
+  set undodir=$HOME/.vim/.undodir/
+endif
+
+" completion options
+set completeopt=menuone,preview
+
+" do not create a backup file
+set nobackup
+set noswapfile
+
+" Automatically read a file that has changed on disk
+set autoread
+
+" number of command line history lines kept
+set history=10000
+
+" default encoding
+set encoding=utf-8
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" do incremental searching
+set incsearch
+
+" set search highlighting, bo do not highlight for now
+set hlsearch
+noh
+
+" line endings settings
+set fileformats=unix,dos
+
+" always show status line
+set laststatus=2
+
+" allow to hide buffer with unsaved changes
+set hidden
+
+" no characters in separators
+set fillchars=""
+
+" disable that annoying beeping
+autocmd GUIEnter * set vb t_vb=
+
+" some options have to be set only at init
 if !exists("g:vimrc_init")
   let g:vimrc_init = 1
 
@@ -72,40 +161,6 @@ if !exists("g:vimrc_init")
 
   endif
 
-  " enable mouse if possible
-  if has('mouse')
-    set mouse+=a
-  endif
-
-  " tmux options
-  if &term =~ '^screen' && exists('$TMUX')
-    " tmux knows the extended mouse mode
-    set ttymouse=xterm2
-    " tmux will send xterm-style keys when xterm-keys is on
-    exec "set <xUp>=\e[1;*A"
-    exec "set <xDown>=\e[1;*B"
-    exec "set <xRight>=\e[1;*C"
-    exec "set <xLeft>=\e[1;*D"
-    exec "set <xHome>=\e[1;*H"
-    exec "set <xEnd>=\e[1;*F"
-    exec "set <Insert>=\e[2;*~"
-    exec "set <Delete>=\e[3;*~"
-    exec "set <PageUp>=\e[5;*~"
-    exec "set <PageDown>=\e[6;*~"
-    exec "set <xF1>=\e[1;*P"
-    exec "set <xF2>=\e[1;*Q"
-    exec "set <xF3>=\e[1;*R"
-    exec "set <xF4>=\e[1;*S"
-    exec "set <F5>=\e[15;*~"
-    exec "set <F6>=\e[17;*~"
-    exec "set <F7>=\e[18;*~"
-    exec "set <F8>=\e[19;*~"
-    exec "set <F9>=\e[20;*~"
-    exec "set <F10>=\e[21;*~"
-    exec "set <F11>=\e[23;*~"
-    exec "set <F12>=\e[24;*~"
-  endif
-
   " when editing a file, always jump to the last known cursor position.
   autocmd BufReadPost *
         \ if line("'\"") > 1 && line("'\"") <= line("$") |
@@ -117,12 +172,6 @@ if !exists("g:vimrc_init")
   silent! let &colorcolumn="80,120"
   " call matchadd('ColorColumn', '\%=80v', -10)
 
-  " enable syntax highlighting
-  syntax on
-
-  " timeout for key codes (delayed ESC is annoying)
-  set ttimeoutlen=0
-
   " indentation options
   set autoindent
   set expandtab
@@ -130,16 +179,6 @@ if !exists("g:vimrc_init")
   set softtabstop=2
   set tabstop=2
   set smarttab
-
-  " enable persistent undo + its settings
-  if has("persistent_undo")
-    set undolevels=15000
-    set undofile
-    set undodir=$HOME/.vim/.undodir/
-  endif
-
-  " completion options
-  set completeopt=menuone,preview
 
   " do not indent visibility keywords in C++ classes, indent lambdas
   " set cindent
@@ -154,25 +193,9 @@ if !exists("g:vimrc_init")
   " diff options
   set diffopt+=vertical
 
-  " do not create a backup file
-  set nobackup
-  set noswapfile
-
-  " Automatically read a file that has changed on disk
-  set autoread
-
-  " number of command line history lines kept
-  set history=500
-
-  " default encoding
-  set encoding=utf-8
-
   " split settings
   set splitbelow
   set splitright
-
-  " allow backspacing over everything in insert mode
-  set backspace=indent,eol,start
 
   " show the cursor position all the time
   set ruler
@@ -180,27 +203,8 @@ if !exists("g:vimrc_init")
   " display incomplete commands
   set showcmd
 
-  " do incremental searching
-  set incsearch
-
-  " set search highlighting, bo do not highlight for now
-  set hlsearch
-  noh
-
-  " line endings settings
-  set fileformats=unix,dos
-
-  " always show status line
-  set laststatus=2
-
   " show at least 5 lines below/above cursor
   set scrolloff=5
-
-  " allow to hide buffer with unsaved changes
-  set hidden
-
-  " no characters in separators
-  set fillchars=""
 
   " foldenable + foldcolumn
   " silent! set nofoldenable
@@ -209,9 +213,6 @@ if !exists("g:vimrc_init")
   else
     silent! set foldcolumn=0
   endif
-
-  " disable that annoying beeping
-  autocmd GUIEnter * set vb t_vb=
 
   " set filetype for .shellrc file
   autocmd BufRead $DOTFILES_DIR/.shellrc set ft=sh
@@ -227,6 +228,7 @@ let NERDTreeMouseMode = 3
 
 " vim-commentary settings
 autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
+autocmd FileType gnuplot setlocal commentstring=#\ %s
 autocmd FileType cmake setlocal commentstring=#\ %s
 
 " jedi-vim settings
@@ -546,7 +548,7 @@ command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, extend(
 
 function! s:git_files_if_in_repo(bang)
   let expanded = expand('%:p:h')
-  if expanded =~ '^\(scp\|ftp\)://'
+  if s:is_remote()
     let expanded = getcwd()
   endif
   let git_root = join(split(fugitive#extract_git_dir(expanded), '/')[:-2], '/')
@@ -579,11 +581,10 @@ command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
 
 function! s:git_root_or_current_dir()
-  let expanded = expand('%:p:h')
-  if expanded =~ '^\(scp\|ftp\)://'
+  if s:is_remote()
     return getcwd()
   endif
-  let git_root = join(split(fugitive#extract_git_dir(expanded), '/')[:-2], '/')
+  let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
   return git_root == '' ? expanded : '/'.git_root
 endfunction
 
@@ -663,17 +664,6 @@ function! s:mru_sink(lines)
 endfunction
 
 let g:mru_full_path = 0
-
-function! s:mru_list_without_nonexistent()
-  if empty(expand('%'))
-    let mru_list = ctrlp#mrufiles#list()
-  else
-    let mru_list = ctrlp#mrufiles#list()[1:]
-  endif
-  let cwd = fnameescape(getcwd())
-  call filter(mru_list, '!empty(findfile(v:val, cwd))')
-  return mru_list
-endfunction
 
 function! s:fzf_mru(bang)
   if g:mru_full_path == 0
@@ -809,6 +799,9 @@ nnoremap <C-p> :Mru<CR>
 nnoremap RR :Regs<CR>
 vnoremap RR :<c-u>Regs 1<CR>
 " inoremap RR  <ESC>:<C-u>Regs<CR>i
+autocmd filetype vimfiler nunmap RR
+autocmd filetype vimfiler autocmd BufEnter <buffer> nunmap RR
+autocmd filetype vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
@@ -830,9 +823,11 @@ let g:goyo_height='95%'
 nmap MM :Goyo<CR>
 
 nmap LL :Limelight!!<CR>
+autocmd filetype nerdtree nunmap LL
+autocmd filetype nerdtree autocmd BufEnter <buffer> nunmap LL
+autocmd filetype nerdtree autocmd BufLeave <buffer> nmap LL :Limelight!!<CR>
 
-let g:limelight_default_coefficient = 0.7
-let g:limelight_conceal_ctermfg = 238
+let g:limelight_default_coefficient = 0.54
 
 function! s:goyo_enter()
   silent !tmux set -w status off
@@ -891,9 +886,46 @@ autocmd filetype vimfiler nmap <buffer> C <Plug>(vimfiler_cd_file)
 autocmd filetype vimfiler nmap <buffer> I <Plug>(vimfiler_toggle_visible_ignore_files)
 autocmd filetype vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
 autocmd filetype vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
+autocmd filetype vimfiler nmap <buffer> R <Plug>(vimfiler_redraw_screen)
+
+function! VimFilerRemoteOrFind()
+  let file = expand('%')
+  if file =~# '^scp://'
+    let file = substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')
+    echo file
+    exec 'VimFilerExplorer ' . file
+  elseif file =~# '^//'
+    let file = b:vimfiler.current_file['action__directory']
+    let file = substitute(file, '\(ssh://[^/]\+\)\(/.*\)', '\1:\2/', '')
+    echo file
+    exec 'VimFilerExplorer ' . file
+  else
+    let dir = ''
+    for buf in filter(range(1, bufnr('$')), 'getbufvar(v:val, "&filetype") ==# "vimfiler" && bufname(v:val) =~# "vimfiler:explorer"')
+      let vimfiler = getbufvar(buf, 'vimfiler')
+      if vimfiler['current_dir'] =~ '^//'
+        let dir = getcwd()
+      endif
+    endfor
+    exec 'VimFilerExplorer -find ' . dir
+  endif
+endfunction
 
 map FF :VimFilerExplorer<CR>
-map FR :exec 'VimFilerExplorer ' . substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')<CR>
+map <silent> FR :call VimFilerRemoteOrFind()<CR>
+
+autocmd BufRead *
+      \ if expand('%') =~# '^vimfiler:default' |
+      \   let new_name = b:vimfiler.current_file.action__path[4:] |
+      \   let cntr = 1 |
+      \   if bufexists(new_name) |
+      \     while bufexists(new_name . '@' . cntr) |
+      \       let cntr = cntr + 1 |
+      \     endwhile |
+      \     let new_name = new_name . '@' . cntr |
+      \   endif |
+      \   exec 'file ' . new_name |
+      \ endif
 
 let g:tmux_navigator_no_mappings = 1
 
@@ -1005,3 +1037,23 @@ vnoremap <leader>ud "hy:<C-u>call GetUnityDoc()<CR>
 
 " jedi vim overrides <leader>r mapping
 map <leader><leader>r :redraw!<CR>
+
+
+function! s:is_remote()
+  let file = expand('%')
+  return file =~# '^\(scp\|ftp\)://' || file =~# '^//'
+endfunction
+
+" old, dependent on new stuff
+
+function! s:mru_list_without_nonexistent()
+  if empty(expand('%')) || s:is_remote() || &readonly
+    let mru_list = ctrlp#mrufiles#list()
+  else
+    let mru_list = ctrlp#mrufiles#list()[1:]
+  endif
+  let cwd = fnameescape(getcwd())
+  call filter(mru_list, '!empty(findfile(v:val, cwd))')
+  return mru_list
+endfunction
+
