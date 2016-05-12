@@ -34,7 +34,7 @@ Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install -
 Plug 'junegunn/fzf.vim'
 Plug 'flazz/vim-colorschemes'
 Plug 'junegunn/goyo.vim'
-Plug 'christoomey/vim-tmux-navigator'
+Plug 'bmalkus/vim-tmux-navigator'
 Plug 'Shougo/unite.vim'
 Plug 'Shougo/neossh.vim'
 Plug 'Shougo/vimfiler.vim'
