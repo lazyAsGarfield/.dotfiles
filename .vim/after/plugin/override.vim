@@ -1,1 +1,1 @@
-command! -nargs=* -bang Ag AgGitRootOrCurrent<bang> <args>
+command! -nargs=* -bang Ag AgGitRootOrCwd<bang> <args>
