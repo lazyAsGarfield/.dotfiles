@@ -133,17 +133,9 @@ bindkey '^I'   menu-complete
 bindkey '^['   undo
 bindkey '^X^E' edit-command-line
 
-_accept-or-complete-word()
-{
-  if [[ $ZSH_AUTOSUGGEST_STRATEGY != complete ]]; then
-    zle autosuggest-accept
-  else
-    zle complete-word
-  fi
-}
 # bindkey '^ '   autosuggest-accept
-zle -N _accept-or-complete-word
-bindkey '^ ' _accept-or-complete-word
+zle -N autosuggest-accept
+bindkey '^ ' autosuggest-accept
 
 autoload -z edit-command-line
 zle -N edit-command-line
@@ -185,37 +177,15 @@ bindkey -M vicmd '^W'                 backward-kill-word
 
 KEYTIMEOUT=1
 
-ZSH_AUTOSUGGEST_STRATEGY=default
-
 tog()
 {
   if [[ $# -eq 0 ]]; then
     echo "No utility name given"
     return
   elif [[ $1 == "vi" ]]; then
-    # sed -i -e '/^en()$/q' \
-    #   -e 's/^bindkey -v$/bindkey -e/' \
-    #   -e 's/^bindkey -e$/bindkey -v/' \
-    #   "$DOTFILES_DIR"/.zshrc
     [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
       bindkey -e ||
       bindkey -v
-  elif [[ $1 == "as" ]]; then
-    # sed -i -e '/^en()$/q3' \
-    #   -e 's/^ZSH_AUTOSUGGEST_STRATEGY=default$/ZSH_AUTOSUGGEST_STRATEGY=complete/q1' \
-    #   -e 's/^ZSH_AUTOSUGGEST_STRATEGY=complete$/ZSH_AUTOSUGGEST_STRATEGY=default/q2' \
-    #   "$DOTFILES_DIR"/.zshrc
-    # ret=$?
-    # if [[ $ret -eq 1 ]]; then
-    #   ZSH_AUTOSUGGEST_STRATEGY=complete
-    # elif [[ $ret -eq 2 ]]; then
-    #   ZSH_AUTOSUGGEST_STRATEGY=default
-    # fi
-    if [[ $ZSH_AUTOSUGGEST_STRATEGY != complete ]]; then
-      ZSH_AUTOSUGGEST_STRATEGY=complete
-    else
-      ZSH_AUTOSUGGEST_STRATEGY=default
-    fi
   fi
 }
 
@@ -226,11 +196,6 @@ en()
     return
   elif [[ $1 == "vi" ]]; then
     bindkey -v
-  elif [[ $1 == "as" ]]; then
-    # sed -i -e '/^en()$/q' \
-    #   -e 's/^ZSH_AUTOSUGGEST_STRATEGY=default$/ZSH_AUTOSUGGEST_STRATEGY=complete/' \
-    #   "$DOTFILES_DIR"/.zshrc
-    ZSH_AUTOSUGGEST_STRATEGY=complete
   fi
 }
 
@@ -241,29 +206,10 @@ dis()
     return
   elif [[ $1 == "vi" ]]; then
     bindkey -e
-  elif [[ $1 == "as" ]]; then
-    # sed -i -e '/^en()$/q' \
-    #   -e 's/^ZSH_AUTOSUGGEST_STRATEGY=complete$/ZSH_AUTOSUGGEST_STRATEGY=default/' \
-    #   "$DOTFILES_DIR"/.zshrc
-    ZSH_AUTOSUGGEST_STRATEGY=default
   fi
 }
 
 autoload -Uz add-zsh-hook
-
-disable_realtime_suggestions_once()
-{
-  if (( $precmd_functions[(I)disable_realtime_suggestions_once] )); then
-    enable_realtime_suggestions
-    add-zsh-hook -d precmd disable_realtime_suggestions_once
-  else
-    disable_realtime_suggestions
-    add-zsh-hook precmd disable_realtime_suggestions_once
-  fi
-}
-
-zle -N disable_realtime_suggestions_once
-bindkey '^H' disable_realtime_suggestions_once
 
 # }}}
 
@@ -274,7 +220,6 @@ zstyle ':completion:*' matcher-list '' \
   'm:{[:lower:][:upper:]\-\_}={[:upper:][:lower:]\_\-}' \
   'r:[^[:alpha:]]||[[:alpha:]]=** r:|=* m:{a-z\-}={A-Z\_}' \
   'r:[[:ascii:]]||[[:ascii:]]=** r:|=* m:{a-z\-}={A-Z\_}'
-  # 'l:|=* r:|=*'
 
 zstyle ':completion:*' max-errors 2
 
@@ -295,92 +240,13 @@ compinit
 ZLE_REMOVE_SUFFIX_CHARS="*"
 # }}}
 
-# autosuggestions + completion based autosuggestions {{{
-
-dest_file="$DOTFILES_DIR/.zgen/zsh-users/zsh-autosuggestions-master/zsh-autosuggestions.plugin.zsh"
-
-if [[ -f $dest_file ]]; then
-
-  read -r -d '' new_fun << 'EOF'
-
-  local __hit=""
-  local pref_for_len
-
-  if [[ $ZSH_AUTOSUGGEST_STRATEGY == 'complete' ]]; then
-
-    local prev_groups=("___")
-    local was_F
-
-    compadd()
-    {
-      _compadd "$@"
-      return $?
-    }
-
-    _globquals() { }
-    _dnf() { }
-
-    zstyle -g completers ':completion:*' completer
-    new=($completers)
-    new=(${new:#(_approximate|_match|_correct)})
-    zstyle ':completion:*' completer $new
-    zstyle -g matcher_list ':completion:*' matcher-list
-    zstyle ':completion:*' matcher-list ''
-
-    [[ $PENDING -eq 0 && -z $RBUFFER && ! $BUFFER =~ ---$ && ! $BUFFER =~ \\)$ ]] &&
-      _zsh_autosuggest_invoke_original_widget "autosuggest-orig-list-choices"
-
-    zstyle ':completion:*' completer $completers
-    zstyle ':completion:*' matcher-list "${matcher_list[@]}"
-
-    eval "_globquals() { $(echo "$functions[_globquals_orig]") }"
-    eval "_dnf() { $(echo "$functions[_dnf_orig]") }"
-
-    unset -f compadd
-  fi
-EOF
-
-  new_fun="$(awk -v new_fun="$new_fun" '{print $0} \
-    k>0 {next} \
-    /^\s*_zsh_autosuggest_invoke_original_widget \$@$/{print new_fun} \
-    /suggestion="\$\(_zsh_autosuggest_suggestion "\$BUFFER"\)"/{j++} \
-    j>0 {j++} j==3 {print "unset __hit"; k++;}' \
-    <<< $(echo $functions[_zsh_autosuggest_modify]))"
-
-  [[ ! $(whence -w _zsh_autosuggest_modify_orig) =~ "function" ]] &&
-    eval "_zsh_autosuggest_modify_orig() { $(echo $functions[_zsh_autosuggest_modify]) }"
-  eval "_zsh_autosuggest_modify() { $(echo $new_fun) }"
-
-fi
-
-unset dest_file
-# unset new_fun
-
-# some functions are overwritten temporarily when
-# completion based autosuggestions trigger
-source $DOTFILES_DIR/compadd
-
-if [[ ! $(whence -w _globquals_orig) =~ "function" ]]; then
-  _globquals >/dev/null 2>&1 # just to load it
-  eval "_globquals_orig() { $(echo "$functions[_globquals]") }"
-fi
-if [[ ! $(whence -w _dnf_orig) =~ "function" ]]; then
-  _dnf >/dev/null 2>&1
-  eval "_dnf_orig() { $(echo "$functions[_dnf]") }"
-fi
-
-_zsh_autosuggest_strategy_complete() {
-  [[ -n $__hit ]] &&
-    echo -E ${__hit:$#pref_for_len}
-}
+# autosuggestions {{{
 
 ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
   "fzf-completion"
   "complete-word"
   "expand-or-complete"
   "menu-complete"
-  "menu-complete"
-  "_accept-or-complete-word"
 )
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=245,underline'
