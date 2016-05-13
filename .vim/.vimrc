@@ -237,15 +237,15 @@ let g:jedi#show_call_signatures_delay = 0
 let g:jedi#show_call_signatures = "0"
 
 let g:jedi#use_splits_not_buffers = "right"
-let g:jedi#goto_command = "<leader>d"
-let g:jedi#goto_assignments_command = "<leader>g"
-let g:jedi#goto_definitions_command = ""
-let g:jedi#documentation_command = "K"
-let g:jedi#usages_command = "<leader>u"
+let g:jedi#goto_command = "yjg"
+let g:jedi#goto_assignments_command = "yja"
+let g:jedi#goto_definitions_command = "yjd"
+let g:jedi#documentation_command = "yjd"
+let g:jedi#usages_command = "yju"
 " let g:jedi#completions_command = "<C-Space>"
 " let g:jedi#completions_command = "<Tab>"
 let g:jedi#completions_command = ""
-let g:jedi#rename_command = "<leader>r"
+let g:jedi#rename_command = "yjr"
 
 " disable completions from jedi-vim, using YCM instead
 let g:jedi#completions_enabled = 0
@@ -581,12 +581,12 @@ command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
       \ 'options': '--prompt "Buffers> "'
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
 
-function! s:git_root_or_current_dir()
+function! s:git_root_or_cwd()
   if s:is_remote()
     return getcwd()
   endif
   let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
-  return git_root == '' ? expanded : '/'.git_root
+  return git_root == '' ? getcwd() : '/'.git_root
 endfunction
 
 function! s:all_files_git_root_or_cwd(bang)
