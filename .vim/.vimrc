@@ -553,6 +553,7 @@ function! s:git_files_if_in_repo(bang)
   endif
   let git_root = join(split(fugitive#extract_git_dir(expanded), '/')[:-2], '/')
   if git_root == ''
+    let expanded = getcwd()
     return fzf#vim#files(expanded, extend({
           \ 'source': 'ag -g "" --hidden -U --ignore .git/',
           \ 'options': '--prompt "' . expanded . ' (Files)>"'
@@ -574,7 +575,7 @@ function! s:git_files_if_in_repo(bang)
   endif
 endfunction
 
-command! -bang GitFilesOrCurrent call s:git_files_if_in_repo(<bang>0)
+command! -bang GitFilesOrCwd call s:git_files_if_in_repo(<bang>0)
 
 command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
       \ 'options': '--prompt "Buffers> "'
@@ -588,18 +589,17 @@ function! s:git_root_or_current_dir()
   return git_root == '' ? expanded : '/'.git_root
 endfunction
 
-function! s:all_files_git_root_or_current_dir(bang)
-  let path = s:git_root_or_current_dir()
+function! s:all_files_git_root_or_cwd(bang)
+  let path = s:git_root_or_cwd()
   call fzf#vim#files(path, extend({
         \ 'source': 'ag -g "" --hidden -U --ignore .git/',
         \ 'options': '--prompt "' . path . ' (Files)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
-command! -bang FilesGitRootOrCurrent call s:all_files_git_root_or_current_dir(<bang>0)
+command! -bang FilesGitRootOrCwd call s:all_files_git_root_or_cwd(<bang>0)
 
-" expands path relatively to current dir or git root if possible
-" or to cwd if editing over ssh/ftp
+" expands path relatively to cwd or git root if possible
 " (similar to CtrlP plugin)
 function! s:relpath(filepath_or_name)
   let fullpath = fnamemodify(a:filepath_or_name, ':p')
@@ -609,7 +609,7 @@ function! s:relpath(filepath_or_name)
   let save_cwd = fnameescape(getcwd())
   let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
   try
-    exec cdCmd . fnameescape(s:git_root_or_current_dir())
+    exec cdCmd . fnameescape(s:git_root_or_cwd())
     let ret = fnamemodify(fullpath, ':.')
   finally
     exec cdCmd . save_cwd
@@ -631,15 +631,14 @@ let s:default_action = {
   \ 'ctrl-v': 'vsplit' }
 
 " below function is used in order to get actions like ctrl-v etc.
-" and to transform path to proper version (as it may be relative to
-" dir of current file, not necessarily to cwd)
+" and to transform path to proper version
 function! s:mru_sink(lines)
   let key = remove(a:lines, 0)
   let cmd = get(s:default_action, key, 'e')
   let save_cwd = fnameescape(getcwd())
   let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
   try
-    exec cdCmd . fnameescape(s:git_root_or_current_dir())
+    exec cdCmd . fnameescape(s:git_root_or_cwd())
     let full_path_lines = map(a:lines, 'fnameescape(fnamemodify(v:val, ":p"))')
   finally
     exec cdCmd . save_cwd
@@ -670,7 +669,7 @@ function! s:fzf_mru(bang)
     call fzf#run({
           \ 'source':  map(s:mru_list_without_nonexistent(), 's:color_path(s:relpath(v:val))'),
           \ 'sink*': function("s:mru_sink"),
-          \ 'options': '-m -x +s --prompt "' . s:git_root_or_current_dir() .
+          \ 'options': '-m -x +s --prompt "' . s:git_root_or_cwd() .
           \ ' (MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
           \ 'down':    '40%'
           \ })
@@ -691,8 +690,8 @@ function! s:ag_in(bang, ...)
   let query   = (filter(copy(tokens), 'v:val !~ "^-"'))
   let save_cwd = fnameescape(getcwd())
   let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
-  " in case path is relative:
-  " we want it to be relative to dir of current file, not cwd
+  " in case provided path is relative:
+  " treat it as relative to dir of current file, not cwd
   try
     exec cdCmd . fnameescape(expand('%:p:h'))
     let dir = s:full_path(a:1)
@@ -709,7 +708,7 @@ function! s:ag_with_opts(arg, bang)
   let tokens  = split(a:arg)
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
-  let dir = s:git_root_or_current_dir()
+  let dir = s:git_root_or_cwd()
   call fzf#vim#ag(query, ag_opts . ' --ignore .git/', extend({
         \ 'dir': dir,
         \ 'options': '--prompt "' . dir . ' (Ag)> "'
@@ -719,8 +718,8 @@ endfunction
 command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
 command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
-command! -nargs=* -bang AgGitRootOrCurrent call s:ag_with_opts(<q-args>, <bang>0)
-command! -nargs=* -bang Ag AgGitRootOrCurrent<bang> <args>
+command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<q-args>, <bang>0)
+" Ag command is set in after/plugin/override.vim
 
 function! s:ansi(str, col, bold)
   return printf("\x1b[%s%sm%s\x1b[m", a:col, a:bold ? ';1' : '', a:str)
@@ -789,9 +788,9 @@ nnoremap cof :let g:mru_full_path=!g:mru_full_path<CR>
 nnoremap [of :let g:mru_full_path=1<CR>
 nnoremap ]of :let g:mru_full_path=0<CR>
 
-nnoremap <C-f> :GitFilesOrCurrent<CR>
+nnoremap <C-f> :GitFilesOrCwd<CR>
 nnoremap <C-b> :BuffersBetterPrompt<CR>
-nnoremap <C-g> :FilesGitRootOrCurrent<CR>
+nnoremap <C-g> :FilesGitRootOrCwd<CR>
 nnoremap <C-p> :Mru<CR>
 
 " good way of detecting if in visual mode
@@ -1038,7 +1037,6 @@ vnoremap <leader>ud "hy:<C-u>call GetUnityDoc()<CR>
 " jedi vim overrides <leader>r mapping
 map <leader><leader>r :redraw!<CR>
 
-
 function! s:is_remote()
   let file = expand('%')
   return file =~# '^\(scp\|ftp\)://' || file =~# '^//'
@@ -1057,3 +1055,23 @@ function! s:mru_list_without_nonexistent()
   return mru_list
 endfunction
 
+map <silent> cd :lcd %:p:h \| pwd<CR>
+autocmd VimEnter * let g:cwd = getcwd()
+autocmd CursorMoved * if ! haslocaldir() | let g:cwd = getcwd() | endif
+map <silent> cD :exec 'cd ' . g:cwd \| pwd<CR>
+
+function! RemoveFromQF(ind)
+  let qf = getqflist()
+  let ind = a:ind - 1
+  if ind == 0
+    call setqflist(qf[1:])
+  else
+    call setqflist(qf[:ind-1] + qf[ind+1:])
+    exec ind+1
+  endif
+  if len(qf) == 1
+    cclose
+  endif
+endfunction
+
+autocmd filetype qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
