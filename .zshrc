@@ -67,13 +67,13 @@ zle -N zle-keymap-select prompt_command_if_vi_mode
 
 zmodload zsh/complist
 
+zplugs=()
+
 zstyle ":zplug:tag" lazy true
 
 source $DOTFILES_DIR/.zplug/init.zsh
 
 ZPLUG_HOME=$DOTFILES_DIR/.zplug
-
-zplugs=()
 
 zplug "plugins/pip", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh
@@ -134,7 +134,7 @@ bindkey '^['   undo
 bindkey '^X^E' edit-command-line
 
 # bindkey '^ '   autosuggest-accept
-zle -N autosuggest-accept
+# zle -N autosuggest-accept
 bindkey '^ ' autosuggest-accept
 
 autoload -z edit-command-line

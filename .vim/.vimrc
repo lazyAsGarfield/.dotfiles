@@ -551,19 +551,18 @@ function! s:git_files_if_in_repo(bang)
   if s:is_remote()
     let expanded = getcwd()
   endif
-  let git_root = join(split(fugitive#extract_git_dir(expanded), '/')[:-2], '/')
-  if git_root == ''
+  if ! exists('b:git_dir')
     let expanded = getcwd()
     return fzf#vim#files(expanded, extend({
           \ 'source': 'ag -g "" --hidden -U --ignore .git/',
           \ 'options': '--prompt "' . expanded . ' (Files)>"'
           \ }, a:bang ? {} : g:fzf#vim#default_layout))
   else
-    let git_root = '/' . git_root
+    let git_root = fugitive#repo().tree()
     let save_cwd = fnameescape(getcwd())
     let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
     try
-      exec cdCmd . fnameescape(git_root)
+      exec cdCmd . git_root
       let z = { 'options': '--prompt "' . git_root . ' (GitFiles)> "' }
       echo z
       call fzf#vim#gitfiles('', extend({
@@ -585,8 +584,7 @@ function! s:git_root_or_cwd()
   if s:is_remote()
     return getcwd()
   endif
-  let git_root = join(split(fugitive#extract_git_dir(expand('%:p:h')), '/')[:-2], '/')
-  return git_root == '' ? getcwd() : '/'.git_root
+  return exists('b:git_dir') ? fugitive#repo().tree() : getcwd()
 endfunction
 
 function! s:all_files_git_root_or_cwd(bang)
