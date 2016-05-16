@@ -961,6 +961,9 @@ nnoremap <silent> <C-l> :call Navigate('r')<CR>
 
 " typing in wrong order may be annoying
 " map q<leader> :q<CR>
+command Q q
+command Qw qw
+command QW qw
 
 let g:gitgutter_override_sign_column_highlight = 0
 
