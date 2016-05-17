@@ -820,9 +820,9 @@ let g:goyo_height='95%'
 nmap MM :Goyo<CR>
 
 nmap LL :Limelight!!<CR>
-autocmd filetype nerdtree nunmap LL
-autocmd filetype nerdtree autocmd BufEnter <buffer> nunmap LL
-autocmd filetype nerdtree autocmd BufLeave <buffer> nmap LL :Limelight!!<CR>
+autocmd filetype nerdtree silent! nunmap LL
+autocmd filetype nerdtree autocmd BufEnter <buffer> silent! nunmap LL
+autocmd filetype nerdtree autocmd BufLeave <buffer> silent! nmap LL :Limelight!!<CR>
 
 let g:limelight_default_coefficient = 0.54
 
@@ -961,9 +961,9 @@ nnoremap <silent> <C-l> :call Navigate('r')<CR>
 
 " typing in wrong order may be annoying
 " map q<leader> :q<CR>
-command Q q
-command Qw qw
-command QW qw
+command! Q q
+command! Qw qw
+command! QW qw
 
 let g:gitgutter_override_sign_column_highlight = 0
 

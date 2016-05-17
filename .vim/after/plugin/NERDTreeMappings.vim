@@ -52,7 +52,9 @@ endfunction
 function! NERDTree_dir_l(dir)
   let dir = a:dir
   call dir.activate()
-  call dir.getChildByIndex(0, 1).putCursorHere(0,0)
+  if dir.getVisibleChildCount() > 0
+    let child = dir.getChildByIndex(0, 1).putCursorHere(0,0)
+  endif
 endfunction
 
 function! NERDTree_file_l(node)
