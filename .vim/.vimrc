@@ -49,6 +49,10 @@ call plug#end()
 
 filetype plugin indent on
 
+" some options get overriden by plugins when re-sourcing vimrc, set them to
+" desired values
+runtime after/plugin/override.vim
+
 " --------------- PLUGINS END --------------- }}}
 
 " ---------- VIM OPTS ------------- {{{
@@ -696,14 +700,14 @@ function! s:ag_in(bang, ...)
   finally
     exec cdCmd . save_cwd
   endtry
-  call fzf#vim#ag(join(query[1:], ' '), ag_opts . '--ignore .git/', extend({
+  call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --ignore .git/', extend({
         \ 'dir': dir,
         \ 'options': '--prompt "' . dir . ' (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
-function! s:ag_with_opts(arg, bang)
-  let tokens  = split(a:arg)
+function! s:ag_with_opts(bang, ...)
+  let tokens  = a:000
   let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
   let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
   let dir = s:git_root_or_cwd()
@@ -716,7 +720,7 @@ endfunction
 command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
 command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
-command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<q-args>, <bang>0)
+command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<bang>0, <f-args>)
 " Ag command is set in after/plugin/override.vim
 
 function! s:ansi(str, col, bold)
@@ -852,6 +856,8 @@ autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
 autocmd filetype help nnoremap <nowait> <buffer> q :quit<CR>
 " autocmd filetype help nnoremap <buffer>  :quit<CR>
+
+autocmd filetype qf nnoremap <nowait> <buffer> q :quit<CR>
 
 autocmd filetype undotree nmap <nowait> <buffer> q :quit<CR>
 autocmd filetype undotree nmap <buffer> <C-j> j
@@ -1058,7 +1064,7 @@ endfunction
 
 map <silent> cd :lcd %:p:h \| pwd<CR>
 autocmd VimEnter * let g:cwd = getcwd()
-autocmd CursorMoved * if ! haslocaldir() | let g:cwd = getcwd() | endif
+autocmd CursorMoved,BufLeave * if ! haslocaldir() | let g:cwd = getcwd() | endif
 map <silent> cD :exec 'cd ' . g:cwd \| pwd<CR>
 
 function! RemoveFromQF(ind)
@@ -1076,3 +1082,10 @@ function! RemoveFromQF(ind)
 endfunction
 
 autocmd filetype qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
+
+" python << EOF
+" import sys
+" import vim
+" for p in sys.path:
+"   vim.command('echo "%s"' % p)
+" EOF
