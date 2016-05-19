@@ -720,6 +720,7 @@ endfunction
 command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
 command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
+command! -nargs=* -bang Agcwd exec 'Agin<bang>'  getcwd() '<args>'
 command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<bang>0, <f-args>)
 " Ag command is set in after/plugin/override.vim
 
