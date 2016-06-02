@@ -18,6 +18,11 @@ alias ......='cd ../../../../..'
 alias s='saved'
 alias c='local_cd_hist'
 
+detach()
+{
+  (nohup "$@" >/dev/null 2>&1 &)
+}
+
 command -v vim >/dev/null 2>&1 &&
   EDITOR=vim
 command -v vimx >/dev/null 2>&1 &&

@@ -237,6 +237,8 @@ zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p
 autoload -Uz compinit
 compinit
 
+compdef _precommand detach
+
 ZLE_REMOVE_SUFFIX_CHARS="*"
 # }}}
 
