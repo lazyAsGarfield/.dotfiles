@@ -231,7 +231,7 @@ endif " exists("g:vimrc_init")
 let NERDTreeMouseMode = 3
 
 " vim-commentary settings
-autocmd FileType c,cpp,cs,java setlocal commentstring=//\ %s
+autocmd FileType c,cpp,cs,java,cuda,cuda.cpp setlocal commentstring=//\ %s
 autocmd FileType gnuplot setlocal commentstring=#\ %s
 autocmd FileType cmake setlocal commentstring=#\ %s
 
@@ -399,6 +399,7 @@ nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
 nnoremap ycf :YcmCompleter FixIt<CR>
 nnoremap ycd :YcmCompleter GetDoc<CR>
 nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
+nnoremap ycl :YcmDiags<CR>
 nnoremap yct :YcmCompleter GetType<CR>
 " vnoremap yct :<c-u>YcmCompleter GetType<CR>
 
@@ -811,9 +812,12 @@ autocmd filetype vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
 
 " new stuff, not categorized yet
 
+autocmd filetype cuda set ft=cuda.cpp
+
 " default flags files for c-like langs for YCM
 autocmd filetype cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cpp/.ycm_extra_conf.py"
 autocmd filetype c let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/c/.ycm_extra_conf.py"
+autocmd filetype cuda.cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cuda/.ycm_extra_conf.py"
 
 set nowrap
 
