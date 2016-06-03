@@ -151,7 +151,7 @@ _z() {
             function output(files, out, common) {
                 # list or return the desired directory
                 if( list ) {
-                    cmd = "sort -rn | head -n$limit >&2"
+                    cmd = "sort -rn >&2"
                     for( x in files ) {
                         if( files[x] ) printf "%-10s %s\n", files[x], x | cmd
                     }
@@ -215,12 +215,14 @@ _z() {
                     output(imatches, ibest_match, common(imatches))
                 }
             }
-        ' 2> >(awk -v args="$args" -v typ="$typ" '
+        ' 2> >(awk -v args="$args" -v typ="$typ" -v limit="$limit" '
         {
-          if ( $1 != "common:" && args <= 1 && !typ )
-            printf "%4d  %s\n", ++i, $0
-          else
-            print "      "$0
+          if ( i < limit ) {
+            if ( $1 != "common:" && args <= 1 && !typ )
+              printf "%4d  %s\n", ++i, $0
+            else
+              print "      "$0
+          }
         }
         ' >&2))"
         [ $? -gt 0 ] && return
