@@ -9,14 +9,19 @@ let path='~/.vim/plugged'
 call plug#begin(path)
 
 Plug 'tpope/vim-surround'
-Plug 'scrooloose/nerdtree'
+if v:version >= 703
+  Plug 'scrooloose/nerdtree'
+  Plug 'mbbill/undotree'
+  Plug 'Shougo/unite.vim'
+  Plug 'Shougo/neossh.vim'
+  Plug 'Shougo/vimfiler.vim'
+  Plug 'easymotion/vim-easymotion'
+endif
 Plug 'tpope/vim-commentary'
 Plug 'kien/ctrlp.vim'
 Plug 'bling/vim-airline'
 Plug 'hynek/vim-python-pep8-indent'
 Plug 'rking/ag.vim'
-Plug 'easymotion/vim-easymotion'
-Plug 'davidhalter/jedi-vim'
 Plug 'tpope/vim-unimpaired'
 if empty($__NO_YCM__)
   if empty($__NO_COMPL__)
@@ -24,20 +29,16 @@ if empty($__NO_YCM__)
   else
     Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
   endif
+  Plug 'davidhalter/jedi-vim'
 endif
 Plug 'tpope/vim-fugitive'
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'lazyAsGarfield/delimitMate'
 Plug 'junegunn/vim-easy-align'
-Plug 'mbbill/undotree'
 Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'flazz/vim-colorschemes'
 Plug 'junegunn/goyo.vim'
 Plug 'bmalkus/vim-tmux-navigator'
-Plug 'Shougo/unite.vim'
-Plug 'Shougo/neossh.vim'
-Plug 'Shougo/vimfiler.vim'
 Plug 'tpope/vim-endwise'
 Plug 'airblade/vim-gitgutter'
 Plug 'moll/vim-bbye'
@@ -393,15 +394,44 @@ inoremap <C-U> <C-G>u<C-U>
 
 " ---------- PLUGIN MAPPINGS ------ {{{
 
-" YCM mappings
-nnoremap ycg :YcmCompleter GoTo<CR>
-nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
-nnoremap ycf :YcmCompleter FixIt<CR>
-nnoremap ycd :YcmCompleter GetDoc<CR>
-nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
-nnoremap ycl :YcmDiags<CR>
-nnoremap yct :YcmCompleter GetType<CR>
-" vnoremap yct :<c-u>YcmCompleter GetType<CR>
+if version >= 703
+
+  " YCM mappings
+  nnoremap ycg :YcmCompleter GoTo<CR>
+  nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
+  nnoremap ycf :YcmCompleter FixIt<CR>
+  nnoremap ycd :YcmCompleter GetDoc<CR>
+  nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
+  nnoremap ycl :YcmDiags<CR>
+  nnoremap yct :YcmCompleter GetType<CR>
+
+  " Undotree plugin
+  nnoremap <C-t> :UndotreeToggle<CR>
+
+  " NERDTree plugin
+  function! NERDTreeEnableOrToggle()
+    try
+      NERDTreeToggle
+    catch
+      silent! NERDTree
+    endtry
+  endfunction
+
+  map <C-n> :call NERDTreeEnableOrToggle()<CR>
+  map <leader><leader>n :NERDTreeFind<CR>
+
+  " Easymotion mappings
+  nmap <leader><leader>t <Plug>(easymotion-t2)
+  nmap <leader><leader>f <Plug>(easymotion-f2)
+  nmap <leader><leader>T <Plug>(easymotion-T2)
+  nmap <leader><leader>F <Plug>(easymotion-F2)
+
+  nmap <leader>t <Plug>(easymotion-t)
+  nmap <leader>f <Plug>(easymotion-f)
+  nmap <leader>T <Plug>(easymotion-T)
+  nmap <leader>F <Plug>(easymotion-F)
+
+endif
 
 " delimitMate mappings
 imap <C-k> <Plug>delimitMateJumpMany
@@ -409,85 +439,12 @@ imap <C-l> <Plug>delimitMateS-Tab
 imap <C-h> <Plug>delimitMateS-BS
 imap <C-j> <C-k><CR>
 
-" Undotree plugin
-nnoremap <C-t> :UndotreeToggle<CR>
-
-" NERDTree plugin
-function! NERDTreeEnableOrToggle()
-  try
-    NERDTreeToggle
-  catch
-    silent! NERDTree
-  endtry
-endfunction
-
-map <C-n> :call NERDTreeEnableOrToggle()<CR>
-map <leader><leader>n :NERDTreeFind<CR>
-
-" FZF list
-" <C-f> is mapped in commands section deal more wisely with git repos
-" <C-b> is mapped in commands for better prompt
-" nmap <C-f> :Files<CR>
-" nmap <C-b> :Buffers<CR>
-
 " no need for mapping, using fzf instead
 let g:ctrlp_map = ''
-
-" CtrlP plugin
-let g:ctrlp_cmd = 'call CallCtrlP()'
-
-func! CallCtrlP()
-    if exists('g:called_ctrlp')
-        CtrlPLastMode
-    else
-        let g:called_ctrlp = 1
-        " CtrlPMRU
-        CtrlP
-    endif
-endfunc
 
 " EasyAlign mappings
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
-
-" Easymotion mappings
-nmap <leader><leader>t <Plug>(easymotion-t2)
-nmap <leader><leader>f <Plug>(easymotion-f2)
-nmap <leader><leader>T <Plug>(easymotion-T2)
-nmap <leader><leader>F <Plug>(easymotion-F2)
-
-nmap <leader>t <Plug>(easymotion-t)
-nmap <leader>f <Plug>(easymotion-f)
-nmap <leader>T <Plug>(easymotion-T)
-nmap <leader>F <Plug>(easymotion-F)
-
-" tab as omnicomplete key, but not at beginning of
-" file and not on non-letter char
-" YCM overrides tab mapping, therefore it's not needed
-" let g:tab_completion = 1
-
-" function! ToggleTabCompletion()
-"   let g:tab_completion = !g:tab_completion
-"   if g:tab_completion
-"     echo 'Tab completion enabled'
-"   else
-"     echo 'Tab completion disabled'
-"   endif
-" endfunction
-
-" nmap c<Tab> :call ToggleTabCompletion()<CR>
-
-" function! InsertTabWrapper()
-"     let col = col('.') - 1
-"     if !col || getline('.')[col - 1] !~ '\k' || !g:tab_completion
-"         return "\<tab>"
-"     else
-"         return "\<C-n>"
-"     endif
-" endfunction
-
-" inoremap <Tab> <c-r>=InsertTabWrapper()<cr>
-" inoremap <S-Tab> <C-p>
 
 " --------------- PLUGIN MAPPINGS END -------------- }}}
 
@@ -506,34 +463,6 @@ function! CountListedBuffers()
   endfor
   return cnt
 endfunction
-
-" function! LastUsedBufferOrPrevious(bang)
-"   if a:bang
-"     if CountListedBuffers() == 1 || bufwinnr('#') > -1
-"       bd!
-"     elseif buflisted(bufnr("#"))
-"       b #
-"       bd! #
-"     else
-"       bp
-"       bd! #
-"     endif
-"   elseif getbufvar(bufnr("%"), "&mod")
-"     echoerr "Unsaved changes (add ! to override)"
-"   else
-"     if CountListedBuffers() == 1 || bufwinnr('#') > -1
-"       bd
-"     elseif buflisted(bufnr("#"))
-"       b #
-"       bd #
-"     else
-"       bp
-"       bd #
-"     endif
-"   endif
-" endfunction
-
-" command! -bang BD call LastUsedBufferOrPrevious(<bang>0)
 
 " --------------- VIM COMMANDS END -------------- }}}
 
@@ -836,24 +765,28 @@ autocmd filetype nerdtree autocmd BufLeave <buffer> silent! nmap LL :Limelight!!
 let g:limelight_default_coefficient = 0.54
 
 function! s:goyo_enter()
-  silent !tmux set -w status off
-  silent !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
+  if !empty($TMUX)
+    silent! !tmux set -w status off
+    silent! !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
+  endif
   set noshowmode
   set noshowcmd
   let g:scrolloff_saved=&scrolloff
   set scrolloff=999
   Goyo x95%
-  Limelight
+  silent! Limelight
 endfunction
 
 function! s:goyo_leave()
-  silent !tmux set -w status on
-  silent !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
+  if !empty($TMUX)
+    silent! !tmux set -w status on
+    silent! !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
+  endif
   set showmode
   set showcmd
   exec 'set scrolloff=' . g:scrolloff_saved
-  Limelight!
-  call SetGitGutterColors()
+  silent! Limelight!
+  silent! call SetGitGutterColors()
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
@@ -896,31 +829,35 @@ autocmd filetype vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
 autocmd filetype vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
 autocmd filetype vimfiler nmap <buffer> R <Plug>(vimfiler_redraw_screen)
 
-function! VimFilerRemoteOrFind()
-  let file = expand('%')
-  if file =~# '^scp://'
-    let file = substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')
-    echo file
-    exec 'VimFilerExplorer ' . file
-  elseif file =~# '^//'
-    let file = b:vimfiler.current_file['action__directory']
-    let file = substitute(file, '\(ssh://[^/]\+\)\(/.*\)', '\1:\2/', '')
-    echo file
-    exec 'VimFilerExplorer ' . file
-  else
-    let dir = ''
-    for buf in filter(range(1, bufnr('$')), 'getbufvar(v:val, "&filetype") ==# "vimfiler" && bufname(v:val) =~# "vimfiler:explorer"')
-      let vimfiler = getbufvar(buf, 'vimfiler')
-      if vimfiler['current_dir'] =~ '^//'
-        let dir = getcwd()
-      endif
-    endfor
-    exec 'VimFilerExplorer -find ' . dir
-  endif
-endfunction
+if version >= 703
 
-map FF :VimFilerExplorer<CR>
-map <silent> FR :call VimFilerRemoteOrFind()<CR>
+  function! VimFilerRemoteOrFind()
+    let file = expand('%')
+    if file =~# '^scp://'
+      let file = substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')
+      echo file
+      exec 'VimFilerExplorer ' . file
+    elseif file =~# '^//'
+      let file = b:vimfiler.current_file['action__directory']
+      let file = substitute(file, '\(ssh://[^/]\+\)\(/.*\)', '\1:\2/', '')
+      echo file
+      exec 'VimFilerExplorer ' . file
+    else
+      let dir = ''
+      for buf in filter(range(1, bufnr('$')), 'getbufvar(v:val, "&filetype") ==# "vimfiler" && bufname(v:val) =~# "vimfiler:explorer"')
+        let vimfiler = getbufvar(buf, 'vimfiler')
+        if vimfiler['current_dir'] =~ '^//'
+          let dir = getcwd()
+        endif
+      endfor
+      exec 'VimFilerExplorer -find ' . dir
+    endif
+  endfunction
+
+  map FF :VimFilerExplorer<CR>
+  map <silent> FR :call VimFilerRemoteOrFind()<CR>
+
+endif
 
 autocmd BufRead *
       \ if expand('%') =~# '^vimfiler:default' |

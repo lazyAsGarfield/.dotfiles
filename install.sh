@@ -128,10 +128,12 @@ setup_vim()
         if [[ $(read_or_no "Install YCM? [y]/n:") == "n" ]]; then
           __NO_YCM__=1
           export __NO_YCM__
+          add_lines "__NO_YCM__=1"$'\n'"export __NO_YCM__" $HOME/.bashrc
         else
           if [[ $(read_or_no "With semantic completers? [y]/n: ") == "n" ]]; then
             __NO_COMPL__=1
             export __NO_COMPL__
+            add_lines "__NO_COMPL__=1"$'\n'"export __NO_COMPL__" $HOME/.bashrc
           fi
         fi
 
@@ -423,18 +425,22 @@ if [[ -d "$target_dir"/.fzf ]] && [[ $(read_or_yes "Install fzf? y/[n]: ") == "y
 fi
 
 changed=
+
 if [[ $(read_or_yes "Compile screen-256color.terminfo? y/[n]: ") == "y" ]]; then
   msg_and_run "Compiling $target_dir/screen-256color.terminfo" tic -o "$HOME"/.terminfo "$target_dir/screen-256color.terminfo"
   changed=1
 fi
 
-if [[ -n $xterm ]]; then
-  if [[ $(read_or_yes "Compile xterm-256color.terminfo? y/[n]: ") == "y" ]]; then
-    cat screen-256color.terminfo | sed 's/screen/xterm/g' > "/tmp/xterm-256color.terminfo"
-    msg_and_run "Compiling /tmp/xterm-256color.terminfo" tic -o "$HOME"/.terminfo "/tmp/xterm-256color.terminfo"
-    changed=1
-  fi
+if [[ $(read_or_yes "Compile xterm-256color.terminfo? y/[n]: ") == "y" ]]; then
+  msg_and_run "Compiling $target_dir/xterm-256color.terminfo" tic -o "$HOME"/.terminfo "$target_dir/xterm-256color.terminfo"
+  changed=1
 fi
+
+if [[ $(read_or_yes "Compile tmux-256color.terminfo? y/[n]: ") == "y" ]]; then
+  msg_and_run "Compiling $target_dir/tmux-256color.terminfo" tic -o "$HOME"/.terminfo "$target_dir/tmux-256color.terminfo"
+  changed=1
+fi
+
 [[ -n $changed ]] && echo
 
 q="Create link to version compare utils in $(eval "echo $version_utils_dest")? y/[n]: "

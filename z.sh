@@ -111,13 +111,13 @@ _z() {
                     c) local fnd="^$PWD $fnd";;
                     e) local echo=echo;;
                     h) echo "${_Z_CMD:-z} [-cehlrtx] args" >&2; return;;
-                    l) local list=1; [ "${1:2}" =~ ^[0-9]+$ ] && limit=${1:2};;
+                    l) local list=1; [[ "${1:2}" =~ ^[0-9]+$ ]] && limit=${1:2};;
                     r) local typ="rank";;
                     t) local typ="recent";;
                     x) sed -i -e "\:^${PWD}|.*:d" "$datafile";;
                 esac; opt=${opt:1}; done;;
              *) if [ $# -eq 1 ]; then
-                     if [ "$1" =~ ^[0-9]+$ ]; then
+                     if [[ "$1" =~ ^[0-9]+$ ]]; then
                        only="$1"
                        local fnd=".*"
                      fi
