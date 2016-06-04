@@ -731,9 +731,9 @@ nnoremap <C-p> :Mru<CR>
 nnoremap RR :Regs<CR>
 vnoremap RR :<c-u>Regs 1<CR>
 " inoremap RR  <ESC>:<C-u>Regs<CR>i
-autocmd filetype vimfiler nunmap RR
-autocmd filetype vimfiler autocmd BufEnter <buffer> nunmap RR
-autocmd filetype vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
+autocmd FileType vimfiler nunmap RR
+autocmd FileType vimfiler autocmd BufEnter <buffer> nunmap RR
+autocmd FileType vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
@@ -741,12 +741,12 @@ autocmd filetype vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
 
 " new stuff, not categorized yet
 
-autocmd filetype cuda set ft=cuda.cpp
+autocmd FileType cuda set ft=cuda.cpp
 
 " default flags files for c-like langs for YCM
-autocmd filetype cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cpp/.ycm_extra_conf.py"
-autocmd filetype c let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/c/.ycm_extra_conf.py"
-autocmd filetype cuda.cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cuda/.ycm_extra_conf.py"
+autocmd FileType cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cpp/.ycm_extra_conf.py"
+autocmd FileType c let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/c/.ycm_extra_conf.py"
+autocmd FileType cuda.cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cuda/.ycm_extra_conf.py"
 
 set nowrap
 
@@ -758,9 +758,9 @@ let g:goyo_height='95%'
 nmap MM :Goyo<CR>
 
 nmap LL :Limelight!!<CR>
-autocmd filetype nerdtree silent! nunmap LL
-autocmd filetype nerdtree autocmd BufEnter <buffer> silent! nunmap LL
-autocmd filetype nerdtree autocmd BufLeave <buffer> silent! nmap LL :Limelight!!<CR>
+autocmd FileType nerdtree silent! nunmap LL
+autocmd FileType nerdtree autocmd BufEnter <buffer> silent! nunmap LL
+autocmd FileType nerdtree autocmd BufLeave <buffer> silent! nmap LL :Limelight!!<CR>
 
 let g:limelight_default_coefficient = 0.54
 
@@ -792,42 +792,42 @@ endfunction
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
 autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
-autocmd filetype help nnoremap <nowait> <buffer> q :quit<CR>
-" autocmd filetype help nnoremap <buffer>  :quit<CR>
+autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
+" autocmd FileType help nnoremap <buffer>  :quit<CR>
 
-autocmd filetype qf nnoremap <nowait> <buffer> q :quit<CR>
+autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
 
-autocmd filetype undotree nmap <nowait> <buffer> q :quit<CR>
-autocmd filetype undotree nmap <buffer> <C-j> j
-autocmd filetype undotree nmap <buffer> <C-k> k
-autocmd filetype undotree nmap <buffer>  :quit<CR>
+autocmd FileType undotree nmap <nowait> <buffer> q :quit<CR>
+autocmd FileType undotree nmap <buffer> <C-j> j
+autocmd FileType undotree nmap <buffer> <C-k> k
+autocmd FileType undotree nmap <buffer>  :quit<CR>
 
-" autocmd filetype nerdtree nmap <buffer>  :quit<CR>
-autocmd filetype nerdtree nmap <buffer> <C-v> s
-autocmd filetype nerdtree nmap <buffer> <C-x> i
-autocmd filetype nerdtree nmap <buffer> <C-j> j
-autocmd filetype nerdtree nmap <buffer> <C-k> k
-autocmd filetype nerdtree nmap <buffer> . I
+" autocmd FileType nerdtree nmap <buffer>  :quit<CR>
+autocmd FileType nerdtree nmap <buffer> <C-v> s
+autocmd FileType nerdtree nmap <buffer> <C-x> i
+autocmd FileType nerdtree nmap <buffer> <C-j> j
+autocmd FileType nerdtree nmap <buffer> <C-k> k
+autocmd FileType nerdtree nmap <buffer> . I
 
-autocmd! filetype unite
-autocmd filetype unite nunmap <buffer> <C-h>
-autocmd filetype unite nunmap <buffer> <C-k>
-autocmd filetype unite imap <buffer> <C-j> <Plug>(unite_loop_cursor_up)
-autocmd filetype unite imap <buffer> <C-k> <Plug>(unite_loop_cursor_down)
+autocmd! FileType unite
+autocmd FileType unite nunmap <buffer> <C-h>
+autocmd FileType unite nunmap <buffer> <C-k>
+autocmd FileType unite imap <buffer> <C-j> <Plug>(unite_loop_cursor_up)
+autocmd FileType unite imap <buffer> <C-k> <Plug>(unite_loop_cursor_down)
 
-autocmd! filetype vimfiler
-autocmd filetype vimfiler nunmap <buffer> <C-l>
-autocmd filetype vimfiler nmap <buffer> <C-k> <Plug>(vimfiler_loop_cursor_up)
-autocmd filetype vimfiler nmap <buffer> <C-j> <Plug>(vimfiler_loop_cursor_down)
-autocmd filetype vimfiler nmap <buffer> ? <Plug>(vimfiler_help)
-autocmd filetype vimfiler nmap <buffer> o <Plug>(vimfiler_expand_or_edit)
-autocmd filetype vimfiler nmap <buffer> u <Plug>(vimfiler_switch_to_parent_directory)
-autocmd filetype vimfiler nmap <buffer> i <Plug>(vimfiler_cd_input_directory)
-autocmd filetype vimfiler nmap <buffer> C <Plug>(vimfiler_cd_file)
-autocmd filetype vimfiler nmap <buffer> I <Plug>(vimfiler_toggle_visible_ignore_files)
-autocmd filetype vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
-autocmd filetype vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
-autocmd filetype vimfiler nmap <buffer> R <Plug>(vimfiler_redraw_screen)
+autocmd! FileType vimfiler
+autocmd FileType vimfiler nunmap <buffer> <C-l>
+autocmd FileType vimfiler nmap <buffer> <C-k> <Plug>(vimfiler_loop_cursor_up)
+autocmd FileType vimfiler nmap <buffer> <C-j> <Plug>(vimfiler_loop_cursor_down)
+autocmd FileType vimfiler nmap <buffer> ? <Plug>(vimfiler_help)
+autocmd FileType vimfiler nmap <buffer> o <Plug>(vimfiler_expand_or_edit)
+autocmd FileType vimfiler nmap <buffer> u <Plug>(vimfiler_switch_to_parent_directory)
+autocmd FileType vimfiler nmap <buffer> i <Plug>(vimfiler_cd_input_directory)
+autocmd FileType vimfiler nmap <buffer> C <Plug>(vimfiler_cd_file)
+autocmd FileType vimfiler nmap <buffer> I <Plug>(vimfiler_toggle_visible_ignore_files)
+autocmd FileType vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
+autocmd FileType vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
+autocmd FileType vimfiler nmap <buffer> R <Plug>(vimfiler_redraw_screen)
 
 if version >= 703
 
@@ -963,7 +963,7 @@ nmap <space>st :StripWhitespace<CR>
 
 map <leader>D :Bdelete<CR>
 
-autocmd filetype gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
+autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
 
 nmap <leader>ss :source %<CR>
 
@@ -1023,7 +1023,7 @@ function! RemoveFromQF(ind)
   endif
 endfunction
 
-autocmd filetype qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
+autocmd FileType qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
 
 " python << EOF
 " import sys
