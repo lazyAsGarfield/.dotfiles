@@ -63,8 +63,8 @@ __get_git_branch()
     local killed=0
     local more_info=""
     git_info="$(git branch 2> /dev/null | grep '* ' | cut -c3-)"
-    if [[ -n $ZSH_VERSION ]]; then
-      if [[ -n $git_info ]]; then
+    if [[ -n $git_info ]]; then
+      if [[ -n $ZSH_VERSION ]]; then
         [[ -f $HOME/.fonts/octicons-local.ttf ]] &&
           branch_icon="\uf020 "
         git_info="$LIGHT_BLUE$branch_icon$git_info"
@@ -128,9 +128,9 @@ __get_git_branch()
         else
           git_info="$git_info$more_info"
         fi
+      else
+        git_info="$git_info "
       fi
-    else
-      git_info="$git_info "
     fi
   fi
   echo -e "$git_info"
