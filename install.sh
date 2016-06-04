@@ -125,7 +125,7 @@ setup_vim()
       echo "Could not find, nor download plug.vim, skipping pluggins section"
     else
       if [[ $(read_or_yes "Install plugins? y/[n]: ") == "y" ]]; then
-        if [[ $(read_or_no "Install YCM? [y]/n:") == "n" ]]; then
+        if [[ $(read_or_no "Install YCM (if vim is present in proper version)? [y]/n:") == "n" ]]; then
           __NO_YCM__=1
           export __NO_YCM__
           add_lines "__NO_YCM__=1"$'\n'"export __NO_YCM__" $HOME/.bashrc

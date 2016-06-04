@@ -16,6 +16,14 @@ if v:version >= 703
   Plug 'Shougo/neossh.vim'
   Plug 'Shougo/vimfiler.vim'
   Plug 'easymotion/vim-easymotion'
+  if empty($__NO_YCM__)
+    if empty($__NO_COMPL__)
+      Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --omnisharp-completer' }
+    else
+      Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
+    endif
+    Plug 'davidhalter/jedi-vim'
+  endif
 endif
 Plug 'tpope/vim-commentary'
 Plug 'kien/ctrlp.vim'
@@ -23,14 +31,6 @@ Plug 'bling/vim-airline'
 Plug 'hynek/vim-python-pep8-indent'
 Plug 'rking/ag.vim'
 Plug 'tpope/vim-unimpaired'
-if empty($__NO_YCM__)
-  if empty($__NO_COMPL__)
-    Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --omnisharp-completer' }
-  else
-    Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
-  endif
-  Plug 'davidhalter/jedi-vim'
-endif
 Plug 'tpope/vim-fugitive'
 Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'lazyAsGarfield/delimitMate'
