@@ -63,70 +63,74 @@ __get_git_branch()
     local killed=0
     local more_info=""
     git_info="$(git branch 2> /dev/null | grep '* ' | cut -c3-)"
-    if [[ -n $git_info ]]; then
-      [[ -f $HOME/.fonts/octicons-local.ttf ]] &&
-        branch_icon="\uf020 "
-      git_info="$LIGHT_BLUE$branch_icon$git_info"
-      local ahead_behind
-      ahead_behind="$(timeout 0.1s bash -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
-      ret=$?
-      if [[ $ret -eq 124 || $ret -eq 137 ]]; then
-        killed=1
-      else
-        local ahead="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
-        local behind="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
-        if [[ $behind -gt 0 ]]; then
-          more_info="$more_info$GREEN\u25BC$behind"
-        fi
-        if [[ $ahead -gt 0 ]]; then
-          more_info="$more_info$GREEN\u25B2$ahead"
-        fi
-      fi
-      more_info="$more_info "
-
-      if ! (( $killed )); then
-        local untracked
-        untracked="$(timeout 0.1s bash -c "git ls-files \"$(git rev-parse --show-toplevel)\" --exclude-standard --others | wc -l")"
+    if [[ -n $ZSH_VERSION ]]; then
+      if [[ -n $git_info ]]; then
+        [[ -f $HOME/.fonts/octicons-local.ttf ]] &&
+          branch_icon="\uf020 "
+        git_info="$LIGHT_BLUE$branch_icon$git_info"
+        local ahead_behind
+        ahead_behind="$(timeout 0.1s bash -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
         ret=$?
         if [[ $ret -eq 124 || $ret -eq 137 ]]; then
           killed=1
         else
-          if [[ $untracked -gt 0 ]]; then
-            more_info="$more_info$LIGHT_BLUE$untracked\u25A1 "
+          local ahead="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
+          local behind="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
+          if [[ $behind -gt 0 ]]; then
+            more_info="$more_info$GREEN\u25BC$behind"
+          fi
+          if [[ $ahead -gt 0 ]]; then
+            more_info="$more_info$GREEN\u25B2$ahead"
           fi
         fi
-      fi
+        more_info="$more_info "
 
-      if ! (( $killed )); then
-        local unstaged
-        unstaged="$(timeout 0.1s bash -c "git diff --numstat | wc -l")"
-        ret=$?
-        if [[ $ret -eq 124 || $ret -eq 137 ]]; then
-          killed=1
-        else
-          if [[ $unstaged -gt 0 ]]; then
-            more_info="$more_info$LIGHT_BLUE$unstaged\u25EA "
+        if ! (( $killed )); then
+          local untracked
+          untracked="$(timeout 0.1s bash -c "git ls-files \"$(git rev-parse --show-toplevel)\" --exclude-standard --others | wc -l")"
+          ret=$?
+          if [[ $ret -eq 124 || $ret -eq 137 ]]; then
+            killed=1
+          else
+            if [[ $untracked -gt 0 ]]; then
+              more_info="$more_info$LIGHT_BLUE$untracked\u25A1 "
+            fi
           fi
         fi
-      fi
 
-      if ! (( $killed )); then
-        local staged
-        staged="$(timeout 0.1s bash -c "git diff --cached --numstat | wc -l")"
-        ret=$?
-        if [[ $ret -eq 124 || $ret -eq 137 ]]; then
-          killed=1
-        else
-          if [[ $staged -gt 0 ]]; then
-            more_info="$more_info$LIGHT_BLUE$staged\u25A0 "
+        if ! (( $killed )); then
+          local unstaged
+          unstaged="$(timeout 0.1s bash -c "git diff --numstat | wc -l")"
+          ret=$?
+          if [[ $ret -eq 124 || $ret -eq 137 ]]; then
+            killed=1
+          else
+            if [[ $unstaged -gt 0 ]]; then
+              more_info="$more_info$LIGHT_BLUE$unstaged\u25EA "
+            fi
           fi
         fi
+
+        if ! (( $killed )); then
+          local staged
+          staged="$(timeout 0.1s bash -c "git diff --cached --numstat | wc -l")"
+          ret=$?
+          if [[ $ret -eq 124 || $ret -eq 137 ]]; then
+            killed=1
+          else
+            if [[ $staged -gt 0 ]]; then
+              more_info="$more_info$LIGHT_BLUE$staged\u25A0 "
+            fi
+          fi
+        fi
+        if (( $killed )); then
+          git_info="$git_info $RED? "
+        else
+          git_info="$git_info$more_info"
+        fi
       fi
-      if (( $killed )); then
-        git_info="$git_info $RED? "
-      else
-        git_info="$git_info$more_info"
-      fi
+    else
+      git_info="$git_info "
     fi
   fi
   echo -e "$git_info"
