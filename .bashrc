@@ -31,5 +31,5 @@ prompt_command()
   PS1="$BLUE$virtual_env$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE] $git_branch$BOLD$ $NORMAL"
 }
 
-PROMPT_COMMAND="history -a; prompt_command; $PROMPT_COMMAND"
+PROMPT_COMMAND="$PROMPT_COMMAND history -a; prompt_command"
 
