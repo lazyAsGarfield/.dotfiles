@@ -45,6 +45,8 @@ Plug 'moll/vim-bbye'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'tpope/vim-sleuth'
 Plug 'junegunn/limelight.vim'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 
 call plug#end()
 
@@ -910,8 +912,8 @@ nnoremap <silent> <C-l> :call Navigate('r')<CR>
 " typing in wrong order may be annoying
 " map q<leader> :q<CR>
 command! Q q
-command! Qw qw
-command! QW qw
+command! Wq wq
+command! WQ wq
 
 let g:gitgutter_override_sign_column_highlight = 0
 
@@ -991,8 +993,6 @@ function! s:is_remote()
   return file =~# '^\(scp\|ftp\)://' || file =~# '^//'
 endfunction
 
-" old, dependent on new stuff
-
 function! s:mru_list_without_nonexistent()
   if empty(expand('%')) || s:is_remote() || &readonly
     let mru_list = ctrlp#mrufiles#list()
@@ -1024,6 +1024,11 @@ function! RemoveFromQF(ind)
 endfunction
 
 autocmd FileType qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
+
+let g:UltiSnipsExpandTrigger = '<C-a>'
+let g:UltiSnipsListSnippets = ''
+let g:UltiSnipsJumpForwardTrigger = '<C-e>'
+let g:UltiSnipsJumpBackwardTrigger = '<C-z>'
 
 " python << EOF
 " import sys

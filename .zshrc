@@ -77,8 +77,9 @@ ZPLUG_HOME=$DOTFILES_DIR/.zplug
 
 zplug "plugins/pip", from:oh-my-zsh
 zplug "plugins/docker", from:oh-my-zsh
-zplug "zsh-users/zsh-autosuggestions"
-zplug "zsh-users/zsh-completions"
+zplug "plugins/git", from:oh-my-zsh, if:"(( $+commands[git] ))", nice:10
+zplug "zsh-users/zsh-autosuggestions", nice:10
+zplug "zsh-users/zsh-completions", nice:10
 
 if ! zplug check; then
     zplug install
