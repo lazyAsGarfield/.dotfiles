@@ -1,4 +1,6 @@
 .netrwhist
 .undodir/
+.swapdir/
+.backupdir/
 plugged/
 vim-plug/

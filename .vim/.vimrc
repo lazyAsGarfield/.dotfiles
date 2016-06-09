@@ -102,6 +102,9 @@ set ttimeoutlen=0
 
 " enable persistent undo + its settings
 if has("persistent_undo")
+  if isdirectory($HOME . '/.vim/.undodir') == 0
+    :silent !mkdir -p $HOME/.vim/.undodir >/dev/null 2>&1
+  endif
   set undolevels=15000
   set undofile
   set undodir=$HOME/.vim/.undodir/
@@ -111,8 +114,19 @@ endif
 set completeopt=menuone,preview
 
 " do not create a backup file
-set nobackup
-set noswapfile
+" set nobackup
+" set noswapfile
+if isdirectory($HOME . '/.vim/.backupdir') == 0
+  :silent !mkdir -p $HOME/.vim/.backupdir >/dev/null 2>&1
+endif
+set backupdir=$HOME/.vim/.backupdir//
+set backup
+
+if isdirectory($HOME . '/.vim/.swapdir') == 0
+  :silent !mkdir -p $HOME/.vim/.swapdir >/dev/null 2>&1
+endif
+set directory=$HOME/.vim/.swapdir//
+set swapfile
 
 " Automatically read a file that has changed on disk
 set autoread
@@ -1004,10 +1018,28 @@ function! s:mru_list_without_nonexistent()
   return mru_list
 endfunction
 
-map <silent> cd :lcd %:p:h \| pwd<CR>
-autocmd VimEnter * let g:cwd = getcwd()
-autocmd CursorMoved,BufLeave * if ! haslocaldir() | let g:cwd = getcwd() | endif
-map <silent> cD :exec 'cd ' . g:cwd \| pwd<CR>
+function! s:cd_to_root_if_git_repo()
+  if exists('b:git_dir')
+    exec 'cd' fugitive#repo().tree()
+    let g:_cwd = getcwd()
+    pwd
+  else
+    echo 'Not in git repo'
+  endif
+endfunction
+
+command! CdRootGitRoot call s:cd_to_root_if_git_repo()
+
+nmap <silent> cg :CdRootGitRoot<CR>
+nmap <silent> cd :lcd %:p:h \| pwd<CR>
+autocmd VimEnter * let g:_cwd = getcwd()
+autocmd CursorMoved,BufLeave * if ! haslocaldir() | let g:_cwd = getcwd() | endif
+nmap <silent> cD :exec 'cd ' . g:_cwd \| pwd<CR>
+
+if ! exists('g:_starting_cd')
+  let g:_starting_cd = getcwd()
+endif
+nmap <silent> cc :exec 'cd' g:_starting_cd \| let g:_cwd = getcwd() \| pwd<CR>
 
 function! RemoveFromQF(ind)
   let qf = getqflist()
@@ -1036,3 +1068,4 @@ let g:UltiSnipsJumpBackwardTrigger = '<C-z>'
 " for p in sys.path:
 "   vim.command('echo "%s"' % p)
 " EOF
+
