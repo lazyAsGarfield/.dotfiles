@@ -1054,10 +1054,15 @@ endfunction
 
 autocmd FileType qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
 
-let g:UltiSnipsExpandTrigger = '<C-e>'
-let g:UltiSnipsListSnippets = ''
-let g:UltiSnipsJumpForwardTrigger = '<C-b>'
-let g:UltiSnipsJumpBackwardTrigger = '<C-z>'
+" trick in order to vim not to delay esc in insert mode
+set <M-s>=s
+set <M-e>=e
+set <M-n>=n
+set <M-b>=b
+let g:UltiSnipsExpandTrigger = '<M-e>'
+let g:UltiSnipsListSnippets = '<M-s>'
+let g:UltiSnipsJumpForwardTrigger = '<M-n>'
+let g:UltiSnipsJumpBackwardTrigger = '<M-b>'
 
 function! MoveToPrevTab()
   let l:line = line('.')
