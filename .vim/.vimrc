@@ -66,7 +66,7 @@ if has('mouse')
 endif
 
 " tmux options
-if &term =~ '^screen' && exists('$TMUX')
+if ( &term =~ '^screen' || &term =~ '^tmux' ) && exists('$TMUX')
   " tmux knows the extended mouse mode
   set ttymouse=xterm2
   " tmux will send xterm-style keys when xterm-keys is on
@@ -234,9 +234,6 @@ if !exists("g:vimrc_init")
   else
     silent! set foldcolumn=0
   endif
-
-  " set filetype for .shellrc file
-  autocmd BufRead $DOTFILES_DIR/.shellrc set ft=sh
 
 endif " exists("g:vimrc_init")
 
@@ -1057,10 +1054,69 @@ endfunction
 
 autocmd FileType qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
 
-let g:UltiSnipsExpandTrigger = '<C-a>'
+let g:UltiSnipsExpandTrigger = '<C-e>'
 let g:UltiSnipsListSnippets = ''
-let g:UltiSnipsJumpForwardTrigger = '<C-e>'
+let g:UltiSnipsJumpForwardTrigger = '<C-b>'
 let g:UltiSnipsJumpBackwardTrigger = '<C-z>'
+
+function! MoveToPrevTab()
+  let l:line = line('.')
+  "there is only one window
+  if tabpagenr('$') == 1 && winnr('$') == 1
+    return
+  endif
+  "preparing new window
+  let l:tab_nr = tabpagenr('$')
+  let l:cur_buf = bufnr('%')
+  if tabpagenr() != 1
+    close!
+    if l:tab_nr == tabpagenr('$')
+      tabprev
+    endif
+    vsp
+  else
+    close!
+    exe "0tabnew"
+  endif
+  "opening current buffer in new window
+  exe "b".l:cur_buf
+  exe l:line
+endfunc
+
+function! MoveToNextTab()
+  let l:line = line('.')
+  "there is only one window
+  if tabpagenr('$') == 1 && winnr('$') == 1
+    return
+  endif
+  "preparing new window
+  let l:tab_nr = tabpagenr('$')
+  let l:cur_buf = bufnr('%')
+  if tabpagenr() < tab_nr
+    close!
+    if l:tab_nr == tabpagenr('$')
+      tabnext
+    endif
+    vsp
+  else
+    close!
+    tabnew
+  endif
+  "opening current buffer in new window
+  exe "b".l:cur_buf
+  exe l:line
+endfunc
+
+nnoremap <silent> . :call MoveToNextTab()<CR>
+nnoremap <silent> , :call MoveToPrevTab()<CR>
+
+nnoremap 9 gT
+nnoremap <silent> ( :tabm-1<CR>
+nnoremap 0 gt
+nnoremap <silent> ) :tabm+1<CR>
+
+" refresh <nowait> ESC mappings
+runtime after/plugin/ESCNoWaitMappings.vim
 
 " python << EOF
 " import sys
@@ -1068,4 +1124,22 @@ let g:UltiSnipsJumpBackwardTrigger = '<C-z>'
 " for p in sys.path:
 "   vim.command('echo "%s"' % p)
 " EOF
+
+let s:special_files = {
+      \ 'sh': [
+      \ '$DOTFILES_DIR/.shellrc'
+      \ ],
+      \ 'conf': [
+      \ '$DOTFILES_DIR/.tmux-common.conf'
+      \ ]
+      \ }
+
+for [ft, files] in items(s:special_files)
+  for f in files
+    exec 'autocmd BufRead' f 'set ft=' . ft
+  endfor
+endfor
+
+" " set filetype for .shellrc file
+" autocmd BufRead $DOTFILES_DIR/.shellrc set ft=sh
 

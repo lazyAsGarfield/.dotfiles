@@ -73,8 +73,8 @@ hi Visual         cterm=NONE                  ctermbg=59   gui=NONE             
 hi WarningMsg     cterm=NONE      ctermfg=16  ctermbg=130  gui=NONE      guifg=#FFFFFF guibg=#333333
 hi WildMenu       cterm=NONE      ctermfg=81  ctermbg=16   gui=NONE      guifg=#66D9EF guibg=#000000
 hi TabLineFill    cterm=reverse   ctermfg=234 ctermbg=234  gui=reverse   guifg=#1D1F21 guibg=#1D1F21
-hi TabLine        cterm=underline,bold        ctermbg=238  gui=NONE      guifg=#808080 guibg=#1D1F21
-hi TabLineSel     cterm=bold                  ctermbg=235  gui=NONE      guifg=#808080 guibg=#1D1F21
+hi TabLine        cterm=bold                  ctermbg=235  gui=NONE      guifg=#808080 guibg=#1D1F21
+hi TabLineSel     cterm=underline,bold        ctermbg=238  gui=NONE      guifg=#808080 guibg=#1D1F21
 hi Comment        cterm=italic    ctermfg=244              gui=italic    guifg=#7C7C7C
 hi CursorLine     cterm=NONE      ctermfg=253 ctermbg=238  gui=NONE                    guibg=#293739
 hi CursorLineNr   cterm=bold      ctermfg=229 ctermbg=235  gui=bold      guifg=#B6B7BE
