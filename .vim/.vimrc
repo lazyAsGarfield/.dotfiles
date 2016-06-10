@@ -363,7 +363,7 @@ vmap cp "+p
 nmap cP "+P
 vmap cP "+P
 
-imap CP +
+imap CP a+
 
 " easier redrawing - sometimes strange artifacts are visible
 map <leader>r :redraw!<CR>
