@@ -980,22 +980,6 @@ autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<
 
 nmap <leader>ss :source %<CR>
 
-function! GetUnityDoc()
-  if &filetype == "cs" && expand("%:p") =~ "Unity"
-    call system("git web--browse -b google-chrome " .
-          \ "https://docs.unity3d.com/ScriptReference/30_search.html?q=" .
-          \ @h . " >/dev/null 2>&1")
-    if v:shell_error
-      call system("git web--browse " .
-            \ "https://docs.unity3d.com/ScriptReference/30_search.html?q=" .
-            \ @h . " >/dev/null 2>&1")
-    endif
-  endif
-endfunction
-
-nnoremap <leader>ud "hyiw:call GetUnityDoc()<CR>
-vnoremap <leader>ud "hy:<C-u>call GetUnityDoc()<CR>
-
 " jedi vim overrides <leader>r mapping
 map <leader><leader>r :redraw!<CR>
 
@@ -1111,6 +1095,10 @@ function! MoveToNextTab()
   exe "b".l:cur_buf
   exe l:line
 endfunc
+
+nnoremap <silent> t :tabnew<CR>
+nnoremap <silent> x :new<CR>
+nnoremap <silent> v :vnew<CR>
 
 nnoremap <silent> . :call MoveToNextTab()<CR>
 nnoremap <silent> , :call MoveToPrevTab()<CR>
