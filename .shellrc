@@ -18,6 +18,8 @@ alias ......='cd ../../../../..'
 alias s='saved'
 alias c='local_cd_hist'
 
+alias ssh='TERM=xterm-256color ssh'
+
 detach()
 {
   (nohup "$@" >/dev/null 2>&1 &)
@@ -36,17 +38,27 @@ else
 fi
 
 export FZF_DEFAULT_OPTS="--color fg:187,bg:233,hl:103,fg+:222,bg+:234,hl+:104 \
---color info:183,prompt:110,spinner:107,pointer:167,marker:215 \
---bind \"ctrl-u:page-up,ctrl-d:page-down,alt-a:select-all,alt-d:deselect-all,alt-t:toggle-all\""
+  --color info:183,prompt:110,spinner:107,pointer:167,marker:215 \
+  --bind \"ctrl-u:page-up,ctrl-d:page-down,alt-a:select-all,alt-d:deselect-all,alt-t:toggle-all\""
 
 export FZF_ALT_C_COMMAND='find -L . -type d 2>/dev/null | grep -v ".git" | sed 1d | cut -b3-'
 export FZF_CTRL_T_COMMAND='find -L . -type d -o -type f -o -type l 2>/dev/null | grep -v ".git/" | sed 1d | cut -b3-'
 export FZF_DEFAULT_COMMAND='ag -g "" -U --hidden --ignore .git/ 2>/dev/null'
 
 if [ -x /usr/bin/dircolors ]; then
-    eval "$(dircolors -b)"
-    alias ls='ls --color=auto'
-    alias grep='grep --color=auto'
+  if [[ -f $DOTFILES_DIR/dircolors.256dark ]]; then
+    eval "$(dircolors $DOTFILES_DIR/dircolors.256dark -b)"
+  elif [[ $TERM =~ ^tmux ]]; then
+    fname=/tmp/__dir_colors$RANDOM
+    sed -ne '/^TERM/q; p' /etc/DIR_COLORS > $fname
+    echo "TERM tmux" >> $fname
+    echo "TERM tmux-256color" >> $fname
+    sed -ne '/^TERM/,$p' /etc/DIR_COLORS >> $fname
+    eval "$(dircolors -b $fname)"
+    rm -f $fname
+  fi
+  alias ls='ls --color=always'
+  alias grep='grep --color=auto'
 fi
 
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
