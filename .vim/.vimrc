@@ -47,6 +47,8 @@ Plug 'tpope/vim-sleuth'
 Plug 'junegunn/limelight.vim'
 Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
+Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
+Plug 'vim-airline/vim-airline-themes'
 
 call plug#end()
 
@@ -162,11 +164,14 @@ set fillchars=""
 " disable that annoying beeping
 autocmd GUIEnter * set vb t_vb=
 
+" display incomplete commands
+set showcmd
+
 " some options have to be set only at init
 if !exists("g:vimrc_init")
   let g:vimrc_init = 1
 
-  silent! colorscheme atom-dark-256-mine
+  " silent! colorscheme atom-dark-256-mine
 
   if has("gui_running")
 
@@ -220,9 +225,6 @@ if !exists("g:vimrc_init")
 
   " show the cursor position all the time
   set ruler
-
-  " display incomplete commands
-  set showcmd
 
   " show at least 5 lines below/above cursor
   set scrolloff=5
@@ -487,10 +489,9 @@ function! s:full_path(dir_or_file)
   return fnamemodify(fnamemodify(a:dir_or_file, ':p'), ':p')
 endfunction
 
-command! -bang -nargs=? -complete=dir Files call fzf#vim#files(<q-args>, extend({
+command! -bang -nargs=? -complete=dir FilesBetterPrompt call fzf#vim#files(<q-args>, extend({
       \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-      \ 'options': '--prompt "' . (<q-args> ? getcwd() :
-      \ s:full_path(<q-args>) . ' (Files)> "'
+      \ 'options': '--prompt "' . (<q-args> ? getcwd() : s:full_path(<q-args>)) . ' (Files)> "'
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
 
 function! s:git_files_if_in_repo(bang)
@@ -737,6 +738,7 @@ nnoremap ]of :let g:mru_full_path=0<CR>
 nnoremap <C-f> :GitFilesOrCwd<CR>
 nnoremap <C-b> :BuffersBetterPrompt<CR>
 nnoremap <C-g> :FilesGitRootOrCwd<CR>
+nnoremap <C-c> :Files<CR>
 nnoremap <C-p> :Mru<CR>
 
 " good way of detecting if in visual mode
@@ -799,7 +801,7 @@ function! s:goyo_leave()
   set showcmd
   exec 'set scrolloff=' . g:scrolloff_saved
   silent! Limelight!
-  silent! call SetGitGutterColors()
+  " silent! call SetGitGutterColors()
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
@@ -928,14 +930,7 @@ command! WQ wq
 
 let g:gitgutter_override_sign_column_highlight = 0
 
-function! SetGitGutterColors()
-  hi GitGutterAdd          cterm=bold ctermfg=46  ctermbg=235
-  hi GitGutterChange       cterm=bold ctermfg=105 ctermbg=235
-  hi GitGutterDelete       cterm=bold ctermfg=196 ctermbg=235
-  hi GitGutterChangeDelete cterm=bold ctermfg=126 ctermbg=235
-endfunction
-
-call SetGitGutterColors()
+silent! colorscheme Tomorrow-Night-Eighties-Mine
 
 " those are better visible
 let g:gitgutter_sign_modified = '#'
@@ -1108,6 +1103,10 @@ nnoremap <silent> ( :tabm-1<CR>
 nnoremap 0 gt
 nnoremap <silent> ) :tabm+1<CR>
 
+nnoremap t :tabnew<CR>
+nnoremap v :vnew<CR>
+nnoremap x :new<CR>
+
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
 
@@ -1135,4 +1134,6 @@ endfor
 
 " " set filetype for .shellrc file
 " autocmd BufRead $DOTFILES_DIR/.shellrc set ft=sh
+
+imap jj 
 
