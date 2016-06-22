@@ -503,7 +503,7 @@ function! s:git_files_if_in_repo(bang)
     let expanded = getcwd()
     return fzf#vim#files(expanded, extend({
           \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-          \ 'options': '--prompt "' . expanded . ' (Files)>"'
+          \ 'options': '--prompt "' . expanded . ' (Files)> "'
           \ }, a:bang ? {} : g:fzf#vim#default_layout))
   else
     let git_root = fugitive#repo().tree()
@@ -589,10 +589,13 @@ function! s:mru_sink(lines)
   finally
     exec cdCmd . save_cwd
   endtry
-  augroup fzf_swap
-    autocmd SwapExists * let v:swapchoice='o'
-          \| call s:warn('E325: swap file exists: '.expand('<afile>'))
-  augroup END
+  if len(a:lines) > 1
+    augroup fzf_swap
+      autocmd SwapExists *
+            \ let v:swapchoice='o'
+            \| let b:swapname = v:swapname
+    augroup END
+  endif
   let empty = empty(expand('%')) && line('$') == 1 && empty(getline(1)) && !&modified
   try
     for item in full_path_lines
@@ -601,6 +604,16 @@ function! s:mru_sink(lines)
         let empty = 0
       else
         exec cmd item
+      endif
+      if exists('b:swapname')
+        augroup swap_exists_once
+          autocmd InsertEnter <buffer>
+                \ echohl ErrorMsg
+                \| echom 'E325: swap file exists: ' . b:swapname
+                \| sleep 2
+                \| echohl None
+                \| autocmd! swap_exists_once
+        augroup END
       endif
     endfor
   finally

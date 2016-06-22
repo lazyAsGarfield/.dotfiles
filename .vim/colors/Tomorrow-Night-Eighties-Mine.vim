@@ -8,6 +8,7 @@ let s:foreground = "cccccc"
 let s:background = "2d2d2d"
 let s:darker_background = "2a2a2a"
 let s:selection = "515151"
+let s:linenr = "616161"
 let s:line = "393939"
 let s:comment = "999999"
 let s:red = "f2777a"
@@ -234,9 +235,9 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 
 	" Vim Highlighting
 	call <SID>X("Normal", s:foreground, s:background, "")
-	call <SID>X("LineNr", s:selection, "", "")
+	call <SID>X("LineNr", s:linenr, "", "")
 	call <SID>X("NonText", s:selection, "", "")
-	call <SID>X("SpecialKey", s:selection, "", "")
+	call <SID>X("SpecialKey", s:comment, "", "")
 	call <SID>X("Search", s:background, s:yellow, "")
 	call <SID>X("TabLine", s:foreground, s:window, "none")
 	call <SID>X("TabLineFill", s:window, s:foreground, "reverse")
