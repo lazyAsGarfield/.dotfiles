@@ -15,6 +15,8 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 
+alias pjson='python -m json.tool'
+
 alias s='saved'
 alias c='local_cd_hist'
 
@@ -26,9 +28,9 @@ detach()
 }
 
 command -v vim >/dev/null 2>&1 &&
-  EDITOR=vim
+  export EDITOR=vim
 command -v vimx >/dev/null 2>&1 &&
-  EDITOR=vimx
+  export EDITOR=vimx
 
 # in order to keep aliases in one place
 if [[ -n $ZSH_VERSION ]]; then
@@ -57,7 +59,7 @@ if [ -x /usr/bin/dircolors ]; then
     eval "$(dircolors -b $fname)"
     rm -f $fname
   fi
-  alias ls='ls --color=always'
+  alias ls='ls --color=auto'
   alias grep='grep --color=auto'
 fi
 
