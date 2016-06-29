@@ -18,7 +18,7 @@ if v:version >= 703
   Plug 'easymotion/vim-easymotion'
   if empty($__NO_YCM__)
     if empty($__NO_COMPL__)
-      Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --omnisharp-completer' }
+      Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --omnisharp-completer --gocode-completer' }
     else
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
     endif
@@ -49,6 +49,7 @@ Plug 'SirVer/ultisnips'
 Plug 'honza/vim-snippets'
 Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
+Plug 'nvie/vim-flake8'
 
 call plug#end()
 
@@ -345,6 +346,8 @@ nmap <silent> <leader>sv :so $MYVIMRC<CR>
 " resizing splits more easily
 nmap + :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
 nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
+nmap + :exe "resize " . ((winheight(0) + 1) * 3/2)<CR>
+nmap - :exe "resize " . (winheight(0) * 2/3)<CR>
 
 " registers
 nmap cr "
@@ -814,7 +817,7 @@ function! s:goyo_leave()
   set showcmd
   exec 'set scrolloff=' . g:scrolloff_saved
   silent! Limelight!
-  " silent! call SetGitGutterColors()
+  silent! colorscheme Tomorrow-Night-Eighties-Mine
 endfunction
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
@@ -1049,11 +1052,11 @@ autocmd FileType qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(lin
 " trick in order to vim not to delay esc in insert mode
 set <M-s>=s
 set <M-e>=e
-set <M-n>=n
+set <M-f>=f
 set <M-b>=b
 let g:UltiSnipsExpandTrigger = '<M-e>'
 let g:UltiSnipsListSnippets = '<M-s>'
-let g:UltiSnipsJumpForwardTrigger = '<M-n>'
+let g:UltiSnipsJumpForwardTrigger = '<M-f>'
 let g:UltiSnipsJumpBackwardTrigger = '<M-b>'
 
 function! MoveToPrevTab()
@@ -1150,3 +1153,8 @@ endfor
 
 imap jj 
 
+let no_flake8_maps = 1
+let g:flake8_show_in_file=1
+
+autocmd FileType python noremap <buffer> [sc :call flake8#Flake8()<CR>
+autocmd FileType python noremap <buffer> ]sc :call flake8#Flake8UnplaceMarkers() \| cclose<CR>

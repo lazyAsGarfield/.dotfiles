@@ -117,6 +117,7 @@ setopt nomultios
 setopt interactive_comments
 setopt no_beep
 setopt no_nomatch
+setopt extendedhistory
 # }}}
 
 # bindings and so on {{{

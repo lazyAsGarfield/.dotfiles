@@ -252,7 +252,7 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 	call <SID>X("WarningMsg", s:red, "", "")
 	call <SID>X("MatchParen", "", s:selection, "")
 	call <SID>X("Folded", s:comment, s:darker_background, "")
-	call <SID>X("FoldColumn", "", s:background, "")
+	call <SID>X("FoldColumn", s:foreground, s:background, "")
 	if version >= 700
 		call <SID>X("CursorLine", "", s:line, "none")
 		call <SID>X("CursorColumn", "", s:line, "none")
@@ -484,10 +484,10 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 
 	call <SID>X("YcmErrorSign", s:red, "", "")
 	call <SID>X("YcmWarningSign", s:yellow, "", "")
-	call <SID>X("YcmErrorLine", "", s:orange, "")
+	call <SID>X("YcmErrorLine", "", "", "")
 	call <SID>X("YcmWarningLine", "", "", "")
-	call <SID>X("YcmErrorSection", "", s:red, "")
-	call <SID>X("YcmWarningSection", "", s:yellow, "")
+	call <SID>X("YcmErrorSection", s:background, s:red, "")
+	call <SID>X("YcmWarningSection", s:background, s:yellow, "")
 
 	if has("spell")
 			call <SID>X("SpellBad", s:background, s:orange, "underline")
@@ -495,6 +495,13 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 			call <SID>X("SpellLocal", s:background, s:aqua, "underline")
 			call <SID>X("SpellRare", s:background, s:yellow, "underline")
 	endif
+
+	call <SID>X("Flake8_Error", s:background, s:red, "")
+	call <SID>X("Flake8_Warning", s:background, s:aqua, "")
+	call <SID>X("Flake8_Complexity", s:background, s:aqua, "")
+	call <SID>X("Flake8_Naming", s:background, s:aqua, "")
+	call <SID>X("Flake8_PyFlake", s:background, s:aqua, "")
+
 
 	" Delete Functions
 	delf <SID>X
