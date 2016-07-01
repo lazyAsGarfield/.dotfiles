@@ -1158,3 +1158,22 @@ let g:flake8_show_in_file=1
 
 autocmd FileType python noremap <buffer> [sc :call flake8#Flake8()<CR>
 autocmd FileType python noremap <buffer> ]sc :call flake8#Flake8UnplaceMarkers() \| cclose<CR>
+
+function! WhereIsDaCursor ()
+  let cl = &cursorline
+  let cc = &cursorcolumn
+  for i in range(2)
+    set cursorline
+    set cursorcolumn
+    redraw!
+    sleep 200 m
+    set nocursorline
+    set nocursorcolumn
+    redraw!
+    if i < 1
+      sleep 200 m
+    endif
+  endfor
+endfunction
+
+nmap <silent> KK :call WhereIsDaCursor()<CR>

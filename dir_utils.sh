@@ -188,7 +188,7 @@ function local_cd_hist()
         pat="$pat${pat:+ }$1";
       done
     [[ -z $pat ]] && pat="$@"
-    [[ $1 =~ ^[0-9]+$ ]] &&
+    [[ $1 =~ ^-?[0-9]+$ ]] &&
       dir="${__cd_history__[$1]}"
     pat="$(sed 's/\./\\./g' <<< "$pat")"
     pat="$(sed 's/\ /.*/g' <<< "$pat")"
