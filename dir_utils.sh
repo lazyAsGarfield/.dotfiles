@@ -124,48 +124,6 @@ _list_cd_local_hist()
   done
 }
 
-function cd()
-{
-  # $ cd --<num> 
-  # go to dir saved on postition num
-  if [[ $1 =~ ^--[0-9]+$ ]]; then
-    __go_to_saved ${1:2}
-  # $ cd -<num>
-  # go to dir on position num in history
-  elif [[ $1 =~ ^-[0-9]+$ ]]; then
-    local num="${1:1}"
-    if [[ $num -gt ${#__cd_history__[@]} ]]; then
-      echo "No entry $num in history"
-    else
-      local dir="${__cd_history__[$num]}"
-      if [[ -d $dir ]]; then
-        local saved_pwd="$PWD"
-        if [[ $PWD != $dir ]]; then
-          if builtin cd "$dir"; then
-            echo "$dir"
-          else
-            return $?
-          fi
-        fi
-      fi
-    fi
-  # $ cd -h[num]|--
-  # show cd history
-  elif [[ $1 =~ ^-h[0-9]*$ || $1 = "--" ]]; then
-    local limit
-    if [[ ${1:2} =~ ^[0-9]+$ ]]; then
-      limit="${1:2}"
-    else
-      limit=15
-    fi
-    _list_cd_local_hist $limit
-  # just pass args (and add dir to history if needed)
-  else
-    builtin cd "$@"
-    return $?
-  fi
-}
-
 function local_cd_hist()
 {
   local dir

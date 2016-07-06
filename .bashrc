@@ -36,3 +36,12 @@ if [[ -z ${__prompt_cmd_set+x} ]]; then
   PROMPT_COMMAND="$PROMPT_COMMAND history -a; prompt_command; __dir_history"
 fi
 
+_completemarks() {
+  local curw=${COMP_WORDS[COMP_CWORD]}
+  local wordlist=$(find $MARKPATH -type l -printf "%f\n")
+  COMPREPLY=($(compgen -W '${wordlist[@]}' -- "$curw"))
+  return 0
+}
+
+complete -F _completemarks jump unmark
+

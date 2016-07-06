@@ -118,6 +118,19 @@ setopt interactive_comments
 setopt no_beep
 setopt no_nomatch
 setopt extendedhistory
+
+function _completemarks {
+  reply=($(ls $MARKPATH))
+}
+
+compctl -K _completemarks jump
+compctl -K _completemarks unmark
+
+function _completehistory {
+  reply=(${(Oa)__cd_history__[@]})
+}
+
+compctl -V hist -2 -K _completehistory local_cd_hist
 # }}}
 
 # bindings and so on {{{
