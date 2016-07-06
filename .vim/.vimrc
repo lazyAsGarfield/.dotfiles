@@ -38,7 +38,7 @@ Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'junegunn/goyo.vim'
-Plug 'bmalkus/vim-tmux-navigator'
+Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-endwise'
 Plug 'airblade/vim-gitgutter'
 Plug 'moll/vim-bbye'
@@ -173,6 +173,7 @@ if !exists("g:vimrc_init")
   let g:vimrc_init = 1
 
   " silent! colorscheme atom-dark-256-mine
+  silent! colorscheme Tomorrow-Night-Eighties-Mine
 
   if has("gui_running")
 
@@ -945,8 +946,6 @@ command! Wq wq
 command! WQ wq
 
 let g:gitgutter_override_sign_column_highlight = 0
-
-silent! colorscheme Tomorrow-Night-Eighties-Mine
 
 " those are better visible
 let g:gitgutter_sign_modified = '#'
