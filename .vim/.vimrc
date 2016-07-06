@@ -1058,31 +1058,31 @@ let g:UltiSnipsListSnippets = '<M-s>'
 let g:UltiSnipsJumpForwardTrigger = '<M-f>'
 let g:UltiSnipsJumpBackwardTrigger = '<M-b>'
 
-function! MoveToPrevTab()
+function! MoveToPrevTab(...)
   let l:line = line('.')
   "there is only one window
   if tabpagenr('$') == 1 && winnr('$') == 1
     return
   endif
   "preparing new window
-  let l:tab_nr = tabpagenr('$')
+  let l:last = tabpagenr() == tabpagenr('$')
   let l:cur_buf = bufnr('%')
-  if tabpagenr() != 1
+  if tabpagenr() != 1 && a:0 == 0
     close!
-    if l:tab_nr == tabpagenr('$')
+    if !l:last
       tabprev
     endif
     vsp
   else
     close!
-    exe "0tabnew"
+    exe tabpagenr() - 1 . "tabnew"
   endif
   "opening current buffer in new window
   exe "b".l:cur_buf
   exe l:line
 endfunc
 
-function! MoveToNextTab()
+function! MoveToNextTab(...)
   let l:line = line('.')
   "there is only one window
   if tabpagenr('$') == 1 && winnr('$') == 1
@@ -1091,7 +1091,7 @@ function! MoveToNextTab()
   "preparing new window
   let l:tab_nr = tabpagenr('$')
   let l:cur_buf = bufnr('%')
-  if tabpagenr() < tab_nr
+  if tabpagenr() < tab_nr && a:0 == 0
     close!
     if l:tab_nr == tabpagenr('$')
       tabnext
@@ -1113,10 +1113,17 @@ nnoremap <silent> v :vnew<CR>
 nnoremap <silent> . :call MoveToNextTab()<CR>
 nnoremap <silent> , :call MoveToPrevTab()<CR>
 
+nnoremap <silent> > :call MoveToNextTab(1)<CR>
+nnoremap <silent> < :call MoveToPrevTab(1)<CR>
+
 nnoremap 9 gT
+nnoremap h gT
 nnoremap <silent> ( :tabm-1<CR>
+nnoremap <silent> H :tabm-1<CR>
 nnoremap 0 gt
+nnoremap l gt
 nnoremap <silent> ) :tabm+1<CR>
+nnoremap <silent> L :tabm+1<CR>
 
 nnoremap t :tabnew<CR>
 nnoremap v :vnew<CR>
@@ -1158,21 +1165,49 @@ let g:flake8_show_in_file=1
 autocmd FileType python noremap <buffer> [sc :call flake8#Flake8()<CR>
 autocmd FileType python noremap <buffer> ]sc :call flake8#Flake8UnplaceMarkers() \| cclose<CR>
 
-function! WhereIsDaCursor ()
-  let cl = &cursorline
-  let cc = &cursorcolumn
-  for i in range(2)
-    set cursorline
-    set cursorcolumn
-    redraw!
-    sleep 200 m
-    set nocursorline
-    set nocursorcolumn
-    redraw!
-    if i < 1
-      sleep 200 m
-    endif
+function! DeleteHidden()
+  let visible = []
+  for tab in range(1, tabpagenr('$'))
+    call extend(visible, tabpagebuflist(tab))
+  endfor
+  for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(visible, v:val) == -1')
+    exec 'bwipeout ' . buf
   endfor
 endfunction
 
-nmap <silent> KK :call WhereIsDaCursor()<CR>
+command! DeleteHidden call DeleteHidden()
+
+function! ToggleHlCurrLine()
+  if !exists('w:match_ids')
+    let w:match_ids = {}
+  endif
+  if !exists('w:match_ids[' . line('.') . ']')
+    let w:match_ids[line('.')] = matchadd('Search', '\%' . line('.') . 'l')
+  else
+    call matchdelete(w:match_ids[line('.')])
+    unlet w:match_ids[line('.')]
+  endif
+endfunction
+
+function! ToggleHlCurrWord()
+  if !exists('w:match_ids_words')
+    let w:match_ids_words = {}
+  endif
+  if !exists('w:match_ids_words["' . line('.') . expand('<cword>') . '"]')
+    let w:match_ids_words[line('.') . expand('<cword>')] = matchadd('Search', '\%' . line('.') . 'l' . expand('<cword>'))
+  else
+    call matchdelete(w:match_ids_words[line('.') . expand('<cword>')])
+    unlet w:match_ids_words[line('.') . expand('<cword>')]
+  endif
+endfunction
+
+
+function! UnHlAll()
+  let w:match_ids = {}
+  let w:match_ids_words = {}
+  call clearmatches()
+endfunction
+
+nmap <silent> <leader>ll :call ToggleHlCurrLine()<CR>
+nmap <silent> <leader>lw :call ToggleHlCurrWord()<CR>
+nmap <silent> <leader>ln :call UnHlAll()<CR>
