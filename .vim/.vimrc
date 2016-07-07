@@ -752,10 +752,10 @@ nnoremap cof :let g:mru_full_path=!g:mru_full_path<CR>
 nnoremap [of :let g:mru_full_path=1<CR>
 nnoremap ]of :let g:mru_full_path=0<CR>
 
-nnoremap <C-f> :GitFilesOrCwd<CR>
+nnoremap <C-f><C-g> :GitFilesOrCwd<CR>
 nnoremap <C-b> :BuffersBetterPrompt<CR>
 nnoremap <C-g> :FilesGitRootOrCwd<CR>
-nnoremap <C-c> :Files<CR>
+nnoremap <C-f><C-f> :Files<CR>
 nnoremap <C-p> :Mru<CR>
 
 " good way of detecting if in visual mode
@@ -866,7 +866,7 @@ if version >= 703
   function! VimFilerRemoteOrFind()
     let file = expand('%')
     if file =~# '^scp://'
-      let file = substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')
+      let file = substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/\?.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')
       echo file
       exec 'VimFilerExplorer ' . file
     elseif file =~# '^//'
