@@ -625,24 +625,14 @@ function! s:mru_sink(lines)
   endtry
 endfunction
 
-let g:mru_full_path = 0
-
 function! s:fzf_mru(bang)
-  if g:mru_full_path == 0
-    call fzf#run({
-          \ 'source':  map(s:mru_list_without_nonexistent(), 's:color_path(s:relpath(v:val))'),
-          \ 'sink*': function("s:mru_sink"),
-          \ 'options': '-m -x +s --prompt "' . s:git_root_or_cwd() .
-          \ ' (MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
-          \ 'down':    '40%'
-          \ })
-  else
-    call fzf#run(extend({
-          \ 'source':  map(s:mru_list_without_nonexistent(), 'fnamemodify(v:val, ":p")'),
-          \ 'sink*': function("s:mru_sink"),
-          \ 'options': '-m -x +s --prompt "(MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
-          \ }, a:bang ? {} : g:fzf#vim#default_layout ))
-  endif
+  call fzf#run({
+        \ 'source':  map(s:mru_list_without_nonexistent(), 's:color_path(s:relpath(v:val))'),
+        \ 'sink*': function("s:mru_sink"),
+        \ 'options': '-m -x +s --prompt "' . s:git_root_or_cwd() .
+        \ ' (MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
+        \ 'down':    '40%'
+        \ })
 endfunction
 
 command! -bang Mru call s:fzf_mru(<bang>0)
@@ -748,15 +738,11 @@ command! -nargs=? Regs call fzf#run({
       \ 'down':    '40%'
       \ })
 
-nnoremap cof :let g:mru_full_path=!g:mru_full_path<CR>
-nnoremap [of :let g:mru_full_path=1<CR>
-nnoremap ]of :let g:mru_full_path=0<CR>
-
-nnoremap <C-f><C-g> :GitFilesOrCwd<CR>
-nnoremap <C-b> :BuffersBetterPrompt<CR>
-nnoremap <C-g> :FilesGitRootOrCwd<CR>
-nnoremap <C-f><C-f> :Files<CR>
 nnoremap <C-p> :Mru<CR>
+nnoremap <C-b> :BuffersBetterPrompt<CR>
+nnoremap <C-g> :GitFilesOrCwd<CR>
+nnoremap <C-f><C-f> :Files<CR>
+nnoremap <C-f><C-g> :FilesGitRootOrCwd<CR>
 
 " good way of detecting if in visual mode
 " a bit experimental mappings

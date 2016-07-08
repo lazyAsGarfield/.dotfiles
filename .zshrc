@@ -65,6 +65,19 @@ prompt_command_if_vi_mode()
 zle -N zle-line-init prompt_command_if_vi_mode
 zle -N zle-keymap-select prompt_command_if_vi_mode
 
+HISTFILE=~/.histfile
+HISTSIZE=100000
+SAVEHIST=100000
+
+setopt appendhistory
+setopt autocd
+setopt nocdablevars
+setopt nomultios
+setopt interactive_comments
+setopt no_beep
+setopt no_nomatch
+setopt extendedhistory
+
 zmodload zsh/complist
 
 zplugs=()
@@ -106,19 +119,6 @@ alias -g N2=' 2> /dev/null '
 alias -g N12=' > /dev/null 2>&1'
 alias -g M21=' 2>&1'
 
-HISTFILE=~/.histfile
-HISTSIZE=100000
-SAVEHIST=100000
-
-setopt appendhistory
-setopt autocd
-setopt nocdablevars
-setopt nomultios
-setopt interactive_comments
-setopt no_beep
-setopt no_nomatch
-setopt extendedhistory
-
 function _completemarks {
   reply=($(ls $MARKPATH))
 }
@@ -131,97 +131,82 @@ function _completehistory {
 }
 
 compctl -V hist -2 -K _completehistory local_cd_hist
+
+alias guc='git reset --soft HEAD^'
+alias grm='git reset --mixed HEAD^'
+
 # }}}
 
 # bindings and so on {{{
 
-### emacs mode
-bindkey -e
-
-bindkey "${terminfo[khome]}" beginning-of-line
-bindkey "${terminfo[kend]}"  end-of-line
-bindkey "^[[3~"              delete-char
-bindkey "^[3;5~"             delete-char
-
-bindkey '^[[Z' reverse-menu-complete
-bindkey '^I'   menu-complete
-bindkey '^['   undo
-bindkey '^X^E' edit-command-line
-
-# bindkey '^ '   autosuggest-accept
-# zle -N autosuggest-accept
-bindkey '^ ' autosuggest-accept
-
-autoload -z edit-command-line
-zle -N edit-command-line
-
-bindkey -M menuselect '^[' undo
-bindkey -M menuselect '^M' .accept-line
-bindkey -M menuselect ' '  accept-line
-bindkey -M menuselect '^G' .send-break
-
-### vim mode
-# bindkey -v
-
-bindkey -M viins "${terminfo[khome]}" beginning-of-line
-bindkey -M viins "${terminfo[kend]}"  end-of-line
-bindkey -M viins "^[[3~"              delete-char
-bindkey -M viins "^[3;5~"             delete-char
-
-bindkey -M viins '^[[Z'               reverse-menu-complete
-bindkey -M viins '^G'                 send-break
-bindkey -M viins '^J'                 history-beginning-search-forward
-bindkey -M viins '^K'                 history-beginning-search-backward
-bindkey -M viins '^Y'                 yank
-bindkey -M viins '^U'                 kill-whole-line
-bindkey -M viins '^?'                 backward-delete-char
-bindkey -M viins '^X^E'               edit-command-line
-# bindkey -M viins '^W'                 backward-kill-word
-bindkey -M viins '^W'                 undo
-
-bindkey -M vicmd "${terminfo[khome]}" beginning-of-line
-bindkey -M vicmd "${terminfo[kend]}"  end-of-line
-bindkey -M vicmd "^[[3~"              delete-char
-bindkey -M vicmd "^[3;5~"             delete-char
-
-bindkey -M vicmd '^G'                 send-break
-bindkey -M vicmd '^Y'                 yank
-bindkey -M vicmd '^U'                 kill-whole-line
-bindkey -M vicmd '^X^E'               edit-command-line
-bindkey -M vicmd '^W'                 backward-kill-word
-
 KEYTIMEOUT=1
+
+_emacs_bindings()
+{
+  bindkey -e
+
+  bindkey "${terminfo[khome]}" beginning-of-line
+  bindkey "${terminfo[kend]}"  end-of-line
+  bindkey "^[[3~"              delete-char
+  bindkey "^[3;5~"             delete-char
+
+  bindkey '^[[Z' reverse-menu-complete
+  bindkey '^I'   menu-complete
+  bindkey '^['   undo
+  bindkey '^X^E' edit-command-line
+
+  # bindkey '^ '   autosuggest-accept
+  # zle -N autosuggest-accept
+  bindkey '^ ' autosuggest-accept
+
+  autoload -z edit-command-line
+  zle -N edit-command-line
+
+  bindkey -M menuselect '^[' undo
+  bindkey -M menuselect '^M' .accept-line
+  bindkey -M menuselect ' '  accept-line
+  bindkey -M menuselect '^G' .send-break
+}
+
+_vi_bindings()
+{
+  bindkey -v
+
+  bindkey -M viins "${terminfo[khome]}" beginning-of-line
+  bindkey -M viins "${terminfo[kend]}"  end-of-line
+  bindkey -M viins "^[[3~"              delete-char
+  bindkey -M viins "^[3;5~"             delete-char
+
+  bindkey -M viins '^[[Z'               reverse-menu-complete
+  bindkey -M viins '^G'                 send-break
+  bindkey -M viins '^J'                 history-beginning-search-forward
+  bindkey -M viins '^K'                 history-beginning-search-backward
+  bindkey -M viins '^Y'                 yank
+  bindkey -M viins '^U'                 kill-whole-line
+  bindkey -M viins '^?'                 backward-delete-char
+  bindkey -M viins '^X^E'               edit-command-line
+  bindkey -M viins '^W'                 backward-kill-word
+  bindkey -M viins '^B'                 undo
+
+  bindkey -M vicmd "${terminfo[khome]}" beginning-of-line
+  bindkey -M vicmd "${terminfo[kend]}"  end-of-line
+  bindkey -M vicmd "^[[3~"              delete-char
+  bindkey -M vicmd "^[3;5~"             delete-char
+
+  bindkey -M vicmd '^G'                 send-break
+  bindkey -M vicmd '^Y'                 yank
+  bindkey -M vicmd '^U'                 kill-whole-line
+  bindkey -M vicmd '^X^E'               edit-command-line
+  bindkey -M vicmd '^W'                 backward-kill-word
+}
+
+_emacs_bindings
 
 tog()
 {
-  if [[ $# -eq 0 ]]; then
-    echo "No utility name given"
-    return
-  elif [[ $1 == "vi" ]]; then
-    [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
-      bindkey -e ||
-      bindkey -v
-  fi
-}
-
-en()
-{
-  if [[ $# -eq 0 ]]; then
-    echo "No utility name given"
-    return
-  elif [[ $1 == "vi" ]]; then
-    bindkey -v
-  fi
-}
-
-dis()
-{
-  if [[ $# -eq 0 ]]; then
-    echo "No utility name given"
-    return
-  elif [[ $1 == "vi" ]]; then
-    bindkey -e
-  fi
+  [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
+    _emacs_bindings ||
+    _vi_bindings
 }
 
 autoload -Uz add-zsh-hook
