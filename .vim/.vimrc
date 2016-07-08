@@ -1107,8 +1107,10 @@ function! MoveToNextTab(...)
 endfunc
 
 nnoremap <silent> t :tabnew<CR>
-nnoremap <silent> x :new<CR>
-nnoremap <silent> v :vnew<CR>
+nnoremap <silent> x :sp<CR>
+nnoremap <silent> X :new<CR>
+nnoremap <silent> v :vsp<CR>
+nnoremap <silent> V :vnew<CR>
 
 nnoremap <silent> . :call MoveToNextTab()<CR>
 nnoremap <silent> , :call MoveToPrevTab()<CR>
@@ -1124,10 +1126,6 @@ nnoremap 0 gt
 nnoremap l gt
 nnoremap <silent> ) :tabm+1<CR>
 nnoremap <silent> L :tabm+1<CR>
-
-nnoremap t :tabnew<CR>
-nnoremap v :vnew<CR>
-nnoremap x :new<CR>
 
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
