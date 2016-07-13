@@ -24,7 +24,7 @@ alias c='local_cd_hist'
 
 alias j='jump'
 
-alias ssh='TERM=xterm-256color ssh'
+alias ssh='TERM=screen-256color ssh'
 
 # http://jeroenjanssens.com/2013/08/16/quickly-navigate-your-filesystem-from-the-command-line.html
 export MARKPATH=$HOME/.marks
@@ -187,6 +187,12 @@ __get_virtual_env()
     fi
   fi
   echo $virtual_env
+}
+
+__prompt_char()
+{
+  git branch >/dev/null 2>/dev/null && echo "±" && return
+  echo '$'
 }
 
 function __add_to_hist()

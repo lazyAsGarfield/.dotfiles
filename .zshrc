@@ -42,7 +42,7 @@ __prompt_command()
     local vim_prompt="${${KEYMAP/vicmd/$vim_norm_prompt}/(main|viins)/$vim_ins_prompt}" ||
     local vim_prompt=""
 
-  PROMPT="${BLUE}${virtual_env}${LIGHT_BLUE}[${NORMAL}%n${GREEN}@${BLUE}%m${YELLOW}:${BOLD}%1~${LIGHT_BLUE}] ${git_branch}${vim_prompt}${BOLD}$ ${NORMAL}"
+  PROMPT="${BLUE}${virtual_env}${LIGHT_BLUE}[${NORMAL}%n${GREEN}@${BLUE}%m${YELLOW}:${BOLD}%1~${LIGHT_BLUE}] ${git_branch}${vim_prompt}${BOLD}$(__prompt_char) ${NORMAL}"
 
   zle && zle reset-prompt
 }
