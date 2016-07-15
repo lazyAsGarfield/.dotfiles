@@ -45,11 +45,9 @@ Plug 'moll/vim-bbye'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'tpope/vim-sleuth'
 Plug 'junegunn/limelight.vim'
-Plug 'SirVer/ultisnips'
-Plug 'honza/vim-snippets'
+Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
-Plug 'nvie/vim-flake8'
 
 call plug#end()
 
@@ -714,20 +712,24 @@ function! s:yank_to_buffer(key_with_str, visual)
 endfunction
 
 function! s:registers_sink(key_with_str)
-  let [key, str] = a:key_with_str
-  if tolower(key) == s:yank_key
-    call s:yank_to_buffer(a:key_with_str, 0)
-  else
-    call s:paste_buffer(a:key_with_str, 0)
+  if len(a:key_with_str) > 1
+    let [key, str] = a:key_with_str
+    if tolower(key) == s:yank_key
+      call s:yank_to_buffer(a:key_with_str, 0)
+    else
+      call s:paste_buffer(a:key_with_str, 0)
+    endif
   endif
 endfunction
 
 function! s:registers_sink_visual(key_with_str)
-  let [key, str] = a:key_with_str
-  if tolower(key) == s:yank_key
-    call s:yank_to_buffer(a:key_with_str, 1)
-  else
-    call s:paste_buffer(a:key_with_str, 1)
+  if len(a:key_with_str) > 1
+    let [key, str] = a:key_with_str
+    if tolower(key) == s:yank_key
+      call s:yank_to_buffer(a:key_with_str, 1)
+    else
+      call s:paste_buffer(a:key_with_str, 1)
+    endif
   endif
 endfunction
 
@@ -740,8 +742,10 @@ command! -nargs=? Regs call fzf#run({
 
 nnoremap <C-p> :Mru<CR>
 nnoremap <C-b> :BuffersBetterPrompt<CR>
-nnoremap <C-g> :GitFilesOrCwd<CR>
+nnoremap <C-g><C-g> :GitFilesOrCwd<CR>
+nnoremap <C-g><C-f> 1<C-g>
 nnoremap <C-f><C-f> :Files<CR>
+
 nnoremap <C-f><C-g> :FilesGitRootOrCwd<CR>
 
 " good way of detecting if in visual mode
@@ -1143,12 +1147,6 @@ endfor
 
 imap jj 
 
-let no_flake8_maps = 1
-let g:flake8_show_in_file=1
-
-autocmd FileType python noremap <buffer> [sc :call flake8#Flake8()<CR>
-autocmd FileType python noremap <buffer> ]sc :call flake8#Flake8UnplaceMarkers() \| cclose<CR>
-
 function! DeleteHidden()
   let visible = []
   for tab in range(1, tabpagenr('$'))
@@ -1195,3 +1193,12 @@ endfunction
 nmap <silent> <leader>ll :call ToggleHlCurrLine()<CR>
 nmap <silent> <leader>lw :call ToggleHlCurrWord()<CR>
 nmap <silent> <leader>ln :call UnHlAll()<CR>
+
+cnoremap <C-a> <Home>
+cnoremap <C-e> <End>
+cnoremap <M-b> <C-Left>
+cnoremap <M-f> <C-Right>
+
+autocmd CmdwinEnter : noremap <buffer> <CR> <CR>q:
+autocmd CmdwinEnter : imap <buffer> <CR> <CR>q:i
+autocmd CmdwinEnter * nnoremap <buffer> q :quit<CR>
