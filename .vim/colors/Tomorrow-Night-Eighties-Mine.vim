@@ -12,7 +12,9 @@ let s:linenr = "616161"
 let s:line = "393939"
 let s:comment = "999999"
 let s:red = "f2777a"
+let s:dark_red = "e2676a"
 let s:orange = "f99157"
+let s:light_yellow = "ffdc86"
 let s:yellow = "ffcc66"
 let s:green = "99cc99"
 let s:aqua = "66cccc"
@@ -255,6 +257,7 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 	call <SID>X("FoldColumn", s:foreground, s:background, "")
 	if version >= 700
 		call <SID>X("CursorLine", "", s:line, "none")
+		call <SID>X("CursorLineNr", s:orange, "", "bold")
 		call <SID>X("CursorColumn", "", s:line, "none")
 		call <SID>X("PMenu", s:foreground, s:selection, "none")
 		call <SID>X("PMenuSel", s:foreground, s:selection, "reverse")
@@ -482,12 +485,12 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 	call <SID>X("GitGutterDelete",  s:red, "", "bold")
 	call <SID>X("GitGutterChangeDelete",  s:purple, "", "bold")
 
-	call <SID>X("YcmErrorSign", s:red, "", "")
-	call <SID>X("YcmWarningSign", s:yellow, "", "")
+	call <SID>X("YcmErrorSign", s:dark_red, "", "")
+	call <SID>X("YcmWarningSign", "FFFFFF", "", "")
 	call <SID>X("YcmErrorLine", "", "", "")
 	call <SID>X("YcmWarningLine", "", "", "")
-	call <SID>X("YcmErrorSection", s:background, s:red, "")
-	call <SID>X("YcmWarningSection", s:background, s:yellow, "")
+	call <SID>X("YcmErrorSection", s:background, s:dark_red, "")
+	call <SID>X("YcmWarningSection", s:background, s:light_yellow, "")
 
 	if has("spell")
 			call <SID>X("SpellBad", s:background, s:orange, "underline")

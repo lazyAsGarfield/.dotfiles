@@ -208,10 +208,6 @@ if !exists("g:vimrc_init")
   set tabstop=2
   set smarttab
 
-  " do not indent visibility keywords in C++ classes, indent lambdas
-  " set cindent
-  set cinoptions=g0,j1
-
   " display line numbers
   set number
 
@@ -811,7 +807,6 @@ autocmd! User GoyoEnter nested call <SID>goyo_enter()
 autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
 autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
-" autocmd FileType help nnoremap <buffer>  :quit<CR>
 
 autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
 
@@ -1195,3 +1190,27 @@ endfunction
 nmap <silent> <leader>ll :call ToggleHlCurrLine()<CR>
 nmap <silent> <leader>lw :call ToggleHlCurrWord()<CR>
 nmap <silent> <leader>ln :call UnHlAll()<CR>
+
+vmap K k
+
+" Cstyle indentation settings
+set cinoptions=
+set cinoptions+=l1
+set cinoptions+=g0
+set cinoptions+=N-s
+set cinoptions+=t0
+set cinoptions+=(0
+set cinoptions+=U1
+set cinoptions+=W2s
+set cinoptions+=k3s
+set cinoptions+=m1
+set cinoptions+=M1
+set cinoptions+=j1
+set cinoptions+=J1
+
+" Sometimes autocommands interfere with each other and break syntax
+" Let's fix it
+au! syntaxset BufEnter *
+
+set virtualedit=block
+
