@@ -28,7 +28,7 @@ prompt_command()
   git_branch=$(__get_git_branch)
   virtual_env=$(__get_virtual_env)
 
-  PS1="$BLUE$virtual_env$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE] $git_branch$BOLD$ $NORMAL"
+  PS1="$BLUE$virtual_env$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE] $git_branch$BOLD$(__prompt_char) $NORMAL"
 }
 
 if [[ -z ${__prompt_cmd_set+x} ]]; then

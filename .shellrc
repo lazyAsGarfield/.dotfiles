@@ -186,6 +186,12 @@ __get_virtual_env()
   echo $virtual_env
 }
 
+__prompt_char()
+{
+  git branch >/dev/null 2>/dev/null && echo "±" && return
+  echo '$'
+}
+
 function __add_to_hist()
 {
   local hist_size="${#__cd_history__[@]}"
