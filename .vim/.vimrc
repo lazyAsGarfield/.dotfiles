@@ -49,6 +49,9 @@ Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
 
+" Extracted from https://github.com/klen/python-mode
+Plug path . '/python-mode-motions'
+
 call plug#end()
 
 filetype plugin indent on
@@ -372,12 +375,6 @@ map <leader>r :redraw!<CR>
 vnoremap <C-r><C-r> "hy:%s/<C-r>h/<C-r>h/g<left><left>
 vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>/<C-r>h/g<left><left>
 
-" moving around splits more easily
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-
 " it's handy to have those when using byobu, as Shift + arrows moves around
 " byobu's splits
 nnoremap <C-Left> <C-w>h
@@ -431,7 +428,6 @@ if version >= 703
   endfunction
 
   map <C-n> :call NERDTreeEnableOrToggle()<CR>
-  map <leader><leader>n :NERDTreeFind<CR>
 
   " Easymotion mappings
   nmap <leader><leader>t <Plug>(easymotion-t2)
@@ -825,6 +821,11 @@ autocmd FileType nerdtree nmap <buffer> <C-x> i
 autocmd FileType nerdtree nmap <buffer> <C-j> j
 autocmd FileType nerdtree nmap <buffer> <C-k> k
 autocmd FileType nerdtree nmap <buffer> . I
+
+let g:NERDTreeMapJumpLastChild = '<C-f>'
+let g:NERDTreeMapJumpFirstChild = '<C-b>'
+let g:NERDTreeMapJumpNextSibling = 'J'
+let g:NERDTreeMapJumpPrevSibling = 'K'
 
 autocmd! FileType unite
 autocmd FileType unite nunmap <buffer> <C-h>
@@ -1220,3 +1221,5 @@ set cinoptions+=J1
 au! syntaxset BufEnter *
 
 set virtualedit=block
+
+nmap n :NERDTreeFind<CR>

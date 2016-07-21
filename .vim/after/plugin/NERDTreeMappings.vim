@@ -67,6 +67,10 @@ if exists('g:loaded_nerd_tree')
     call b:NERDTree.changeRoot(a:node)
   endfunction
 
+  function! NERDTree_bookmark_l(bm)
+    call a:bm.activate(b:NERDTree, !a:bm.path.isDirectory ? {'where': 'p'} : {})
+  endfunction
+
   call NERDTreeAddKeyMap({
         \ 'key': 'h',
         \ 'callback': 'NERDTree_dir_h',
@@ -108,5 +112,11 @@ if exists('g:loaded_nerd_tree')
         \ 'callback': 'NERDTree_file_l',
         \ 'quickhelpText': 'open in previous window',
         \ 'scope': 'FileNode' })
+
+  call NERDTreeAddKeyMap({
+        \ 'key': 'l',
+        \ 'callback': 'NERDTree_bookmark_l',
+        \ 'quickhelpText': 'open bookmark',
+        \ 'scope': 'Bookmark' })
 
 endif
