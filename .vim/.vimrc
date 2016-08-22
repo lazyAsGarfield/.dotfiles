@@ -48,6 +48,7 @@ Plug 'junegunn/limelight.vim'
 Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
+Plug 'majutsushi/tagbar'
 
 " Extracted from https://github.com/klen/python-mode
 Plug path . '/python-mode-motions'
@@ -415,9 +416,6 @@ if version >= 703
   nnoremap ycl :YcmDiags<CR>
   nnoremap yct :YcmCompleter GetType<CR>
 
-  " Undotree plugin
-  nnoremap <C-t> :UndotreeToggle<CR>
-
   " NERDTree plugin
   function! NERDTreeEnableOrToggle()
     try
@@ -573,6 +571,9 @@ let s:default_action = {
 " below function is used in order to get actions like ctrl-v etc.
 " and to transform path to proper version
 function! s:mru_sink(lines)
+  if len(a:lines) <= 1
+    return
+  endif
   let key = remove(a:lines, 0)
   let cmd = get(s:default_action, key, 'e')
   let save_cwd = fnameescape(getcwd())
@@ -813,7 +814,7 @@ autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
 autocmd FileType undotree nmap <nowait> <buffer> q :quit<CR>
 autocmd FileType undotree nmap <buffer> <C-j> j
 autocmd FileType undotree nmap <buffer> <C-k> k
-autocmd FileType undotree nmap <buffer>  :quit<CR>
+autocmd FileType undotree nmap <buffer> <nowait>  :quit<CR>
 
 " autocmd FileType nerdtree nmap <buffer>  :quit<CR>
 autocmd FileType nerdtree nmap <buffer> <C-v> s
@@ -1223,3 +1224,15 @@ au! syntaxset BufEnter *
 set virtualedit=block
 
 nmap n :NERDTreeFind<CR>
+
+let g:airline_left_sep=''
+let g:airline_right_sep=''
+
+nmap g :TagbarToggle<CR>
+
+let g:tagbar_map_openfold = 'l'
+let g:tagbar_map_closefold = 'h'
+
+" Undotree plugin
+nnoremap u :UndotreeToggle<CR>
+
