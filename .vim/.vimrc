@@ -25,7 +25,6 @@ if v:version >= 703
     Plug 'davidhalter/jedi-vim'
   endif
 endif
-Plug 'tpope/vim-commentary'
 Plug 'kien/ctrlp.vim'
 Plug 'bling/vim-airline'
 Plug 'hynek/vim-python-pep8-indent'
@@ -49,6 +48,7 @@ Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
 Plug 'majutsushi/tagbar'
+Plug 'scrooloose/nerdcommenter'
 
 " Extracted from https://github.com/klen/python-mode
 Plug path . '/python-mode-motions'
@@ -1281,3 +1281,12 @@ if has("cscope")
     cab css cs show
 
 endif
+
+let g:NERDMenuMode = 3
+let g:NERDRemoveExtraSpaces = 1
+let g:NERDSpaceDelims = 1
+let g:NERDCompactSexyComs = 1
+nmap gc <leader>c
+xmap gc <leader>c
+
+let g:cpp_experimental_template_highlight = 1
