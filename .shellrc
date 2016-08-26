@@ -1,5 +1,7 @@
-alias ll='ls -alFh'
+alias ll='ls -lFh'
+alias lla='ls -alFh'
 alias llt='ls -alFh --sort=time'
+alias llat='ls -alFh --sort=time --time=access'
 alias lls='ls -alFh --sort=size'
 alias la='ls -A --color=auto'
 alias l='ls -CF'
@@ -73,8 +75,8 @@ export FZF_CTRL_T_COMMAND='find -L . -type d -o -type f -o -type l 2>/dev/null |
 export FZF_DEFAULT_COMMAND='ag -g "" -U --hidden --ignore .git/ 2>/dev/null'
 
 if [ -x /usr/bin/dircolors ]; then
-  if [[ -f $DOTFILES_DIR/dircolors.256dark ]]; then
-    eval "$(dircolors $DOTFILES_DIR/dircolors.256dark -b)"
+  if [[ -f $DOTFILES_DIR/dircolors ]]; then
+    eval "$(dircolors $DOTFILES_DIR/dircolors -b)"
   elif [[ $TERM =~ ^tmux ]]; then
     fname=/tmp/__dir_colors$RANDOM
     sed -ne '/^TERM/q; p' /etc/DIR_COLORS > $fname
