@@ -1134,10 +1134,10 @@ runtime after/plugin/ESCNoWaitMappings.vim
 
 let s:special_files = {
       \ 'sh': [
-      \ '$DOTFILES_DIR/.shellrc'
+      \ resolve(expand('$DOTFILES_DIR/.shellrc'))
       \ ],
       \ 'conf': [
-      \ '$DOTFILES_DIR/.tmux-common.conf'
+      \ resolve(expand('$DOTFILES_DIR/.tmux-common.conf'))
       \ ]
       \ }
 
@@ -1146,9 +1146,6 @@ for [ft, files] in items(s:special_files)
     exec 'autocmd BufRead' f 'set ft=' . ft
   endfor
 endfor
-
-" " set filetype for .shellrc file
-" autocmd BufRead $DOTFILES_DIR/.shellrc set ft=sh
 
 imap jj 
 
@@ -1257,7 +1254,7 @@ if has("cscope")
     " show msg when cscope db added
     set cscopeverbose
 
-    function s:maybe_open_qf()
+    function! s:maybe_open_qf()
         let qf = getqflist()
         if len(qf) > 1
             copen
