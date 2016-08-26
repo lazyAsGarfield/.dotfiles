@@ -659,12 +659,15 @@ function! s:ag_with_opts(bang, ...)
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
-command! -nargs=+ -complete=dir -bang AgIn call s:ag_in(<bang>0, <f-args>)
 command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
 command! -nargs=* -bang Agcwd exec 'Agin<bang>'  getcwd() '<args>'
 command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<bang>0, <f-args>)
 " Ag command is set in after/plugin/override.vim
+
+cab ag Ag
+cab agin Agin
+cab agcwd Agcwd
 
 function! s:ansi(str, col, bold)
   return printf("\x1b[%s%sm%s\x1b[m", a:col, a:bold ? ';1' : '', a:str)
@@ -733,22 +736,27 @@ command! -nargs=? Regs call fzf#run({
       \ 'down':    '40%'
       \ })
 
-nnoremap <C-p> :Mru<CR>
-nnoremap <C-b> :BuffersBetterPrompt<CR>
-nnoremap <C-g><C-g> :GitFilesOrCwd<CR>
-nnoremap <C-g><C-f> 1<C-g>
-nnoremap <C-f><C-f> :Files<CR>
+if executable('fzf')
+  nnoremap <C-p> :Mru<CR>
+  nnoremap <C-b> :BuffersBetterPrompt<CR>
+  nnoremap <C-g><C-g> :GitFilesOrCwd<CR>
+  nnoremap <C-f><C-f> :Files<CR>
+  nnoremap <C-g><C-f> 1<C-g>
+  nnoremap <C-f><C-g> :FilesGitRootOrCwd<CR>
 
-nnoremap <C-f><C-g> :FilesGitRootOrCwd<CR>
-
-" good way of detecting if in visual mode
-" a bit experimental mappings
-nnoremap RR :Regs<CR>
-vnoremap RR :<c-u>Regs 1<CR>
-" inoremap RR  <ESC>:<C-u>Regs<CR>i
-autocmd FileType vimfiler nunmap RR
-autocmd FileType vimfiler autocmd BufEnter <buffer> nunmap RR
-autocmd FileType vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
+  " good way of detecting if in visual mode
+  " a bit experimental mappings
+  nnoremap RR :Regs<CR>
+  vnoremap RR :<c-u>Regs 1<CR>
+  " inoremap RR  <ESC>:<C-u>Regs<CR>i
+  autocmd FileType vimfiler nunmap RR
+  autocmd FileType vimfiler autocmd BufEnter <buffer> nunmap RR
+  autocmd FileType vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
+else
+  nnoremap <silent> <C-p> :CtrlPMRU<CR>
+  nnoremap <silent> <C-b> :CtrlPBuffer<CR>
+  nnoremap <silent> <C-f> :CtrlP<CR>
+endif
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
@@ -1221,8 +1229,6 @@ set cinoptions+=J1
 " Let's fix it
 au! syntaxset BufEnter *
 
-set virtualedit=block
-
 nmap n :NERDTreeFind<CR>
 
 let g:airline_left_sep=''
@@ -1236,3 +1242,42 @@ let g:tagbar_map_closefold = 'h'
 " Undotree plugin
 nnoremap u :UndotreeToggle<CR>
 
+set cscopequickfix=s-,c-,d-,i-,t-,e-
+
+let g:tagbar_autofocus = 1
+
+if has("cscope")
+
+    " use both cscope and ctag
+    set cscopetag
+
+    " check cscope for definition of a symbol before checking ctags
+    set csto=0
+
+    " show msg when cscope db added
+    set cscopeverbose
+
+    function s:maybe_open_qf()
+        let qf = getqflist()
+        if len(qf) > 1
+            copen
+            wincmd p
+        endif
+    endfunction
+
+    for [bind, prefix] in [['<C-\>', ''], ['<C-@>', 'vert s'], ['<C-@><C-@>', 's']]
+        for cmd in ['s', 'g', 'c', 't', 'e', 'd']
+            exec 'nmap <silent> ' . bind . cmd . ' :' . prefix . 'cs find ' . cmd . ' <C-R>=expand("<cword>")<CR><CR> \| :call <SID>maybe_open_qf()<CR>'
+            exec 'nmap <silent> ' . bind . 'f :' . prefix . 'cs find f <C-R>=expand("<cfile>")<CR><CR> \| :call <SID>maybe_open_qf()<CR>'
+            exec 'nmap <silent> ' . bind . 'i :' . prefix . 'cs find i ^<C-R>=expand("<cfile>")<CR>$<CR> \| :call <SID>maybe_open_qf()<CR>'
+        endfor
+    endfor
+
+    cab csa cs add
+    cab csh cs help
+    cab csf cs find
+    cab csk cs kill
+    cab csr cs reset
+    cab css cs show
+
+endif
