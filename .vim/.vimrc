@@ -316,9 +316,6 @@ noremap ]wq :cclose<CR>
 noremap [wl :lopen<CR>
 noremap ]wl :lclose<CR>
 
-" close preview window
-noremap ]wp <C-w>z
-
 " moving around wrapped lines more naturally
 noremap j gj
 noremap k gk
