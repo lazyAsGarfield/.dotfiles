@@ -48,12 +48,12 @@ function saved()
           dir="${__cd_history__[$num]}"
         fi
       elif [[ $dir == "-" && -n $OLDPWD ]]; then
-        dir="$(realpath "$OLDPWD")"
+        dir="$(readlink -f -- "$OLDPWD")"
       elif [[ $dir =~ ^- ]]; then
         echo "$dir: invalid argument"
         return
       elif [[ -n $dir ]]; then
-        dir="$(realpath "$dir")"
+        dir="$(readlink -f -- "$dir")"
       fi
       if [[ -d $dir ]]; then
         for saved_dir in "${__saved_dirs__[@]}"; do

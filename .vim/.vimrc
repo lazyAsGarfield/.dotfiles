@@ -51,7 +51,7 @@ Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdcommenter'
 
 " Extracted from https://github.com/klen/python-mode
-Plug path . '/python-mode-motions'
+Plug '~/.vim/plugin/python-mode-motions'
 
 call plug#end()
 
