@@ -120,7 +120,7 @@ _list_cd_local_hist()
   local min="$(( $hist_size - $1 + 1 ))"
   min="$(( $min < 1 ? 1 : $min ))"
   for (( i = $min ; i <= $hist_size ; ++i )); do
-    printf "%4d  %s\n" "$i" "${__cd_history__[$i]}"
+    printf "%4d %4d  %s\n" "$i" "$(($i - $hist_size - 1))" "${__cd_history__[$i]}"
   done
 }
 
@@ -135,7 +135,7 @@ function local_cd_hist()
       limit=15
     fi
     _list_cd_local_hist $limit
-  elif [[ $1 =~ ^-c$ ]]; then
+  elif [[ $1 == "-c" ]]; then
     unset __cd_history__
     declare -a __cd_history__
   else
@@ -148,6 +148,8 @@ function local_cd_hist()
     [[ -z $pat ]] && pat="$@"
     [[ $1 =~ ^-?[0-9]+$ ]] &&
       dir="${__cd_history__[$1]}"
+    [[ $1 == "-" ]] &&
+      dir="${__cd_history__[-1]}"
     pat="$(sed 's/\./\\./g' <<< "$pat")"
     pat="$(sed 's/\ /.*/g' <<< "$pat")"
     [[ -z $dir ]] &&
