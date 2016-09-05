@@ -763,11 +763,6 @@ endif
 
 autocmd FileType cuda set ft=cuda.cpp
 
-" default flags files for c-like langs for YCM
-autocmd FileType cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cpp/.ycm_extra_conf.py"
-autocmd FileType c let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/c/.ycm_extra_conf.py"
-autocmd FileType cuda.cpp let g:ycm_global_ycm_extra_conf = "/home/garfield/.vim/ycm/cuda/.ycm_extra_conf.py"
-
 set nowrap
 
 set lazyredraw
@@ -1284,3 +1279,11 @@ nmap gc <leader>c
 xmap gc <leader>c
 
 let g:cpp_experimental_template_highlight = 1
+
+" default flags files for c-like langs for YCM
+" won't work as g:ycm_global_ycm_extra_conf is read only at vim startup
+" autocmd FileType cpp let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/cpp/.ycm_extra_conf.py")
+" autocmd FileType c let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/c/.ycm_extra_conf.py")
+" autocmd FileType cuda.cpp let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/cuda/.ycm_extra_conf.py")
+
+let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")

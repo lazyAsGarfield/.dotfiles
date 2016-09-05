@@ -8,9 +8,6 @@ flags = [
     '-Wno-variadic-macros',
     # '-Wno-overloaded-shift-op-parentheses',
     '-fexceptions',
-    '-std=c++11',
-    '-x',
-    'c++',
 ]
 
 SOURCE_EXTENSIONS = [ '.cpp', '.cxx', '.cc', '.c', '.m', '.mm', ]
