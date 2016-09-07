@@ -1231,7 +1231,7 @@ let g:tagbar_map_closefold = 'h'
 " Undotree plugin
 nnoremap u :UndotreeToggle<CR>
 
-set cscopequickfix=s-,c-,d-,i-,t-,e-
+set cscopequickfix=s-,c-,d-,i-,t-,e-,g-,f-
 
 let g:tagbar_autofocus = 1
 
@@ -1287,3 +1287,7 @@ let g:cpp_experimental_template_highlight = 1
 " autocmd FileType cuda.cpp let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/cuda/.ycm_extra_conf.py")
 
 let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")
+
+let g:ycm_warning_symbol = '>'
+let g:ycm_error_symbol = '>>'
+let g:ycm_collect_identifiers_from_tags_files = 1

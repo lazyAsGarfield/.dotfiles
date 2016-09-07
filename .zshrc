@@ -39,7 +39,7 @@ __prompt_command()
   local vim_norm_prompt="${LIGHT_YELLOW}[N]$NORMAL"
   local vim_ins_prompt="${LIGHT_BLUE}[I]$NORMAL"
   [[ -n $KEYMAP ]] &&
-    local vim_prompt="${${KEYMAP/vicmd/$vim_norm_prompt}/(main|viins)/$vim_ins_prompt}" ||
+    local vim_prompt="${${KEYMAP/vicmd/$vim_norm_prompt}/(main|viins)/$vim_ins_prompt} " ||
     local vim_prompt=""
 
   PROMPT="${BLUE}${virtual_env}${LIGHT_BLUE}[${NORMAL}%n${GREEN}@${BLUE}%m${YELLOW}:${BOLD}%1~${LIGHT_BLUE}] ${git_branch}${vim_prompt}${BOLD}$(__prompt_char) ${NORMAL}"
@@ -141,6 +141,13 @@ alias grm='git reset --mixed HEAD^'
 
 KEYTIMEOUT=1
 
+
+autoload -z edit-command-line
+zle -N edit-command-line
+
+autoload -Uz copy-earlier-word
+zle -N copy-earlier-word
+
 _emacs_bindings()
 {
   bindkey -e
@@ -155,12 +162,11 @@ _emacs_bindings()
   bindkey '^['   undo
   bindkey '^X^E' edit-command-line
 
+  bindkey '^[m' copy-earlier-word
+
   # bindkey '^ '   autosuggest-accept
   # zle -N autosuggest-accept
   bindkey '^ ' autosuggest-accept
-
-  autoload -z edit-command-line
-  zle -N edit-command-line
 
   bindkey -M menuselect '^[' undo
   bindkey -M menuselect '^M' .accept-line
@@ -188,6 +194,26 @@ _vi_bindings()
   bindkey -M viins '^W'                 backward-kill-word
   bindkey -M viins '^B'                 undo
 
+  bindkey -M viins '^ '                 autosuggest-accept
+  bindkey -M viins '^[f'                forward-word
+  bindkey -M viins '^[b'                backward-word
+
+  bindkey -M viins '^A'                 beginning-of-line
+  bindkey -M viins '^E'                 end-of-line
+
+  bindkey -M viins '^[.'                insert-last-word
+  bindkey -M viins '^[m'                copy-earlier-word
+  bindkey -M viins '^[0'                digit-argument
+  bindkey -M viins '^[1'                digit-argument
+  bindkey -M viins '^[2'                digit-argument
+  bindkey -M viins '^[3'                digit-argument
+  bindkey -M viins '^[4'                digit-argument
+  bindkey -M viins '^[5'                digit-argument
+  bindkey -M viins '^[6'                digit-argument
+  bindkey -M viins '^[7'                digit-argument
+  bindkey -M viins '^[8'                digit-argument
+  bindkey -M viins '^[9'                digit-argument
+
   bindkey -M vicmd "${terminfo[khome]}" beginning-of-line
   bindkey -M vicmd "${terminfo[kend]}"  end-of-line
   bindkey -M vicmd "^[[3~"              delete-char
@@ -201,6 +227,7 @@ _vi_bindings()
 }
 
 _emacs_bindings
+_vi_bindings
 
 tog()
 {
