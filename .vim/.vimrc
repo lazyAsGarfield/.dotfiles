@@ -778,6 +778,7 @@ autocmd FileType nerdtree autocmd BufEnter <buffer> silent! nunmap LL
 autocmd FileType nerdtree autocmd BufLeave <buffer> silent! nmap LL :Limelight!!<CR>
 
 let g:limelight_default_coefficient = 0.54
+let g:limelight_paragraph_span = 1
 
 function! s:goyo_enter()
   if !empty($TMUX)
