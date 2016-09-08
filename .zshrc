@@ -119,21 +119,15 @@ alias -g N2=' 2> /dev/null '
 alias -g N12=' > /dev/null 2>&1'
 alias -g M21=' 2>&1'
 
+alias guc='git reset --soft HEAD^'
+alias grm='git reset --mixed HEAD^'
+
 function _completemarks {
   reply=($(ls $MARKPATH))
 }
 
 compctl -K _completemarks jump
 compctl -K _completemarks unmark
-
-function _completehistory {
-  reply=(${(Oa)__cd_history__[@]})
-}
-
-compctl -V hist -2 -K _completehistory local_cd_hist
-
-alias guc='git reset --soft HEAD^'
-alias grm='git reset --mixed HEAD^'
 
 # }}}
 

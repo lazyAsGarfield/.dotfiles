@@ -5,21 +5,17 @@ declare -a __cd_history__
 
 function __go_to_saved()
 {
-  local num="$1"
-  if [[ $num > ${#__saved_dirs__[@]} || $num -eq 0 ]]; then
-    echo "No entry $num in saved directories"
+  [[ $# -ne 1 || ! $1 =~ ^[1-9][0-9]*$ ]] &&
+    return
+  if [[ $1 -gt ${#__saved_dirs__[@]} ]]; then
+    echo "No entry $1 in saved directories"
+    return
+  fi
+  local dir="${__saved_dirs__[$1]}"
+  if [[ -d $dir ]]; then
+    cd "$dir" && echo "$dir"
   else
-    local dir="${__saved_dirs__[$num]}"
-    if [[ -d $dir ]]; then
-      local saved_pwd="$PWD"
-      if [[ $PWD != $dir ]]; then
-        if builtin cd "$dir"; then
-          echo "$dir"
-        else
-          return $?
-        fi
-      fi
-    fi
+    echo "Not a directory: $dir" >&2
   fi
 }
 
@@ -34,12 +30,13 @@ function saved()
     done
   else
     local dir
+    local saved_dir
     if [[ $# -eq 1 && $1 =~ ^[1-9][0-9]*$ && $1 -le ${#__saved_dirs__[@]} ]]; then
       __go_to_saved $1
       return
     fi
     for dir in "$@"; do
-      if [[ $dir =~ ^-[0-9]+$ ]]; then
+      if [[ $dir =~ ^-[1-9][0-9]*$ ]]; then
         local num="${dir:1}"
         if [[ $num -gt ${#__cd_history__[@]} ]]; then
           echo "No entry $num in history"
@@ -47,23 +44,23 @@ function saved()
         else
           dir="${__cd_history__[$num]}"
         fi
-      elif [[ $dir == "-" && -n $OLDPWD ]]; then
+      elif [[ $dir == "-" ]]; then
         dir="$(readlink -f -- "$OLDPWD")"
-      elif [[ $dir =~ ^- ]]; then
-        echo "$dir: invalid argument"
-        return
-      elif [[ -n $dir ]]; then
+      else
         dir="$(readlink -f -- "$dir")"
       fi
       if [[ -d $dir ]]; then
         for saved_dir in "${__saved_dirs__[@]}"; do
           if [[ $saved_dir = $dir ]]; then
             echo "$dir: already saved"
-            return
+            dir=
+            break
           fi
         done
-        echo "$dir"
-        __saved_dirs__[$(( ${#__saved_dirs__[@]} + 1 ))]="$dir"
+        if [[ -n $dir ]]; then
+          echo "$dir"
+          __saved_dirs__[$(( ${#__saved_dirs__[@]} + 1 ))]="$dir"
+        fi
       else
         echo "$dir: No such directory" >&2
       fi
@@ -97,7 +94,7 @@ function dropd()
     repair_indexes
   else
     for arg in "$@"; do
-      if [[ $arg =~ ^[0-9]+$ ]]; then
+      if [[ $arg =~ ^[1-9][0-9]*$ ]]; then
         unset '__saved_dirs__[$arg]'
       elif [[ $arg = "@" ]]; then
         unset __saved_dirs__
@@ -113,12 +110,18 @@ function dropd()
   unset -f repair_indexes
 }
 
-_list_cd_local_hist()
+function _list_cd_local_hist()
 {
-  [[ $# -eq 0 || ! $1 =~ ^[0-9]+$ ]] && return
+  [[ $# -gt 0 && ! $1 =~ ^[1-9][0-9]*$ ]] &&
+    return
   local hist_size="${#__cd_history__[@]}"
-  local min="$(( $hist_size - $1 + 1 ))"
-  min="$(( $min < 1 ? 1 : $min ))"
+  local min
+  if [[ $# -eq 1 ]]; then
+    min="$(( $hist_size - $1 + 1 ))"
+    min="$(( $min < 1 ? 1 : $min ))"
+  else
+    min=1
+  fi
   for (( i = $min ; i <= $hist_size ; ++i )); do
     printf "%4d %4d  %s\n" "$i" "$(($i - $hist_size - 1))" "${__cd_history__[$i]}"
   done
@@ -127,11 +130,11 @@ _list_cd_local_hist()
 function local_cd_hist()
 {
   local dir
-  if [[ $# -eq 0 || $1 =~ ^-l[0-9]+$ ]]; then
+  if [[ $# -eq 0 || $1 =~ ^-l([1-9][0-9]*)?$ ]]; then
     local limit
-    if [[ ${1:2} =~ ^[0-9]+$ ]]; then
+    if [[ ${1:2} =~ ^[1-9][0-9]*$ ]]; then
       limit="${1:2}"
-    else
+    elif [[ $# -eq 0 ]]; then
       limit=15
     fi
     _list_cd_local_hist $limit
@@ -140,24 +143,22 @@ function local_cd_hist()
     declare -a __cd_history__
   else
     local pat
-    [[ $1 == "--" ]] &&
-      while [[ $1 ]]; do
-        shift;
-        pat="$pat${pat:+ }$1";
-      done
-    [[ -z $pat ]] && pat="$@"
-    [[ $1 =~ ^-?[0-9]+$ ]] &&
+    if [[ $1 =~ ^-?[0-9]+$ ]]; then
       dir="${__cd_history__[$1]}"
-    [[ $1 == "-" ]] &&
+    elif [[ $1 = "-" ]]; then
       dir="${__cd_history__[-1]}"
-    pat="$(sed 's/\./\\./g' <<< "$pat")"
-    pat="$(sed 's/\ /.*/g' <<< "$pat")"
-    [[ -z $dir ]] &&
-      dir=$(printf "%s\n" "${__cd_history__[@]}" | grep $pat \
-      | tail -n1)
+    fi
+    if [[ -z $dir ]]; then
+      pat="$@"
+      pat="$(sed 's/\./\\./g' <<< "$pat")"
+      pat="$(sed 's/\ /.*/g' <<< "$pat")"
+      dir=$(printf "%s\n" "${__cd_history__[@]}" | grep $pat | tail -n1)
+    fi
     [[ -z $dir ]] && return
     if [[ -d $dir ]]; then
       cd "$dir" && echo "$dir"
+    else
+      echo "Not a directory: $dir" >&2
     fi
   fi
 }
