@@ -152,7 +152,11 @@ _emacs_bindings()
   bindkey "^[3;5~"             delete-char
 
   bindkey '^[[Z' reverse-menu-complete
-  bindkey '^I'   menu-complete
+  if $(whence -w fzf-completion >/dev/null) ; then
+    bindkey '^I'   fzf-completion
+  else
+    bindkey '^I'   menu-complete
+  fi
   bindkey '^['   undo
   bindkey '^X^E' edit-command-line
 
@@ -178,6 +182,11 @@ _vi_bindings()
   bindkey -M viins "^[3;5~"             delete-char
 
   bindkey -M viins '^[[Z'               reverse-menu-complete
+  if $(whence -w fzf-completion >/dev/null) ; then
+    bindkey -M viins '^I'                 fzf-completion
+  else
+    bindkey -M viins '^I'                 menu-complete
+  fi
   bindkey -M viins '^G'                 send-break
   bindkey -M viins '^J'                 history-beginning-search-forward
   bindkey -M viins '^K'                 history-beginning-search-backward
