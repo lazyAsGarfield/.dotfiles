@@ -204,6 +204,10 @@ _vi_bindings()
   bindkey -M viins '^A'                 beginning-of-line
   bindkey -M viins '^E'                 end-of-line
 
+  bindkey -M viins '^P'                 up-line-or-history
+  bindkey -M viins '^N'                 down-line-or-history
+
+  bindkey -M viins '^[a'                accept-and-hold
   bindkey -M viins '^[.'                insert-last-word
   bindkey -M viins '^[m'                copy-earlier-word
   bindkey -M viins '^[0'                digit-argument

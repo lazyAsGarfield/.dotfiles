@@ -34,10 +34,9 @@ export MARKPATH=$HOME/.marks
 function jump {
   [[ -n $1 ]] && { cd -P "$MARKPATH/$1" 2>/dev/null \
     || echo "No such mark: $1"; } \
-    || { ls -l "$MARKPATH" \
-    | sed 's/  / /g' \
-    | cut -d' ' -f8- \
-    | awk -F ' -> ' '{if ($0 != "") printf "%-10s -> %s\n", $1, $2; else print}' \
+    || { echo && \
+    for f in $(ls -A "$MARKPATH"); do echo "$f" '->' $(readlink -f "$MARKPATH/$f") ; done \
+    | awk -F ' -> ' '{if ($0 != "") printf "    %-10s -> %s\n", $1, $2; else print}' \
     && echo; }
 }
 

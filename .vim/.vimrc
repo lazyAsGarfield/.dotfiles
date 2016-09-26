@@ -49,6 +49,7 @@ Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
 Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdcommenter'
+Plug 'tpope/vim-repeat'
 
 " Extracted from https://github.com/klen/python-mode
 Plug '~/.vim/plugin/python-mode-motions'
@@ -170,6 +171,8 @@ autocmd GUIEnter * set vb t_vb=
 " display incomplete commands
 set showcmd
 
+set lazyredraw
+
 " some options have to be set only at init
 if !exists("g:vimrc_init")
   let g:vimrc_init = 1
@@ -237,6 +240,7 @@ if !exists("g:vimrc_init")
     silent! set foldcolumn=0
   endif
 
+  set nowrap
 endif " exists("g:vimrc_init")
 
 " --------------- VIM OPTS END ------------- }}}
@@ -290,6 +294,8 @@ let g:ycm_semantic_triggers =  {
   \   'erlang' : [':'],
   \ }
 
+autocmd FileType cuda set ft=cuda.cpp
+
 " disable youcompleteme
 " let g:loaded_youcompleteme = 1
 
@@ -303,17 +309,47 @@ let delimitMate_smart_matchpairs = '^\%(\w\|[£$]\|[^[:space:][:punct:]]\)'
 " Undotree settings
 let g:undotree_SetFocusWhenToggle = 1
 
+let g:goyo_width=120
+let g:goyo_height='95%'
+
+let g:limelight_default_coefficient = 0.54
+let g:limelight_paragraph_span = 1
+
+autocmd BufRead *
+      \ if expand('%') =~# '^vimfiler:default' |
+      \   let new_name = b:vimfiler.current_file.action__path[4:] |
+      \   let cntr = 1 |
+      \   if bufexists(new_name) |
+      \     while bufexists(new_name . '@' . cntr) |
+      \       let cntr = cntr + 1 |
+      \     endwhile |
+      \     let new_name = new_name . '@' . cntr |
+      \   endif |
+      \   exec 'file ' . new_name |
+      \ endif
+
+let g:tmux_navigator_no_mappings = 1
+
+let g:gitgutter_override_sign_column_highlight = 0
+
+" those are better visible
+let g:gitgutter_sign_modified = '#'
+let g:gitgutter_sign_removed = 'v'
+let g:gitgutter_sign_modified_removed = '#v'
+
+highlight ExtraWhitespace ctermbg=137
+
 " --------------- PLUGIN OPTS END ---------- }}}
 
 " ---------- VIM MAPPINGS --------- {{{
 
 " change leader key
-let mapleader=","
+let mapleader=" "
 
 " open/close quickfix/location-list window
-noremap [wq :copen<CR>
+noremap [wq :bot copen<CR>
 noremap ]wq :cclose<CR>
-noremap [wl :lopen<CR>
+noremap [wl :bot lopen<CR>
 noremap ]wl :lclose<CR>
 
 " moving around wrapped lines more naturally
@@ -329,9 +365,6 @@ map <leader>w :w<CR>
 " disable search highlighting
 map <silent> <leader>n :noh<CR>
 
-" easier switch to previous buffer
-map <leader>b :b#<CR>
-
 " delete current buffer without closing split
 " map <leader>D :BD<CR>
 
@@ -340,9 +373,9 @@ nmap <silent> <leader>ev :e $MYVIMRC<CR>
 nmap <silent> <leader>sv :so $MYVIMRC<CR>
 
 " resizing splits more easily
-nmap + :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
+nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
 nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
-nmap + :exe "resize " . ((winheight(0) + 1) * 3/2)<CR>
+nmap _ :exe "resize " . ((winheight(0) + 1) * 3/2)<CR>
 nmap - :exe "resize " . (winheight(0) * 2/3)<CR>
 
 " registers
@@ -364,7 +397,7 @@ vmap cp "+p
 nmap cP "+P
 vmap cP "+P
 
-imap CP a+
+imap +P a+
 
 " easier redrawing - sometimes strange artifacts are visible
 map <leader>r :redraw!<CR>
@@ -398,77 +431,11 @@ map zi :call ChangeFold()<CR>
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
 
+autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
+
+autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
+
 " --------------- VIM MAPPINGS END -------------- }}}
-
-" ---------- PLUGIN MAPPINGS ------ {{{
-
-if version >= 703
-
-  " YCM mappings
-  nnoremap ycg :YcmCompleter GoTo<CR>
-  nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
-  nnoremap ycf :YcmCompleter FixIt<CR>
-  nnoremap ycd :YcmCompleter GetDoc<CR>
-  nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
-  nnoremap ycl :YcmDiags<CR>
-  nnoremap yct :YcmCompleter GetType<CR>
-
-  " NERDTree plugin
-  function! NERDTreeEnableOrToggle()
-    try
-      NERDTreeToggle
-    catch
-      silent! NERDTree
-    endtry
-  endfunction
-
-  map <C-n> :call NERDTreeEnableOrToggle()<CR>
-
-  " Easymotion mappings
-  nmap <leader><leader>t <Plug>(easymotion-t2)
-  nmap <leader><leader>f <Plug>(easymotion-f2)
-  nmap <leader><leader>T <Plug>(easymotion-T2)
-  nmap <leader><leader>F <Plug>(easymotion-F2)
-
-  nmap <leader>t <Plug>(easymotion-t)
-  nmap <leader>f <Plug>(easymotion-f)
-  nmap <leader>T <Plug>(easymotion-T)
-  nmap <leader>F <Plug>(easymotion-F)
-
-endif
-
-" delimitMate mappings
-imap <C-k> <Plug>delimitMateJumpMany
-imap <C-l> <Plug>delimitMateS-Tab
-imap <C-h> <Plug>delimitMateS-BS
-imap <C-j> <C-k><CR>
-
-" no need for mapping, using fzf instead
-let g:ctrlp_map = ''
-
-" EasyAlign mappings
-xmap ga <Plug>(EasyAlign)
-nmap ga <Plug>(EasyAlign)
-
-" --------------- PLUGIN MAPPINGS END -------------- }}}
-
-" ---------- VIM COMMANDS --------- {{{
-
-" open buffer [number] in vertical split
-command! -nargs=? VB vert sb <args>
-
-" buffer delete without closing split
-function! CountListedBuffers()
-  let cnt = 0
-  for nr in range(1, bufnr('$'))
-    if buflisted(nr)
-      let cnt += 1
-    endif
-  endfor
-  return cnt
-endfunction
-
-" --------------- VIM COMMANDS END -------------- }}}
 
 " ---------- PLUGIN COMMANDS ------ {{{
 
@@ -733,53 +700,6 @@ command! -nargs=? Regs call fzf#run({
       \ 'down':    '40%'
       \ })
 
-if executable('fzf')
-  nnoremap <C-p> :Mru<CR>
-  nnoremap <C-b> :BuffersBetterPrompt<CR>
-  nnoremap <C-g><C-g> :GitFilesOrCwd<CR>
-  nnoremap <C-f><C-f> :Files<CR>
-  nnoremap <C-g><C-f> 1<C-g>
-  nnoremap <C-f><C-g> :FilesGitRootOrCwd<CR>
-
-  " good way of detecting if in visual mode
-  " a bit experimental mappings
-  nnoremap RR :Regs<CR>
-  vnoremap RR :<c-u>Regs 1<CR>
-  " inoremap RR  <ESC>:<C-u>Regs<CR>i
-  autocmd FileType vimfiler nunmap RR
-  autocmd FileType vimfiler autocmd BufEnter <buffer> nunmap RR
-  autocmd FileType vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
-else
-  nnoremap <silent> <C-p> :CtrlPMRU<CR>
-  nnoremap <silent> <C-b> :CtrlPBuffer<CR>
-  nnoremap <silent> <C-f> :CtrlP<CR>
-endif
-
-" --------------- PLUGIN COMMANDS END -------------- }}}
-
-
-
-" new stuff, not categorized yet
-
-autocmd FileType cuda set ft=cuda.cpp
-
-set nowrap
-
-set lazyredraw
-
-let g:goyo_width=120
-let g:goyo_height='95%'
-
-nmap MM :Goyo<CR>
-
-nmap LL :Limelight!!<CR>
-autocmd FileType nerdtree silent! nunmap LL
-autocmd FileType nerdtree autocmd BufEnter <buffer> silent! nunmap LL
-autocmd FileType nerdtree autocmd BufLeave <buffer> silent! nmap LL :Limelight!!<CR>
-
-let g:limelight_default_coefficient = 0.54
-let g:limelight_paragraph_span = 1
-
 function! s:goyo_enter()
   if !empty($TMUX)
     silent! !tmux set -w status off
@@ -808,9 +728,76 @@ endfunction
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
 autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
-autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
+" --------------- PLUGIN COMMANDS END -------------- }}}
 
-autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
+" ---------- PLUGIN MAPPINGS ------ {{{
+
+if version >= 703
+
+  " YCM mappings
+  nnoremap ycg :YcmCompleter GoTo<CR>
+  nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
+  nnoremap ycf :YcmCompleter FixIt<CR>
+  nnoremap ycd :YcmCompleter GetDoc<CR>
+  nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
+  nnoremap ycl :YcmDiags<CR>
+  nnoremap yct :YcmCompleter GetType<CR>
+  nnoremap ycr :YcmRestartServer<CR>
+
+  " NERDTree plugin
+  function! NERDTreeEnableOrToggle()
+    try
+      NERDTreeToggle
+    catch
+      silent! NERDTree
+    endtry
+  endfunction
+
+  map <C-n> :call NERDTreeEnableOrToggle()<CR>
+
+endif
+
+" delimitMate mappings
+imap <C-k> <Plug>delimitMateJumpMany
+imap <C-l> <Plug>delimitMateS-Tab
+imap <C-h> <Plug>delimitMateS-BS
+imap <C-j> <C-k><CR>
+
+" no need for mapping, using fzf instead
+let g:ctrlp_map = ''
+
+" EasyAlign mappings
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
+
+nmap MM :Goyo<CR>
+
+if executable('fzf')
+  nnoremap <C-p> :Mru<CR>
+  nnoremap <C-b> :BuffersBetterPrompt<CR>
+  nnoremap <C-g><C-g> :GitFilesOrCwd<CR>
+  nnoremap <C-f><C-f> :Files<CR>
+  nnoremap <C-g><C-f> 1<C-g>
+  nnoremap <C-f><C-g> :FilesGitRootOrCwd<CR>
+
+  " good way of detecting if in visual mode
+  " a bit experimental mappings
+  nnoremap RR :Regs<CR>
+  vnoremap RR :<c-u>Regs 1<CR>
+  " inoremap RR  <ESC>:<C-u>Regs<CR>i
+  autocmd FileType vimfiler nunmap RR
+  autocmd FileType vimfiler autocmd BufEnter <buffer> nunmap RR
+  autocmd FileType vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
+else
+  nnoremap <silent> <C-p> :CtrlPMRU<CR>
+  nnoremap <silent> <C-b> :CtrlPBuffer<CR>
+  nnoremap <silent> <C-f> :CtrlP<CR>
+endif
+
+nmap LL :Limelight!!<CR>
+autocmd FileType nerdtree silent! nunmap LL
+autocmd FileType nerdtree autocmd BufEnter <buffer> silent! nunmap LL
+autocmd FileType nerdtree autocmd BufLeave <buffer> silent! nmap LL :Limelight!!<CR>
 
 autocmd FileType undotree nmap <nowait> <buffer> q :quit<CR>
 autocmd FileType undotree nmap <buffer> <C-j> j
@@ -834,65 +821,6 @@ autocmd FileType unite nunmap <buffer> <C-h>
 autocmd FileType unite nunmap <buffer> <C-k>
 autocmd FileType unite imap <buffer> <C-j> <Plug>(unite_loop_cursor_up)
 autocmd FileType unite imap <buffer> <C-k> <Plug>(unite_loop_cursor_down)
-
-autocmd! FileType vimfiler
-autocmd FileType vimfiler nunmap <buffer> <C-l>
-autocmd FileType vimfiler nmap <buffer> <C-k> <Plug>(vimfiler_loop_cursor_up)
-autocmd FileType vimfiler nmap <buffer> <C-j> <Plug>(vimfiler_loop_cursor_down)
-autocmd FileType vimfiler nmap <buffer> ? <Plug>(vimfiler_help)
-autocmd FileType vimfiler nmap <buffer> o <Plug>(vimfiler_expand_or_edit)
-autocmd FileType vimfiler nmap <buffer> u <Plug>(vimfiler_switch_to_parent_directory)
-autocmd FileType vimfiler nmap <buffer> i <Plug>(vimfiler_cd_input_directory)
-autocmd FileType vimfiler nmap <buffer> C <Plug>(vimfiler_cd_file)
-autocmd FileType vimfiler nmap <buffer> I <Plug>(vimfiler_toggle_visible_ignore_files)
-autocmd FileType vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
-autocmd FileType vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
-autocmd FileType vimfiler nmap <buffer> R <Plug>(vimfiler_redraw_screen)
-
-if version >= 703
-
-  function! VimFilerRemoteOrFind()
-    let file = expand('%')
-    if file =~# '^scp://'
-      let file = substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/\?.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')
-      echo file
-      exec 'VimFilerExplorer ' . file
-    elseif file =~# '^//'
-      let file = b:vimfiler.current_file['action__directory']
-      let file = substitute(file, '\(ssh://[^/]\+\)\(/.*\)', '\1:\2/', '')
-      echo file
-      exec 'VimFilerExplorer ' . file
-    else
-      let dir = ''
-      for buf in filter(range(1, bufnr('$')), 'getbufvar(v:val, "&filetype") ==# "vimfiler" && bufname(v:val) =~# "vimfiler:explorer"')
-        let vimfiler = getbufvar(buf, 'vimfiler')
-        if vimfiler['current_dir'] =~ '^//'
-          let dir = getcwd()
-        endif
-      endfor
-      exec 'VimFilerExplorer -find ' . dir
-    endif
-  endfunction
-
-  map FF :VimFilerExplorer<CR>
-  map <silent> FR :call VimFilerRemoteOrFind()<CR>
-
-endif
-
-autocmd BufRead *
-      \ if expand('%') =~# '^vimfiler:default' |
-      \   let new_name = b:vimfiler.current_file.action__path[4:] |
-      \   let cntr = 1 |
-      \   if bufexists(new_name) |
-      \     while bufexists(new_name . '@' . cntr) |
-      \       let cntr = cntr + 1 |
-      \     endwhile |
-      \     let new_name = new_name . '@' . cntr |
-      \   endif |
-      \   exec 'file ' . new_name |
-      \ endif
-
-let g:tmux_navigator_no_mappings = 1
 
 function! Navigate(dir)
   if a:dir == 'l'
@@ -927,59 +855,63 @@ nnoremap <silent> <C-j> :call Navigate('d')<CR>
 nnoremap <silent> <C-k> :call Navigate('u')<CR>
 nnoremap <silent> <C-l> :call Navigate('r')<CR>
 
-" typing in wrong order may be annoying
-" map q<leader> :q<CR>
-command! Q q
-command! Wq wq
-command! WQ wq
-
-let g:gitgutter_override_sign_column_highlight = 0
-
-" those are better visible
-let g:gitgutter_sign_modified = '#'
-let g:gitgutter_sign_removed = 'v'
-let g:gitgutter_sign_modified_removed = '#v'
-
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
 
-function! s:gitgutter_toggle_wrapper()
-  GitGutterToggle
-  if gitgutter#utility#is_active()
-    echo "GitGutter enabled"
-  else
-    echo "GitGutter disabled"
-  endif
-endfunction
-
-command! GitGutterToggleWrapper call s:gitgutter_toggle_wrapper()
-
-nmap <silent> cog :GitGutterToggleWrapper<CR>
-
-highlight ExtraWhitespace ctermbg=137
-
-function! s:toggle_whitespace_wrapper()
-  ToggleWhitespace
-  if g:better_whitespace_enabled == 1
-    echo "BetterWhitespaces enabled"
-  else
-    echo "BetterWhitespaces disabled"
-  endif
-endfunction
-
-command! ToggleWhitespaceWrapper call s:toggle_whitespace_wrapper()
-
-nmap <silent> co<space> :ToggleWhitespaceWrapper<CR>
 nmap <space>st :StripWhitespace<CR>
 
 map <leader>D :Bdelete<CR>
 
 autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
 
-nmap <leader>ss :source %<CR>
+if version >= 703
 
-" jedi vim overrides <leader>r mapping
-map <leader><leader>r :redraw!<CR>
+  function! VimFilerRemoteOrFind()
+    let file = expand('%')
+    if file =~# '^scp://'
+      let file = substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/\?.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')
+      echo file
+      exec 'VimFilerExplorer ' . file
+    elseif file =~# '^//'
+      let file = b:vimfiler.current_file['action__directory']
+      let file = substitute(file, '\(ssh://[^/]\+\)\(/.*\)', '\1:\2/', '')
+      echo file
+      exec 'VimFilerExplorer ' . file
+    else
+      let dir = ''
+      for buf in filter(range(1, bufnr('$')), 'getbufvar(v:val, "&filetype") ==# "vimfiler" && bufname(v:val) =~# "vimfiler:explorer"')
+        let vimfiler = getbufvar(buf, 'vimfiler')
+        if vimfiler['current_dir'] =~ '^//'
+          let dir = getcwd()
+        endif
+      endfor
+      exec 'VimFilerExplorer -find ' . dir
+    endif
+  endfunction
+
+  map FF :VimFilerExplorer<CR>
+  map <silent> FR :call VimFilerRemoteOrFind()<CR>
+
+  autocmd! FileType vimfiler
+  autocmd FileType vimfiler nunmap <buffer> <C-l>
+  autocmd FileType vimfiler nmap <buffer> <C-k> <Plug>(vimfiler_loop_cursor_up)
+  autocmd FileType vimfiler nmap <buffer> <C-j> <Plug>(vimfiler_loop_cursor_down)
+  autocmd FileType vimfiler nmap <buffer> ? <Plug>(vimfiler_help)
+  autocmd FileType vimfiler nmap <buffer> o <Plug>(vimfiler_expand_or_edit)
+  autocmd FileType vimfiler nmap <buffer> u <Plug>(vimfiler_switch_to_parent_directory)
+  autocmd FileType vimfiler nmap <buffer> i <Plug>(vimfiler_cd_input_directory)
+  autocmd FileType vimfiler nmap <buffer> C <Plug>(vimfiler_cd_file)
+  autocmd FileType vimfiler nmap <buffer> I <Plug>(vimfiler_toggle_visible_ignore_files)
+  autocmd FileType vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
+  autocmd FileType vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
+  autocmd FileType vimfiler nmap <buffer> R <Plug>(vimfiler_redraw_screen)
+
+endif
+
+" --------------- PLUGIN MAPPINGS END -------------- }}}
+
+
+" new stuff, not categorized yet
 
 function! s:is_remote()
   let file = expand('%')
@@ -1106,17 +1038,10 @@ nnoremap <silent> , :call MoveToPrevTab()<CR>
 nnoremap <silent> > :call MoveToNextTab(1)<CR>
 nnoremap <silent> < :call MoveToPrevTab(1)<CR>
 
-nnoremap 9 gT
 nnoremap h gT
-nnoremap <silent> ( :tabm-1<CR>
 nnoremap <silent> H :tabm-1<CR>
-nnoremap 0 gt
 nnoremap l gt
-nnoremap <silent> ) :tabm+1<CR>
 nnoremap <silent> L :tabm+1<CR>
-
-" refresh <nowait> ESC mappings
-runtime after/plugin/ESCNoWaitMappings.vim
 
 " python << EOF
 " import sys
@@ -1140,7 +1065,8 @@ for [ft, files] in items(s:special_files)
   endfor
 endfor
 
-imap jj 
+inoremap jj 
+cnoremap jj 
 
 function! DeleteHidden()
   let visible = []
@@ -1154,48 +1080,13 @@ endfunction
 
 command! DeleteHidden call DeleteHidden()
 
-function! ToggleHlCurrLine()
-  if !exists('w:match_ids')
-    let w:match_ids = {}
-  endif
-  if !exists('w:match_ids[' . line('.') . ']')
-    let w:match_ids[line('.')] = matchadd('Search', '\%' . line('.') . 'l')
-  else
-    call matchdelete(w:match_ids[line('.')])
-    unlet w:match_ids[line('.')]
-  endif
-endfunction
-
-function! ToggleHlCurrWord()
-  if !exists('w:match_ids_words')
-    let w:match_ids_words = {}
-  endif
-  if !exists('w:match_ids_words["' . line('.') . expand('<cword>') . '"]')
-    let w:match_ids_words[line('.') . expand('<cword>')] = matchadd('Search', '\%' . line('.') . 'l' . expand('<cword>'))
-  else
-    call matchdelete(w:match_ids_words[line('.') . expand('<cword>')])
-    unlet w:match_ids_words[line('.') . expand('<cword>')]
-  endif
-endfunction
-
-
-function! UnHlAll()
-  let w:match_ids = {}
-  let w:match_ids_words = {}
-  call clearmatches()
-endfunction
-
-nmap <silent> <leader>ll :call ToggleHlCurrLine()<CR>
-nmap <silent> <leader>lw :call ToggleHlCurrWord()<CR>
-nmap <silent> <leader>ln :call UnHlAll()<CR>
-
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <M-b> <C-Left>
 cnoremap <M-f> <C-Right>
 
 autocmd CmdwinEnter : noremap <buffer> <CR> <CR>q:
-autocmd CmdwinEnter : imap <buffer> <CR> <CR>q:i
+autocmd CmdwinEnter : imap <buffer> <CR> <CR>q:
 autocmd CmdwinEnter * nnoremap <buffer> q :quit<CR>
 
 vmap K k
@@ -1250,7 +1141,7 @@ if has("cscope")
     function! s:maybe_open_qf()
         let qf = getqflist()
         if len(qf) > 1
-            copen
+            bot copen
             wincmd p
         endif
     endfunction
@@ -1276,8 +1167,6 @@ let g:NERDMenuMode = 3
 let g:NERDRemoveExtraSpaces = 1
 let g:NERDSpaceDelims = 1
 let g:NERDCompactSexyComs = 1
-nmap gc <leader>c
-xmap gc <leader>c
 
 let g:cpp_experimental_template_highlight = 1
 
@@ -1292,3 +1181,63 @@ let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")
 let g:ycm_warning_symbol = '>'
 let g:ycm_error_symbol = '>>'
 let g:ycm_collect_identifiers_from_tags_files = 1
+
+set shortmess+=c
+
+nmap <leader>p p
+nmap <leader>x x
+nmap <leader><tab> :b#<CR>
+nmap , <space>
+
+nmap <leader>; :
+
+
+if version >= 703
+
+  " Easymotion mappings
+  " nmap <leader><leader>t <Plug>(easymotion-t2)
+  " nmap <leader><leader>f <Plug>(easymotion-f2)
+  " nmap <leader><leader>T <Plug>(easymotion-T2)
+  " nmap <leader><leader>F <Plug>(easymotion-F2)
+
+  " nmap <leader>t <Plug>(easymotion-t)
+  " nmap <leader>f <Plug>(easymotion-f)
+  " nmap <leader>T <Plug>(easymotion-T)
+  " nmap <leader>F <Plug>(easymotion-F)
+
+  nmap <leader>f <Plug>(easymotion-sn-to)
+
+  let g:EasyMotion_timeout_len = 400
+  let g:EasyMotion_off_screen_search = 0
+  let g:EasyMotion_inc_highlight = 1
+  let g:EasyMotion_history_highlight = 0
+
+endif
+
+" typing in wrong order may be annoying
+" map q<leader> :q<CR>
+command! Q q
+command! Wq wq
+command! WQ wq
+command! W w
+
+nnoremap <leader>z z
+
+nmap <C-g><C-]> g<C-]>
+
+" easier switch to previous buffer
+nmap <leader>B :b#<CR>
+nmap <leader>b <C-b>
+
+set relativenumber
+
+nmap <M-f> :normal A fo<C-v><Esc>e<C-v><Esc>j%ofc<C-v><Esc>e<C-v><Esc><C-v><C-o>k^<CR>:foldc<CR>
+
+" refresh <nowait> ESC mappings
+runtime after/plugin/ESCNoWaitMappings.vim
+
+nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
+nnoremap co<space> :<C-R>=b:better_whitespace_enabled ? 'DisableWhitespace' : 'EnableWhitespace'<CR><CR>
+nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGutterEnable'<CR><CR>
+
+nmap <leader>F <Plug>(easymotion-bd-n)
