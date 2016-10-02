@@ -775,9 +775,8 @@ nmap MM :Goyo<CR>
 if executable('fzf')
   nnoremap <C-p> :Mru<CR>
   nnoremap <C-b> :BuffersBetterPrompt<CR>
-  nnoremap <C-g><C-g> :GitFilesOrCwd<CR>
+  nnoremap <leader>g :GitFilesOrCwd<CR>
   nnoremap <C-f><C-f> :Files<CR>
-  nnoremap <C-g><C-f> 1<C-g>
   nnoremap <C-f><C-g> :FilesGitRootOrCwd<CR>
 
   " good way of detecting if in visual mode
@@ -1223,8 +1222,6 @@ command! W w
 
 nnoremap <leader>z z
 
-nmap <C-g><C-]> g<C-]>
-
 " easier switch to previous buffer
 nmap <leader>B :b#<CR>
 nmap <leader>b <C-b>
@@ -1241,3 +1238,5 @@ nnoremap co<space> :<C-R>=b:better_whitespace_enabled ? 'DisableWhitespace' : 'E
 nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGutterEnable'<CR><CR>
 
 nmap <leader>F <Plug>(easymotion-bd-n)
+
+nmap <leader>= =
