@@ -1214,7 +1214,7 @@ nnoremap <leader>z z
 nmap <leader>B :b#<CR>
 nmap <leader>b <C-b>
 
-set relativenumber
+silent! set relativenumber
 
 nmap <M-f> :normal A fo<C-v><Esc>e<C-v><Esc>j%ofc<C-v><Esc>e<C-v><Esc><C-v><C-o>k^<CR>:foldc<CR>
 
