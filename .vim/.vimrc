@@ -1067,18 +1067,6 @@ endfor
 inoremap jj 
 cnoremap jj 
 
-function! DeleteHidden()
-  let visible = []
-  for tab in range(1, tabpagenr('$'))
-    call extend(visible, tabpagebuflist(tab))
-  endfor
-  for buf in filter(range(1, bufnr('$')), 'bufexists(v:val) && index(visible, v:val) == -1')
-    exec 'bwipeout ' . buf
-  endfor
-endfunction
-
-command! DeleteHidden call DeleteHidden()
-
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap <M-b> <C-Left>
@@ -1181,7 +1169,7 @@ let g:ycm_warning_symbol = '>'
 let g:ycm_error_symbol = '>>'
 let g:ycm_collect_identifiers_from_tags_files = 1
 
-set shortmess+=c
+silent! set shortmess+=c
 
 nmap <leader>p p
 nmap <leader>x x
