@@ -25,6 +25,9 @@ if v:version >= 703
     Plug 'davidhalter/jedi-vim'
   endif
 endif
+if v:version >= 740
+  Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+endif
 Plug 'kien/ctrlp.vim'
 Plug 'bling/vim-airline'
 Plug 'hynek/vim-python-pep8-indent'
@@ -44,7 +47,6 @@ Plug 'moll/vim-bbye'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'tpope/vim-sleuth'
 Plug 'junegunn/limelight.vim'
-Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
 Plug 'majutsushi/tagbar'
