@@ -2,4 +2,8 @@
 " alt + key send's esc sequence + key, so vim waits for key after esc when
 " something is mapped to alt + key, don't want it
 silent! nunmap 
-nnoremap <nowait>  
+silent! iunmap 
+silent! cunmap 
+nnoremap <nowait>  
+inoremap <nowait>  
+cnoremap <nowait>  <C-c>

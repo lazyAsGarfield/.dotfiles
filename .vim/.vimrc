@@ -347,6 +347,7 @@ highlight ExtraWhitespace ctermbg=137
 
 " change leader key
 let mapleader=" "
+let maplocalleader=" "
 
 " open/close quickfix/location-list window
 noremap [wq :bot copen<CR>
@@ -969,15 +970,10 @@ endfunction
 
 autocmd FileType qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
 
-" trick in order to vim not to delay esc in insert mode
-set <M-s>=s
-set <M-e>=e
-set <M-f>=f
-set <M-b>=b
-let g:UltiSnipsExpandTrigger = '<M-e>'
-let g:UltiSnipsListSnippets = '<M-s>'
-let g:UltiSnipsJumpForwardTrigger = '<M-f>'
-let g:UltiSnipsJumpBackwardTrigger = '<M-b>'
+let g:UltiSnipsExpandTrigger = 'e'
+let g:UltiSnipsListSnippets = 's'
+let g:UltiSnipsJumpForwardTrigger = 'f'
+let g:UltiSnipsJumpBackwardTrigger = 'b'
 
 function! MoveToPrevTab(...)
   let l:line = line('.')
@@ -1066,13 +1062,10 @@ for [ft, files] in items(s:special_files)
   endfor
 endfor
 
-inoremap jj 
-cnoremap jj 
-
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
-cnoremap <M-b> <C-Left>
-cnoremap <M-f> <C-Right>
+cnoremap b <C-Left>
+cnoremap f <C-Right>
 
 autocmd CmdwinEnter : noremap <buffer> <CR> <CR>q:
 autocmd CmdwinEnter : imap <buffer> <CR> <CR>q:
@@ -1218,10 +1211,12 @@ nmap <leader>b <C-b>
 
 silent! set relativenumber
 
-nmap <M-f> :normal A fo<C-v><Esc>e<C-v><Esc>j%ofc<C-v><Esc>e<C-v><Esc><C-v><C-o>k^<CR>:foldc<CR>
+nmap f :normal A fo<C-v><Esc>e<C-v><Esc>j%ofc<C-v><Esc>e<C-v><Esc><C-v><C-o>k^<CR>:foldc<CR>
 
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
+
+inoremap jj 
 
 nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
 nnoremap co<space> :<C-R>=b:better_whitespace_enabled ? 'DisableWhitespace' : 'EnableWhitespace'<CR><CR>
