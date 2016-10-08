@@ -215,6 +215,13 @@ setup_zshrc()
   [[ -n $changed ]] && echo
 }
 
+setup_gdb()
+{
+  if [[ $(echo_read "Configure gdb? y/[n]: ") == "y" ]]; then
+    ask_and_link "$target_dir/.gdbinit" "$HOME/.gdbinit"
+  fi
+}
+
 install_version_utils()
 {
   if [[ ! -d $1 ]]; then
@@ -304,6 +311,8 @@ setup_git
 setup_bashrc
 
 setup_zshrc
+
+setup_gdb
 
 if [[ -d "$target_dir"/.fzf ]] && [[ $(echo_read "Install fzf? y/[n]: ") == "y" ]]; then
   echo "Installing fzf..."
