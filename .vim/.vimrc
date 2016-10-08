@@ -1025,9 +1025,7 @@ endfunc
 
 nnoremap <silent> t :tabnew<CR>
 nnoremap <silent> x :sp<CR>
-nnoremap <silent> X :new<CR>
 nnoremap <silent> v :vsp<CR>
-nnoremap <silent> V :vnew<CR>
 
 nnoremap <silent> . :call MoveToNextTab()<CR>
 nnoremap <silent> , :call MoveToPrevTab()<CR>
@@ -1225,3 +1223,5 @@ nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGut
 nmap <leader>F <Plug>(easymotion-bd-n)
 
 nmap <leader>= =
+
+let g:NERDTreeCascadeSingleChildDir = 0
