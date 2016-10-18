@@ -108,11 +108,13 @@ setup_vim()
         __NO_YCM__=1
         export __NO_YCM__
         add_lines "__NO_YCM__=1"$'\n'"export __NO_YCM__" $HOME/.bashrc
+        add_lines "__NO_YCM__=1"$'\n'"export __NO_YCM__" $HOME/.zshrc
       else
         if [[ $(echo_read "With semantic completers? [y]/n: ") == "n" ]]; then
           __NO_COMPL__=1
           export __NO_COMPL__
           add_lines "__NO_COMPL__=1"$'\n'"export __NO_COMPL__" $HOME/.bashrc
+          add_lines "__NO_COMPL__=1"$'\n'"export __NO_COMPL__" $HOME/.zshrc
         fi
       fi
 
