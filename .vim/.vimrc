@@ -25,7 +25,7 @@ if v:version >= 703
     Plug 'davidhalter/jedi-vim'
   endif
 endif
-if v:version >= 740
+if v:version >= 704
   Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 endif
 Plug 'kien/ctrlp.vim'
