@@ -6,3 +6,4 @@ xterm-256color|xterm-256color with italics and highlighting,
   smso=\E[7m,
 	use=xterm-256color,
 
+# vim: ft=terminfo

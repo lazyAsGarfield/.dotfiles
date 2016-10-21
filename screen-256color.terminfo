@@ -6,3 +6,4 @@ screen-256color|screen-256color with italics and highlighting,
   smso=\E[7m,
 	use=screen-256color,
 
+# vim: ft=terminfo

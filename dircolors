@@ -264,3 +264,5 @@ EXEC 01;32
 #.html 00;33
 #.shtml 00;33
 #.xml 00;33
+
+# vim: ft=dircolors

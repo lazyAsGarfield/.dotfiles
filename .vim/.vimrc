@@ -362,18 +362,8 @@ noremap k gk
 " easier quitting
 map <leader>q :q<CR>
 
-" save current file
-map <leader>w :w<CR>
-
 " disable search highlighting
 map <silent> <leader>n :noh<CR>
-
-" delete current buffer without closing split
-" map <leader>D :BD<CR>
-
-" quickly edit/reload the vimrc file
-nmap <silent> <leader>ev :e $MYVIMRC<CR>
-nmap <silent> <leader>sv :so $MYVIMRC<CR>
 
 " resizing splits more easily
 nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
@@ -401,9 +391,6 @@ nmap cP "+P
 vmap cP "+P
 
 imap +P a+
-
-" easier redrawing - sometimes strange artifacts are visible
-map <leader>r :redraw!<CR>
 
 " substitute all occurences of text selected in visual mode
 vnoremap <C-r><C-r> "hy:%s/<C-r>h/<C-r>h/g<left><left>
@@ -784,8 +771,8 @@ if executable('fzf')
 
   " good way of detecting if in visual mode
   " a bit experimental mappings
-  nnoremap RR :Regs<CR>
-  vnoremap RR :<c-u>Regs 1<CR>
+  nnoremap <leader>l :Regs<CR>
+  vnoremap <leader>l :<c-u>Regs 1<CR>
   " inoremap RR  <ESC>:<C-u>Regs<CR>i
   autocmd FileType vimfiler nunmap RR
   autocmd FileType vimfiler autocmd BufEnter <buffer> nunmap RR
@@ -859,8 +846,6 @@ nnoremap <silent> <C-l> :call Navigate('r')<CR>
 
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
-
-nmap <space>st :StripWhitespace<CR>
 
 map <leader>D :Bdelete<CR>
 
@@ -1038,28 +1023,6 @@ nnoremap <silent> H :tabm-1<CR>
 nnoremap l gt
 nnoremap <silent> L :tabm+1<CR>
 
-" python << EOF
-" import sys
-" import vim
-" for p in sys.path:
-"   vim.command('echo "%s"' % p)
-" EOF
-
-let s:special_files = {
-      \ 'sh': [
-      \ resolve(expand('$DOTFILES_DIR/.shellrc'))
-      \ ],
-      \ 'conf': [
-      \ resolve(expand('$DOTFILES_DIR/.tmux-common.conf'))
-      \ ]
-      \ }
-
-for [ft, files] in items(s:special_files)
-  for f in files
-    exec 'autocmd BufRead' f 'set ft=' . ft
-  endfor
-endfor
-
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
 cnoremap b <C-Left>
@@ -1225,3 +1188,17 @@ nmap <leader>F <Plug>(easymotion-bd-n)
 nmap <leader>= =
 
 let g:NERDTreeCascadeSingleChildDir = 0
+
+" save current file
+map <leader>w :w<CR>
+
+map <leader>2 <C-w>
+
+" quickly edit/reload the vimrc file
+nmap <silent> <leader>ev :e $MYVIMRC<CR>
+nmap <silent> <leader>sv :so $MYVIMRC<CR>
+
+nmap <space>t :StripWhitespace<CR>
+
+" easier redrawing - sometimes strange artifacts are visible
+map <leader><leader>r :redraw!<CR>

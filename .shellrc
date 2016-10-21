@@ -208,3 +208,4 @@ __dir_history()
   fi
 }
 
+# vim: ft=sh
