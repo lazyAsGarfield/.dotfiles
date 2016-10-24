@@ -273,7 +273,7 @@ compinit
 
 compdef _precommand detach
 
-ZLE_REMOVE_SUFFIX_CHARS="*"
+ZLE_REMOVE_SUFFIX_CHARS=""
 # }}}
 
 # autosuggestions {{{

@@ -290,7 +290,7 @@ if [[ -d $target_dir/.git ]]; then
     exec "$target_dir/install.sh"
   fi
 else
-  if [[ $(echo_read "Clone repo? y/[n]: ") == "y" ]]; then
+  if [[ $(echo_read "Clone repo? [y]/n: ") != "n"* ]]; then
     msg_and_run "Cloning" git clone --recursive http://github.com/bmalkus/.dotfiles "$target_dir"
     echo
   fi
