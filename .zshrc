@@ -172,7 +172,7 @@ _emacs_bindings()
   bindkey -M menuselect '^G' .send-break
 }
 
-_vi_bindings()
+_hybrid_bindings()
 {
   bindkey -v
 
@@ -200,6 +200,8 @@ _vi_bindings()
   bindkey -M viins '^ '                 autosuggest-accept
   bindkey -M viins '^[f'                forward-word
   bindkey -M viins '^[b'                backward-word
+  bindkey -M viins '^F'                 forward-char
+  bindkey -M viins '^B'                 backward-char
 
   bindkey -M viins '^A'                 beginning-of-line
   bindkey -M viins '^E'                 end-of-line
@@ -234,13 +236,13 @@ _vi_bindings()
 }
 
 _emacs_bindings
-_vi_bindings
+_hybrid_bindings
 
 tog()
 {
   [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
     _emacs_bindings ||
-    _vi_bindings
+    _hybrid_bindings
 }
 
 autoload -Uz add-zsh-hook
