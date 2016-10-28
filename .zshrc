@@ -33,8 +33,8 @@ __prompt_command()
     fi
   fi
 
-  local git_branch=$(__get_git_branch)
-  local virtual_env=$(__get_virtual_env)
+  local git_branch="$(__get_git_branch)"
+  local virtual_env="$(__get_virtual_env)"
 
   local vim_norm_prompt="${LIGHT_YELLOW}[N]$NORMAL"
   local vim_ins_prompt="${LIGHT_BLUE}[I]$NORMAL"
