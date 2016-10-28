@@ -1,5 +1,21 @@
 #!/bin/bash
 
+version_lte()
+{
+  n1=$(echo "$1" | sed -r 's/(\.0+)+$//' | sed -r 's/(\.|^)0+([0-9]+)/\1\2/g')
+  n2=$(echo "$2" | sed -r 's/(\.0+)+$//' | sed -r 's/(\.|^)0+([0-9]+)/\1\2/g')
+
+  [[ "$n1" == "$(echo -e "$n1\n$n2" | sort -V | head -n1)" ]]
+}
+
+version_lt()
+{
+  n1=$(echo "$1" | sed -r 's/(\.0+)+$//' | sed -r 's/(\.|^)0+([0-9]+)/\1\2/g')
+  n2=$(echo "$2" | sed -r 's/(\.0+)+$//' | sed -r 's/(\.|^)0+([0-9]+)/\1\2/g')
+
+  version_lte $n1 $n2 && [[ "$n1" != "$n2" ]]
+}
+
 regex='^(([0-9]+\.?)+[A-Za-z]?)\s*([^0-9. \t]+)\s*(([0-9]+\.?)+[A-Za-z]?)$'
 
 v1="$(sed -nr 's/'"$regex"'/\1/p' <<< "$1")"
@@ -8,30 +24,27 @@ cmp="$(sed -r 's/'"$regex"'/\3/' <<< "$1")"
 
 [[ -z $v1 || -z $v2 || -z $cmp ]] &&
   echo "Could not parse: $1" >&2 &&
-  exit 1
+  exit -1
 
 if [[ $cmp == "<" ]]; then
   version_lt "$v1" "$v2" &&
-    echo 1 ||
-    echo 0
+    exit 0
 elif [[ $cmp == "<=" ]]; then
   version_lte "$v1" "$v2" &&
-    echo 1 ||
-    echo 0
+    exit 0
 elif [[ $cmp == "==" || $cmp == "=" ]]; then
   version_lte "$v1" "$v2" && ! version_lt "$v1" "$v2" &&
-    echo 1 ||
-    echo 0
+    exit 0
 elif [[ $cmp == ">=" ]]; then
   version_lte "$v2" "$v1" &&
-    echo 1 ||
-    echo 0
+    exit 0
 elif [[ $cmp == ">" ]]; then
   version_lt "$v2" "$v1" &&
-    echo 1 ||
-    echo 0
+    exit 0
 else
   echo "Invalid comparator: $cmp" >&2 &&
-  exit 1
+  exit -1
 fi
+
+exit 1
 

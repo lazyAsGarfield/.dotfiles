@@ -234,9 +234,16 @@ install_version_utils()
   if [[ ! -d $1 ]]; then
     msg_and_run "Creating $1" mkdir -p "$1"
   fi
-  msg_and_run "Linking version_lt" ln -s "$target_dir/version_lt" "$HOME/.local/bin"
-  msg_and_run "Linking version_lte" ln -s "$target_dir/version_lte" "$HOME/.local/bin"
-  msg_and_run "Linking version_cmp" ln -s "$target_dir/version_cmp" "$HOME/.local/bin"
+  msg_and_run "Linking version_cmp" ln -s "$target_dir/version_cmp" $version_utils_dest
+
+  if [[ -h ${version_utils_dest}/version_lt && ! -e ${version_utils_dest}/version_lt ]]; then
+    echo "Removing old version_lt link"
+    unlink ${version_utils_dest}/version_lt
+  fi
+  if [[ -h ${version_utils_dest}/version_lte && ! -e ${version_utils_dest}/version_lte ]]; then
+    echo "Removing old version_lte link"
+    unlink ${version_utils_dest}/version_lte
+  fi
 
   if [[ $(echo_read "Add $1 to \$PATH in $HOME/.bash_profile? y/[n]: ") == "y" ]]; then
     add_lines "$PATH_lines" "$HOME/.bash_profile"
@@ -272,7 +279,7 @@ bashrc_line="source \$DOTFILES_DIR/.bashrc"
 zshrc_line="source \$DOTFILES_DIR/.zshrc"
 dir_utils_line="source \$DOTFILES_DIR/dir_utils.sh"
 
-version_utils_dest='$HOME/.local/bin'
+version_utils_dest="$HOME/.local/bin"
 
 PATH_lines="PATH=\"\$PATH\":\"$version_utils_dest\""$'\n'"export PATH"
 
@@ -346,7 +353,7 @@ fi
 
 [[ -n $changed ]] && echo
 
-q="Create link to version compare utils in $(eval "echo $version_utils_dest")? y/[n]: "
+q="Create link to version_cmp in $(eval "echo $version_utils_dest")? y/[n]: "
 if [[ $(echo_read "$q") == "y" ]]; then
   install_version_utils $(eval "echo $version_utils_dest")
 fi
