@@ -15,10 +15,10 @@ if v:version >= 703
   Plug 'Shougo/unite.vim'
   Plug 'Shougo/neossh.vim'
   Plug 'Shougo/vimfiler.vim'
-  Plug 'easymotion/vim-easymotion'
+  Plug 'bmalkus/vim-easymotion'
   if empty($__NO_YCM__)
     if empty($__NO_COMPL__)
-      Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --omnisharp-completer --gocode-completer' }
+      Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --omnisharp-completer' }
     else
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
     endif
