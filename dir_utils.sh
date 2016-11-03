@@ -36,9 +36,9 @@ function saved()
       return
     fi
     for dir in "$@"; do
-      if [[ $dir =~ ^-[1-9][0-9]*$ ]]; then
+      if [[ $dir =~ ^--?[1-9][0-9]*$ ]]; then
         local num="${dir:1}"
-        if [[ $num -gt ${#__cd_history__[@]} ]]; then
+        if [[ ${num#-} -gt ${#__cd_history__[@]} ]]; then
           echo "No entry $num in history"
           return
         else
