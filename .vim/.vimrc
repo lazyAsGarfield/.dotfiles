@@ -102,6 +102,11 @@ if ( &term =~ '^screen' || &term =~ '^tmux' ) && exists('$TMUX')
   exec "set <F12>=\e[24;*~"
 endif
 
+" mouse fix for columns > 220
+if has('mouse_sgr')
+  set ttymouse=sgr
+endif
+
 " enable syntax highlighting
 syntax on
 
