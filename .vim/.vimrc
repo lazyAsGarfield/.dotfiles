@@ -973,10 +973,11 @@ function! MoveToPrevTab(...)
   endif
   "preparing new window
   let l:last = tabpagenr() == tabpagenr('$')
+  let l:only = winnr('$') == 1
   let l:cur_buf = bufnr('%')
   if tabpagenr() != 1 && a:0 == 0
     close!
-    if !l:last
+    if (!l:last && l:only) || !l:only
       tabprev
     endif
     vsp
@@ -1046,11 +1047,13 @@ set cinoptions+=g0
 set cinoptions+=N-s
 set cinoptions+=t0
 set cinoptions+=(0
-set cinoptions+=U1
-set cinoptions+=W2s
-set cinoptions+=k3s
-set cinoptions+=m1
-set cinoptions+=M1
+set cinoptions+=u0
+" set cinoptions+=U1
+" set cinoptions+=w1
+set cinoptions+=W1s
+set cinoptions+=k2s
+" set cinoptions+=m1
+" set cinoptions+=M1
 set cinoptions+=j1
 set cinoptions+=J1
 
@@ -1188,7 +1191,7 @@ nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
 nnoremap co<space> :<C-R>=b:better_whitespace_enabled ? 'DisableWhitespace' : 'EnableWhitespace'<CR><CR>
 nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGutterEnable'<CR><CR>
 
-nmap <leader>F <Plug>(easymotion-bd-n)
+nmap <leader>N <Plug>(easymotion-bd-n)
 
 nmap <leader>= =
 
@@ -1207,3 +1210,50 @@ nmap <space>t :StripWhitespace<CR>
 
 " easier redrawing - sometimes strange artifacts are visible
 map <leader><leader>r :redraw!<CR>
+
+" Don't indent namespace and template
+function! CppNoNamespaceAndTemplateIndent()
+  let l:cline_num = line('.')
+  let l:cline = getline(l:cline_num)
+  let l:pline_num = prevnonblank(l:cline_num - 1)
+  let l:pline = getline(l:pline_num)
+  while l:pline =~# '\(^\s*{\s*\|^\s*//\|^\s*/\*\|\*/\s*$\)'
+    let l:pline_num = prevnonblank(l:pline_num - 1)
+    let l:pline = getline(l:pline_num)
+  endwhile
+  let l:retv = cindent('.')
+  let l:pindent = indent(l:pline_num)
+
+  " experimental
+  if l:cline =~# '^\s*>\s*$' &&
+    (
+    l:pline =~# '^\s*template' ||
+    l:pline =~# '^\s*typename' ||
+    l:pline =~# '^\s*class'
+    )
+    return l:pindent
+  endif
+
+  if l:pline =~# '^\s*template\s*<.*>\s*$'
+    let l:retv = l:pindent
+  elseif l:pline =~# '^\s*template\s*<\s*$'
+    let l:retv = l:pindent + &shiftwidth
+  elseif l:pline =~# '^\s*template\s*\s*$'
+    let l:retv = l:pindent
+  elseif l:pline =~# '\s*typename\s*.*,\s*$'
+    let l:retv = l:pindent
+  elseif l:cline =~# '^\s*>\s*$'
+    let l:retv = l:pindent - &shiftwidth
+  elseif l:pline =~# '\s*typename\s*.*>\s*$'
+    let l:retv = l:pindent - &shiftwidth
+  elseif l:pline =~# '^\s*namespace.*'
+    let l:retv = 0
+  endif
+  return l:retv
+endfunction
+
+if has("autocmd")
+    autocmd FileType cpp setlocal indentexpr=CppNoNamespaceAndTemplateIndent()
+endif
+
+" let g:loaded_youcompleteme = 1
