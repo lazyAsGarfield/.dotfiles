@@ -12,9 +12,6 @@ Plug 'tpope/vim-surround'
 if v:version >= 703
   Plug 'scrooloose/nerdtree'
   Plug 'mbbill/undotree'
-  Plug 'Shougo/unite.vim'
-  Plug 'Shougo/neossh.vim'
-  Plug 'Shougo/vimfiler.vim'
   Plug 'bmalkus/vim-easymotion'
   if empty($__NO_YCM__)
     if empty($__NO_COMPL__)
@@ -322,19 +319,6 @@ let g:goyo_height='95%'
 let g:limelight_default_coefficient = 0.54
 let g:limelight_paragraph_span = 1
 
-autocmd BufRead *
-      \ if expand('%') =~# '^vimfiler:default' |
-      \   let new_name = b:vimfiler.current_file.action__path[4:] |
-      \   let cntr = 1 |
-      \   if bufexists(new_name) |
-      \     while bufexists(new_name . '@' . cntr) |
-      \       let cntr = cntr + 1 |
-      \     endwhile |
-      \     let new_name = new_name . '@' . cntr |
-      \   endif |
-      \   exec 'file ' . new_name |
-      \ endif
-
 let g:tmux_navigator_no_mappings = 1
 
 let g:gitgutter_override_sign_column_highlight = 0
@@ -500,9 +484,6 @@ command! -bang FilesGitRootOrCwd call s:all_files_git_root_or_cwd(<bang>0)
 " (similar to CtrlP plugin)
 function! s:relpath(filepath_or_name)
   let fullpath = fnamemodify(a:filepath_or_name, ':p')
-  " if fullpath =~ '^(ssh|ftp)://'
-  "   fullpath = getcwd()
-  " endif
   let save_cwd = fnameescape(getcwd())
   let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
   try
@@ -778,9 +759,6 @@ if executable('fzf')
   " a bit experimental mappings
   nnoremap <leader>l :Regs<CR>
   vnoremap <leader>l :<c-u>Regs 1<CR>
-  autocmd FileType vimfiler nunmap RR
-  autocmd FileType vimfiler autocmd BufEnter <buffer> nunmap RR
-  autocmd FileType vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
 else
   nnoremap <silent> <C-p> :CtrlPMRU<CR>
   nnoremap <silent> <C-b> :CtrlPBuffer<CR>
@@ -808,12 +786,6 @@ let g:NERDTreeMapJumpLastChild = '<C-f>'
 let g:NERDTreeMapJumpFirstChild = '<C-b>'
 let g:NERDTreeMapJumpNextSibling = 'J'
 let g:NERDTreeMapJumpPrevSibling = 'K'
-
-autocmd! FileType unite
-autocmd FileType unite nunmap <buffer> <C-h>
-autocmd FileType unite nunmap <buffer> <C-k>
-autocmd FileType unite imap <buffer> <C-j> <Plug>(unite_loop_cursor_up)
-autocmd FileType unite imap <buffer> <C-k> <Plug>(unite_loop_cursor_down)
 
 function! Navigate(dir)
   if a:dir == 'l'
@@ -854,50 +826,6 @@ nmap ]h <Plug>GitGutterNextHunk
 map <leader>D :Bdelete<CR>
 
 autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
-
-if version >= 703
-
-  function! VimFilerRemoteOrFind()
-    let file = expand('%')
-    if file =~# '^scp://'
-      let file = substitute(substitute(expand('%:p:h'), 'scp://\([^/]\+\)\(/\?.*\)', 'ssh://\1:\2/', ''), '/\~/', '/', '')
-      echo file
-      exec 'VimFilerExplorer ' . file
-    elseif file =~# '^//'
-      let file = b:vimfiler.current_file['action__directory']
-      let file = substitute(file, '\(ssh://[^/]\+\)\(/.*\)', '\1:\2/', '')
-      echo file
-      exec 'VimFilerExplorer ' . file
-    else
-      let dir = ''
-      for buf in filter(range(1, bufnr('$')), 'getbufvar(v:val, "&filetype") ==# "vimfiler" && bufname(v:val) =~# "vimfiler:explorer"')
-        let vimfiler = getbufvar(buf, 'vimfiler')
-        if vimfiler['current_dir'] =~ '^//'
-          let dir = getcwd()
-        endif
-      endfor
-      exec 'VimFilerExplorer -find ' . dir
-    endif
-  endfunction
-
-  map FF :VimFilerExplorer<CR>
-  map <silent> FR :call VimFilerRemoteOrFind()<CR>
-
-  autocmd! FileType vimfiler
-  autocmd FileType vimfiler nunmap <buffer> <C-l>
-  autocmd FileType vimfiler nmap <buffer> <C-k> <Plug>(vimfiler_loop_cursor_up)
-  autocmd FileType vimfiler nmap <buffer> <C-j> <Plug>(vimfiler_loop_cursor_down)
-  autocmd FileType vimfiler nmap <buffer> ? <Plug>(vimfiler_help)
-  autocmd FileType vimfiler nmap <buffer> o <Plug>(vimfiler_expand_or_edit)
-  autocmd FileType vimfiler nmap <buffer> u <Plug>(vimfiler_switch_to_parent_directory)
-  autocmd FileType vimfiler nmap <buffer> i <Plug>(vimfiler_cd_input_directory)
-  autocmd FileType vimfiler nmap <buffer> C <Plug>(vimfiler_cd_file)
-  autocmd FileType vimfiler nmap <buffer> I <Plug>(vimfiler_toggle_visible_ignore_files)
-  autocmd FileType vimfiler nmap <buffer> s <Plug>(vimfiler_split_edit_file)
-  autocmd FileType vimfiler nmap <buffer> <C-v> <Plug>(vimfiler_split_edit_file)
-  autocmd FileType vimfiler nmap <buffer> R <Plug>(vimfiler_redraw_screen)
-
-endif
 
 " --------------- PLUGIN MAPPINGS END -------------- }}}
 
