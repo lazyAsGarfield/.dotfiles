@@ -18,7 +18,7 @@ if v:version >= 703
   Plug 'bmalkus/vim-easymotion'
   if empty($__NO_YCM__)
     if empty($__NO_COMPL__)
-      Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer --omnisharp-completer' }
+      Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
     else
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
     endif
@@ -778,7 +778,6 @@ if executable('fzf')
   " a bit experimental mappings
   nnoremap <leader>l :Regs<CR>
   vnoremap <leader>l :<c-u>Regs 1<CR>
-  " inoremap RR  <ESC>:<C-u>Regs<CR>i
   autocmd FileType vimfiler nunmap RR
   autocmd FileType vimfiler autocmd BufEnter <buffer> nunmap RR
   autocmd FileType vimfiler autocmd BufLeave <buffer> nnoremap RR :Regs<CR>
@@ -933,16 +932,17 @@ endfunction
 
 command! CdRootGitRoot call s:cd_to_root_if_git_repo()
 
-nmap <silent> cg :CdRootGitRoot<CR>
-nmap <silent> cd :lcd %:p:h \| pwd<CR>
-autocmd VimEnter * let g:_cwd = getcwd()
+autocmd VimEnter * if ! haslocaldir() | let g:_cwd = getcwd()  | endif
 autocmd CursorMoved,BufLeave * if ! haslocaldir() | let g:_cwd = getcwd() | endif
-nmap <silent> cD :exec 'cd ' . g:_cwd \| pwd<CR>
 
 if ! exists('g:_starting_cd')
   let g:_starting_cd = getcwd()
 endif
-nmap <silent> cc :exec 'cd' g:_starting_cd \| let g:_cwd = getcwd() \| pwd<CR>
+
+nmap <silent> <leader>ds :exec 'cd' g:_starting_cd \| let g:_cwd = getcwd() \| pwd<CR>
+nmap <silent> <leader>do :exec 'cd ' . g:_cwd \| pwd<CR>
+nmap <silent> <leader>dg :CdRootGitRoot<CR>
+nmap <silent> <leader>dc :lcd %:p:h \| pwd<CR>
 
 function! RemoveFromQF(ind)
   let qf = getqflist()
@@ -1180,7 +1180,7 @@ nmap <leader>b <C-b>
 
 silent! set relativenumber
 
-nmap f :normal A fo<C-v><Esc>e<C-v><Esc>j%ofc<C-v><Esc>e<C-v><Esc><C-v><C-o>k^<CR>:foldc<CR>
+nmap f :normal A fo<C-v><Esc>e<C-v><Esc>]m%ofc<C-v><Esc>e<C-v><Esc><C-v><C-o>k^<CR>:foldc<CR>
 
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
@@ -1203,10 +1203,9 @@ map <leader>w :w<CR>
 map <leader>2 <C-w>
 
 " quickly edit/reload the vimrc file
+nmap <silent> <leader>.e :e $MYVIMRC<CR>
 nmap <silent> <leader>ev :e $MYVIMRC<CR>
-nmap <silent> <leader>sv :so $MYVIMRC<CR>
-
-nmap <space>t :StripWhitespace<CR>
+nmap <silent> <leader>.s :so $MYVIMRC<CR>
 
 " easier redrawing - sometimes strange artifacts are visible
 map <leader><leader>r :redraw!<CR>
@@ -1235,14 +1234,14 @@ function! CppNoNamespaceAndTemplateIndent()
   endif
 
   if l:pline =~# '^\s*template\s*<.*>\s*$'
-    let l:retv = l:pindent
+  let l:retv = l:pindent
   elseif l:pline =~# '^\s*template\s*<\s*$'
-    let l:retv = l:pindent + &shiftwidth
-  elseif l:pline =~# '^\s*template\s*\s*$'
+  let l:retv = l:pindent + &shiftwidth
+  elseif l:pline =~# '^\s*template\s*$'
     let l:retv = l:pindent
   elseif l:pline =~# '\s*typename\s*.*,\s*$'
     let l:retv = l:pindent
-  elseif l:cline =~# '^\s*>\s*$'
+  elseif l:cline =~# '^\s*>.*$'
     let l:retv = l:pindent - &shiftwidth
   elseif l:pline =~# '\s*typename\s*.*>\s*$'
     let l:retv = l:pindent - &shiftwidth
@@ -1252,8 +1251,60 @@ function! CppNoNamespaceAndTemplateIndent()
   return l:retv
 endfunction
 
-if has("autocmd")
-    autocmd FileType cpp setlocal indentexpr=CppNoNamespaceAndTemplateIndent()
-endif
+autocmd FileType cpp setlocal indentexpr=CppNoNamespaceAndTemplateIndent()
+
+let s:src_ext = ['c', 'cpp', 'c\+\+', 'hpp', 'h\+\+']
+let s:header_ext = ['h', 'hpp', 'h\+\+']
+let s:src_ext_str = '(' . join(s:src_ext,'|') . ')'
+let s:header_ext_str = '(' . join(s:header_ext,'|') . ')'
+
+function! s:header_files()
+  call fzf#vim#files(getcwd(), {
+        \ 'source': "ag -g '\\." .  s:header_ext_str . "$'",
+        \ 'options': '--prompt "' . getcwd() . ' (Headers)> "'
+        \ })
+endfunction
+
+function! s:src_files()
+  call fzf#vim#files(getcwd(), {
+        \ 'source': "ag -g '\\." .  s:src_ext_str . "$'",
+        \ 'options': '--prompt "' . getcwd() . ' (Sources)> "'
+        \ })
+endfunction
+
+function! Find_src_or_header(cmd)
+  let fname = expand('%:t:r')
+  let loc = getcwd()
+  if loc =~? 'inc\(l\(ude\)\?\)\?$' || fname =~? 'src$'
+    let loc .= '/..'
+  endif
+  let cmd = "ag " . loc . " -g '" . fname . "\."
+  let is_header = index(s:header_ext, expand('%:e')) != -1
+  if is_header
+    let cmd .= s:src_ext_str
+  else
+    let cmd .= s:header_ext_str
+  endif
+  let cmd .= "$'"
+  let files = systemlist(cmd)
+  if len(files) > 0
+    exe a:cmd files[0]
+  else
+    if is_header
+      echo "Did not find source file"
+    else
+      echo "Did not find header file"
+    endif
+  endif
+endfunction
+
+command! HeaderFiles call <SID>header_files()
+command! SrcFiles call <SID>src_files()
+
+autocmd FileType cpp,c nmap <buffer> <silent> <leader><leader>h :HeaderFiles<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader><leader>s :SrcFiles<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>sx :call Find_src_or_header("sp")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>sv :call Find_src_or_header("vsp")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>ss :call Find_src_or_header("e")<CR>
 
 " let g:loaded_youcompleteme = 1

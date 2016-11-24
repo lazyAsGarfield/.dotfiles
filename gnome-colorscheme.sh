@@ -120,3 +120,43 @@ unset PROFILE_NAME
 unset PROFILE_SLUG
 unset DCONF
 unset UUIDGEN
+
+# [colors]
+
+# # special
+# foreground      = #b5b5b5
+# foreground_bold = #b5b5b5
+# cursor          = #b5b5b5
+# background      = #292929
+
+# # black
+# color0  = #4e4e4e
+# color8  = #777777
+
+# # red
+# color1  = #a9635d
+# color9  = #ff9182
+
+# # green
+# color2  = #468459
+# color10 = #9dedb3
+
+# # yellow
+# color3  = #84763d
+# color11 = #e0ce91
+
+# # blue
+# color4  = #5879af
+# color12 = #b3d1ff
+
+# # magenta
+# color5  = #9c6594
+# color13 = #fabdf0
+
+# # cyan
+# color6  = #008592
+# color14 = #79e0ed
+
+# # white
+# color7  = #cfcfcf
+# color15 = #ffffff
