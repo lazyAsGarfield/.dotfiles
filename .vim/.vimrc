@@ -752,8 +752,8 @@ if executable('fzf')
   nnoremap <C-p> :Mru<CR>
   nnoremap <C-b> :BuffersBetterPrompt<CR>
   nnoremap <leader>g :GitFilesOrCwd<CR>
-  nnoremap <C-f><C-f> :Files<CR>
-  nnoremap <C-f><C-g> :FilesGitRootOrCwd<CR>
+  nnoremap <leader>sf :Files<CR>
+  nnoremap <leader>sr :FilesGitRootOrCwd<CR>
 
   " good way of detecting if in visual mode
   " a bit experimental mappings
