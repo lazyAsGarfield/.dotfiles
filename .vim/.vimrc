@@ -252,7 +252,7 @@ endif " exists("g:vimrc_init")
 " ---------- PLUGIN OPTS ---------- {{{
 
 " NERDTree plugin options
-let NERDTreeMouseMode = 3
+let NERDTreeMouseMode = 2
 
 " vim-commentary settings
 autocmd FileType c,cpp,cs,java,cuda,cuda.cpp setlocal commentstring=//\ %s
