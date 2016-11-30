@@ -429,6 +429,22 @@ command! -bang -nargs=? -complete=dir FilesBetterPrompt call fzf#vim#files(<q-ar
       \ 'options': '--prompt "' . (<q-args> ? getcwd() : s:full_path(<q-args>)) . ' (Files)> "'
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
 
+function! s:is_remote()
+  let file = expand('%')
+  return file =~# '^\(scp\|ftp\)://' || file =~# '^//'
+endfunction
+
+function! s:mru_list_without_nonexistent()
+  if empty(expand('%')) || s:is_remote() || &readonly
+    let mru_list = ctrlp#mrufiles#list()
+  else
+    let mru_list = ctrlp#mrufiles#list()[1:]
+  endif
+  let cwd = fnameescape(getcwd())
+  call filter(mru_list, '!empty(findfile(v:val, cwd))')
+  return mru_list
+endfunction
+
 function! s:git_files_if_in_repo(bang)
   let expanded = expand('%:p:h')
   if s:is_remote()
@@ -751,7 +767,7 @@ nmap MM :Goyo<CR>
 if executable('fzf')
   nnoremap <C-p> :Mru<CR>
   nnoremap <C-b> :BuffersBetterPrompt<CR>
-  nnoremap <leader>g :GitFilesOrCwd<CR>
+  nnoremap <leader>ss :GitFilesOrCwd<CR>
   nnoremap <leader>sf :Files<CR>
   nnoremap <leader>sr :FilesGitRootOrCwd<CR>
 
@@ -832,22 +848,6 @@ autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<
 
 " new stuff, not categorized yet
 
-function! s:is_remote()
-  let file = expand('%')
-  return file =~# '^\(scp\|ftp\)://' || file =~# '^//'
-endfunction
-
-function! s:mru_list_without_nonexistent()
-  if empty(expand('%')) || s:is_remote() || &readonly
-    let mru_list = ctrlp#mrufiles#list()
-  else
-    let mru_list = ctrlp#mrufiles#list()[1:]
-  endif
-  let cwd = fnameescape(getcwd())
-  call filter(mru_list, '!empty(findfile(v:val, cwd))')
-  return mru_list
-endfunction
-
 function! s:cd_to_root_if_git_repo()
   if exists('b:git_dir')
     exec 'cd' fugitive#repo().tree()
@@ -868,9 +868,10 @@ if ! exists('g:_starting_cd')
 endif
 
 nmap <silent> <leader>ds :exec 'cd' g:_starting_cd \| let g:_cwd = getcwd() \| pwd<CR>
-nmap <silent> <leader>do :exec 'cd ' . g:_cwd \| pwd<CR>
 nmap <silent> <leader>dg :CdRootGitRoot<CR>
-nmap <silent> <leader>dc :lcd %:p:h \| pwd<CR>
+nmap <silent> <leader>dc :if ! haslocaldir() \| lcd %:p:h \|
+      \ echo '<local> ' . getcwd() \| else \| exec 'cd ' . g:_cwd \|
+      \ echo '<global> ' .  getcwd() \| endif<CR>
 
 function! RemoveFromQF(ind)
   let qf = getqflist()
@@ -1045,7 +1046,10 @@ endif
 let g:NERDMenuMode = 3
 let g:NERDRemoveExtraSpaces = 1
 let g:NERDSpaceDelims = 1
+" prevent double space after '#' in python
+let g:NERDAltDelims_python = 1
 let g:NERDCompactSexyComs = 1
+let g:NERDDefaultAlign = 'left'
 
 let g:cpp_experimental_template_highlight = 1
 
@@ -1229,10 +1233,13 @@ endfunction
 command! HeaderFiles call <SID>header_files()
 command! SrcFiles call <SID>src_files()
 
-autocmd FileType cpp,c nmap <buffer> <silent> <leader><leader>h :HeaderFiles<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader><leader>s :SrcFiles<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>sx :call Find_src_or_header("sp")<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>sv :call Find_src_or_header("vsp")<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>ss :call Find_src_or_header("e")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>sh :HeaderFiles<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>ss :SrcFiles<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>ax :call Find_src_or_header("sp")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>av :call Find_src_or_header("vsp")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>as :call Find_src_or_header("e")<CR>
 
 " let g:loaded_youcompleteme = 1
+
+let g:UltiSnipsEditSplit = 'vertical'
+let g:UltiSnipsSnippetsDir = $DOTFILES_DIR . '/.vim/UltiSnips'
