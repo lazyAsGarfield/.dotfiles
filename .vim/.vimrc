@@ -49,6 +49,7 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdcommenter'
 Plug 'tpope/vim-repeat'
+Plug 'tikhomirov/vim-glsl'
 
 " Extracted from https://github.com/klen/python-mode
 Plug '~/.vim/plugin/python-mode-motions'
@@ -872,6 +873,7 @@ nmap <silent> <leader>dg :CdRootGitRoot<CR>
 nmap <silent> <leader>dc :if ! haslocaldir() \| lcd %:p:h \|
       \ echo '<local> ' . getcwd() \| else \| exec 'cd ' . g:_cwd \|
       \ echo '<global> ' .  getcwd() \| endif<CR>
+nmap <silent> <leader>dp :echo '=haslocaldir() ? '<local> ' : '<global> '<CR>' . getcwd()<CR>
 
 function! RemoveFromQF(ind)
   let qf = getqflist()
@@ -1051,6 +1053,10 @@ let g:NERDAltDelims_python = 1
 let g:NERDCompactSexyComs = 1
 let g:NERDDefaultAlign = 'left'
 
+let g:NERDCustomDelimiters = {
+      \ 'glsl': { 'left': '//', 'leftAlt': '/*', 'rightAlt': '*/' },
+      \ }
+
 let g:cpp_experimental_template_highlight = 1
 
 " default flags files for c-like langs for YCM
@@ -1206,8 +1212,8 @@ endfunction
 
 function! Find_src_or_header(cmd)
   let fname = expand('%:t:r')
-  let loc = getcwd()
-  if loc =~? 'inc\(l\(ude\)\?\)\?$' || fname =~? 'src$'
+  let loc = expand('%:p:h')
+  if loc =~? 'inc\(l\(ude\)\?\)\?$' || loc =~? 'src$'
     let loc .= '/..'
   endif
   let cmd = "ag " . loc . " -g '" . fname . "\."
