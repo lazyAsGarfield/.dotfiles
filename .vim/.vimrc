@@ -50,6 +50,8 @@ Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdcommenter'
 Plug 'tpope/vim-repeat'
 Plug 'tikhomirov/vim-glsl'
+Plug 'adimit/prolog.vim'
+Plug 'JuliaEditorSupport/julia-vim'
 
 " Extracted from https://github.com/klen/python-mode
 Plug '~/.vim/plugin/python-mode-motions'
@@ -122,7 +124,7 @@ if has("persistent_undo")
 endif
 
 " completion options
-set completeopt=menuone,preview
+set completeopt=menuone
 
 " do not create a backup file
 " set nobackup
@@ -281,7 +283,8 @@ let g:jedi#completions_enabled = 0
 
 let g:ycm_complete_in_comments = 1
 let g:ycm_seed_identifiers_with_syntax = 1
-let g:ycm_autoclose_preview_window_after_insertion = 0
+" let g:ycm_add_preview_to_completeopt = 1
+" let g:ycm_autoclose_preview_window_after_insertion = 0
 let g:ycm_always_populate_location_list = 1
 
 let g:ycm_semantic_triggers =  {
@@ -832,10 +835,18 @@ function! Navigate(dir)
   endif
 endfunction
 
-nnoremap <silent> <C-h> :call Navigate('l')<CR>
-nnoremap <silent> <C-j> :call Navigate('d')<CR>
-nnoremap <silent> <C-k> :call Navigate('u')<CR>
-nnoremap <silent> <C-l> :call Navigate('r')<CR>
+" when .vimrc loaded by other apps, like qt creator, use standard bindings
+if version >= 700
+  nnoremap <silent> <C-h> :call Navigate('l')<CR>
+  nnoremap <silent> <C-j> :call Navigate('d')<CR>
+  nnoremap <silent> <C-k> :call Navigate('u')<CR>
+  nnoremap <silent> <C-l> :call Navigate('r')<CR>
+else
+  nnoremap <C-h> <C-w>h
+  nnoremap <C-j> <C-w>j
+  nnoremap <C-k> <C-w>k
+  nnoremap <C-l> <C-w>l
+endif
 
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
