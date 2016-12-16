@@ -3,7 +3,5 @@
 " something is mapped to alt + key, don't want it
 silent! nunmap 
 silent! iunmap 
-silent! cunmap 
 nnoremap <nowait>  
 inoremap <nowait>  
-cnoremap <nowait>  <C-c>

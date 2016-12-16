@@ -52,6 +52,7 @@ Plug 'tpope/vim-repeat'
 Plug 'tikhomirov/vim-glsl'
 Plug 'adimit/prolog.vim'
 Plug 'JuliaEditorSupport/julia-vim'
+Plug 'haya14busa/incsearch.vim'
 
 " Extracted from https://github.com/klen/python-mode
 Plug '~/.vim/plugin/python-mode-motions'
@@ -973,8 +974,6 @@ nnoremap <silent> L :tabm+1<CR>
 
 cnoremap <C-a> <Home>
 cnoremap <C-e> <End>
-cnoremap b <C-Left>
-cnoremap f <C-Right>
 
 autocmd CmdwinEnter : noremap <buffer> <CR> <CR>q:
 autocmd CmdwinEnter : imap <buffer> <CR> <CR>q:
@@ -1093,21 +1092,10 @@ nmap <leader>; :
 
 
 if version >= 703
-
-  " Easymotion mappings
-  " nmap <leader><leader>t <Plug>(easymotion-t2)
-  " nmap <leader><leader>f <Plug>(easymotion-f2)
-  " nmap <leader><leader>T <Plug>(easymotion-T2)
-  " nmap <leader><leader>F <Plug>(easymotion-F2)
-
-  " nmap <leader>t <Plug>(easymotion-t)
-  " nmap <leader>f <Plug>(easymotion-f)
-  " nmap <leader>T <Plug>(easymotion-T)
-  " nmap <leader>F <Plug>(easymotion-F)
-
   nmap <leader>f <Plug>(easymotion-sn-to)
+  nmap <leader><leader>s <Plug>(easymotion-sn)
 
-  let g:EasyMotion_timeout_len = 400
+  let g:EasyMotion_timeout_len = 500
   let g:EasyMotion_off_screen_search = 0
   let g:EasyMotion_inc_highlight = 1
   let g:EasyMotion_history_highlight = 0
@@ -1139,8 +1127,6 @@ inoremap jj 
 nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
 nnoremap co<space> :<C-R>=b:better_whitespace_enabled ? 'DisableWhitespace' : 'EnableWhitespace'<CR><CR>
 nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGutterEnable'<CR><CR>
-
-nmap <leader>N <Plug>(easymotion-bd-n)
 
 nmap <leader>= =
 
@@ -1260,3 +1246,7 @@ autocmd FileType cpp,c nmap <buffer> <silent> <leader>as :call Find_src_or_heade
 
 let g:UltiSnipsEditSplit = 'vertical'
 let g:UltiSnipsSnippetsDir = $DOTFILES_DIR . '/.vim/UltiSnips'
+
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
