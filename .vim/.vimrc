@@ -28,7 +28,6 @@ endif
 Plug 'kien/ctrlp.vim'
 Plug 'bling/vim-airline'
 Plug 'hynek/vim-python-pep8-indent'
-Plug 'rking/ag.vim'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-fugitive'
 Plug 'octol/vim-cpp-enhanced-highlight'
@@ -36,6 +35,7 @@ Plug 'lazyAsGarfield/delimitMate'
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'junegunn/limelight.vim'
 Plug 'junegunn/goyo.vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-endwise'
@@ -43,7 +43,6 @@ Plug 'airblade/vim-gitgutter'
 Plug 'moll/vim-bbye'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'tpope/vim-sleuth'
-Plug 'junegunn/limelight.vim'
 Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
 Plug 'majutsushi/tagbar'
@@ -626,9 +625,9 @@ command! -nargs=* -bang Agcwd exec 'Agin<bang>'  getcwd() '<args>'
 command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<bang>0, <f-args>)
 " Ag command is set in after/plugin/override.vim
 
-cab ag Ag
-cab agin Agin
-cab agcwd Agcwd
+cnoreabbrev ag Ag
+cnoreabbrev agin Agin
+cnoreabbrev agcwd Agcwd
 
 function! s:ansi(str, col, bold)
   return printf("\x1b[%s%sm%s\x1b[m", a:col, a:bold ? ';1' : '', a:str)
@@ -766,8 +765,6 @@ let g:ctrlp_map = ''
 " EasyAlign mappings
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
-
-nmap MM :Goyo<CR>
 
 if executable('fzf')
   nnoremap <C-p> :Mru<CR>
@@ -1258,3 +1255,5 @@ map *  <Plug>(incsearch-nohl-*)
 map #  <Plug>(incsearch-nohl-#)
 map g* <Plug>(incsearch-nohl-g*)
 map g# <Plug>(incsearch-nohl-g#)
+
+nmap <leader>m :Goyo<CR>
