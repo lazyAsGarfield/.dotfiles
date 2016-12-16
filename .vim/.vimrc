@@ -357,7 +357,7 @@ noremap k gk
 map <leader>q :q<CR>
 
 " disable search highlighting
-map <silent> <leader>n :noh<CR>
+" map <silent> <leader>n :noh<CR>
 
 " resizing splits more easily
 nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
@@ -1250,3 +1250,11 @@ let g:UltiSnipsSnippetsDir = $DOTFILES_DIR . '/.vim/UltiSnips'
 map /  <Plug>(incsearch-forward)
 map ?  <Plug>(incsearch-backward)
 map g/ <Plug>(incsearch-stay)
+
+let g:incsearch#auto_nohlsearch = 1
+map n  <Plug>(incsearch-nohl-n)
+map N  <Plug>(incsearch-nohl-N)
+map *  <Plug>(incsearch-nohl-*)
+map #  <Plug>(incsearch-nohl-#)
+map g* <Plug>(incsearch-nohl-g*)
+map g# <Plug>(incsearch-nohl-g#)
