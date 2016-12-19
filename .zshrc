@@ -121,6 +121,7 @@ alias -g M21=' 2>&1'
 
 alias guc='git reset --soft HEAD^'
 alias grm='git reset --mixed HEAD^'
+alias gdp='git diff HEAD^'
 
 function _completemarks {
   reply=($(ls $MARKPATH))
