@@ -1,0 +1,103 @@
+snippet beg "BEGIN { ... }"
+BEGIN
+{
+	${0}
+}
+endsnippet
+
+# BEGINFILE is a gawk extension
+snippet begf "BEGINFILE { ... }"
+BEGINFILE
+{
+	${0}
+}
+endsnippet
+
+snippet end "END { ... }"
+END
+{
+	${0}
+}
+endsnippet
+
+# ENDFILE is a gawk extension
+snippet endf "ENDFILE { ... }"
+ENDFILE
+{
+	${0}
+}
+endsnippet
+
+snippet if "if {...}"
+if (${1})
+{
+	${0}
+}
+endsnippet
+
+snippet ife "if ... else ..."
+if (${1})
+{
+	${2}
+}
+else
+{
+	${0}
+}
+endsnippet
+
+snippet eif "else if ..."
+else if (${1})
+{
+	${0}
+}
+endsnippet
+
+snippet el "else {...}"
+else
+{
+	${0}
+}
+endsnippet
+
+snippet wh "while"
+while (${1})
+{
+	${2}
+}
+endsnippet
+
+snippet do "do ... while"
+do
+{
+	${0}
+} while (${1})
+endsnippet
+
+snippet for "for"
+for (${2:i} = 0; i < ${1:n}; ${3:++i})
+{
+	${0}
+}
+endsnippet
+
+snippet fore "for each"
+for (${1:i} in ${2:array})
+{
+	${0}
+}
+endsnippet
+
+# the switch is a gawk extension
+snippet sw "switch"
+switch (${1})
+{
+	case ${2}:
+		${3}
+	break
+	default:
+		${0}
+	break
+}
+endsnippet
+

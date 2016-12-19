@@ -8,7 +8,11 @@ snippet inc
 #include <${1:iostream}>
 endsnippet
 
-snippet begend "$1.begin(), $1.end() (beginend)"
+snippet begend "$1.begin(), $1.end() (beginend)" i
+${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(), $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
+endsnippet
+
+snippet beginend "$1.begin(), $1.end() (beginend)" i
 ${1:v}${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}begin(), $1${1/^.*?(-)?(>)?$/(?2::(?1:>:.))/}end()
 endsnippet
 
