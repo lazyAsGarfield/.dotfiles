@@ -77,6 +77,7 @@ setopt interactive_comments
 setopt no_beep
 setopt no_nomatch
 setopt extendedhistory
+setopt nolistambiguous
 
 zmodload zsh/complist
 
@@ -184,9 +185,9 @@ _hybrid_bindings()
 
   bindkey -M viins '^[[Z'               reverse-menu-complete
   if $(whence -w fzf-completion >/dev/null) ; then
-    bindkey -M viins '^I'                 fzf-completion
+    bindkey -M viins '^I'               fzf-completion
   else
-    bindkey -M viins '^I'                 menu-complete
+    # bindkey -M viins '^I'               menu-complete
   fi
   bindkey -M viins '^G'                 send-break
   bindkey -M viins '^J'                 history-beginning-search-forward
