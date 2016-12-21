@@ -22,9 +22,6 @@ function __go_to_saved()
 function saved()
 {
   if [[ $# = 0 ]]; then
-    if [[ ${#__saved_dirs__[@]} = 0 ]]; then
-      echo "No directories saved"
-    fi
     for ((i = 1 ; i <= ${#__saved_dirs__[@]} ; ++i)) ; do
       printf "%4d  %s\n" "$i" "${__saved_dirs__[$i]}"
     done

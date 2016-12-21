@@ -281,6 +281,7 @@ autoload -Uz compinit
 compinit
 
 compdef _precommand detach
+compdef _dir_list saved
 
 ZLE_REMOVE_SUFFIX_CHARS=" "
 # }}}
@@ -297,8 +298,7 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=245,underline'
 # }}}
 
-# Expand @s... or @c... to saved dir/history entry in executed command
-############################################################################
+# Expand @s... or @c... to saved dir/history entry in executed command {{{
 
 setopt bash_rematch
 
@@ -311,7 +311,10 @@ my-accept-line()
       cmd="saved"
     fi
     arg=${BASH_REMATCH[4]}${BASH_REMATCH[5]}
-    BUFFER=$(sed -Ee "s_( |^)@(c-?|s)[0-9]+( |$)_\1$($cmd -g$arg)\3_" <<< "$BUFFER")
+    output="$($cmd -g$arg)"
+    [[ -z $output ]] && break
+    output="${output//\//\\/}"
+    BUFFER=$(sed -Ee "s/( |^)@(c-?|s)[0-9]+( |$)/\1$output\3/" <<< "$BUFFER")
   done
   zle .accept-line
 }
@@ -348,4 +351,4 @@ compdef dc_completion -first-
 zle -N completer_selector
 bindkey -M viins '^I' completer_selector
 
-############################################################################
+# }}}
