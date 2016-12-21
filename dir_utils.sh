@@ -31,9 +31,14 @@ function saved()
   else
     local dir
     local saved_dir
-    if [[ $# -eq 1 && $1 =~ ^[1-9][0-9]*$ && $1 -le ${#__saved_dirs__[@]} ]]; then
-      __go_to_saved $1
-      return
+    if [[ $# -eq 1 ]]; then
+      if [[ $1 =~ ^[1-9][0-9]*$ && $1 -le ${#__saved_dirs__[@]} ]]; then
+        __go_to_saved $1
+        return
+      elif [[ $1 =~ "-g[0-9]+" ]]; then
+        echo ${__saved_dirs__[${1:2}]}
+        return
+      fi
     fi
     for dir in "$@"; do
       if [[ $dir =~ ^--?[1-9][0-9]*$ ]]; then
@@ -138,6 +143,8 @@ function local_cd_hist()
       limit=15
     fi
     _list_cd_local_hist $limit
+  elif [[ $1 =~ "-g-?[0-9]+" ]]; then
+    echo ${__cd_history__[${1:2}]}
   elif [[ $1 == "-c" ]]; then
     unset __cd_history__
     declare -a __cd_history__

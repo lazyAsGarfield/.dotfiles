@@ -62,6 +62,8 @@ prompt_command_if_vi_mode()
     __prompt_command
 }
 
+
+
 zle -N zle-line-init prompt_command_if_vi_mode
 zle -N zle-keymap-select prompt_command_if_vi_mode
 
@@ -235,6 +237,9 @@ _hybrid_bindings()
   bindkey -M vicmd '^U'                 kill-whole-line
   bindkey -M vicmd '^X^E'               edit-command-line
   bindkey -M vicmd '^W'                 backward-kill-word
+
+  bindkey -M vicmd '^X'                 edit-command-line
+  bindkey -M viins '^X'                 edit-command-line
 }
 
 _emacs_bindings
@@ -291,3 +296,56 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
 
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=245,underline'
 # }}}
+
+# Expand @s... or @c... to saved dir/history entry in executed command
+############################################################################
+
+setopt bash_rematch
+
+my-accept-line()
+{
+  while [[ "$BUFFER" =~ '( |^)@(c(-?)|s)([0-9]+)( |$)' ]]; do
+    if [[ ${BASH_REMATCH[3][1]} == "c" ]]; then
+      cmd="local_cd_hist"
+    else
+      cmd="saved"
+    fi
+    arg=${BASH_REMATCH[4]}${BASH_REMATCH[5]}
+    BUFFER=$(sed -Ee "s_( |^)@(c-?|s)[0-9]+( |$)_\1$($cmd -g$arg)\3_" <<< "$BUFFER")
+  done
+  zle .accept-line
+}
+
+zle -N accept-line my-accept-line
+
+dc_completion()
+{
+  if [[ $PREFIX =~ '( |^)@(c|s)$' ]]; then
+    local unsorted
+    if [[ ${BASH_REMATCH[3]} == "c" ]]; then
+      IFS=$'\n' unsorted=( $(local_cd_hist | tr -s ' ' | cut -d' ' -f4-) )
+      unsorted=( "${(Oa)unsorted[@]}" )
+    else
+      IFS=$'\n' unsorted=( $(saved | tr -s ' ' | cut -d' ' -f3-) )
+    fi
+    compadd -S/ -q -U1V unsorted -a unsorted
+    _compskip=all
+  fi
+}
+
+completer_selector()
+{
+  if [[ ${BUFFER:0:$CURSOR} =~ '( |^)@(c|s)$' ]]; then
+    zle menu-complete
+  else
+    zle expand-or-complete
+  fi
+}
+
+zle -N dc_completion
+compdef dc_completion -first-
+
+zle -N completer_selector
+bindkey -M viins '^I' completer_selector
+
+############################################################################
