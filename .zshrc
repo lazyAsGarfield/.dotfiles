@@ -162,7 +162,7 @@ _emacs_bindings()
     bindkey '^I'   menu-complete
   fi
   bindkey '^['   undo
-  bindkey '^X^E' edit-command-line
+  bindkey '^X^X' edit-command-line
 
   bindkey '^[m' copy-earlier-word
 
@@ -197,7 +197,7 @@ _hybrid_bindings()
   bindkey -M viins '^Y'                 yank
   bindkey -M viins '^U'                 kill-whole-line
   bindkey -M viins '^?'                 backward-delete-char
-  bindkey -M viins '^X^E'               edit-command-line
+  bindkey -M viins '^X^X'               edit-command-line
   bindkey -M viins '^W'                 backward-kill-word
   bindkey -M viins '^B'                 undo
 
@@ -235,11 +235,8 @@ _hybrid_bindings()
   bindkey -M vicmd '^G'                 send-break
   bindkey -M vicmd '^Y'                 yank
   bindkey -M vicmd '^U'                 kill-whole-line
-  bindkey -M vicmd '^X^E'               edit-command-line
+  bindkey -M vicmd '^X^X'               edit-command-line
   bindkey -M vicmd '^W'                 backward-kill-word
-
-  bindkey -M vicmd '^X'                 edit-command-line
-  bindkey -M viins '^X'                 edit-command-line
 }
 
 _emacs_bindings
@@ -323,13 +320,15 @@ zle -N accept-line my-accept-line
 
 dc_completion()
 {
-  if [[ $PREFIX =~ '( |^)@(c|s)$' ]]; then
+  if [[ $PREFIX =~ '( |^)@(c|s|m)$' ]]; then
     local unsorted
     if [[ ${BASH_REMATCH[3]} == "c" ]]; then
       IFS=$'\n' unsorted=( $(local_cd_hist | tr -s ' ' | cut -d' ' -f4-) )
       unsorted=( "${(Oa)unsorted[@]}" )
-    else
+    elif [[ ${BASH_REMATCH[3]} == "s" ]]; then
       IFS=$'\n' unsorted=( $(saved | tr -s ' ' | cut -d' ' -f3-) )
+    else
+      IFS=$'\n' unsorted=( $(ls -1 "$HOME/.marks" | xargs -L1 -I{} readlink -f "$MARKPATH/{}") )
     fi
     compadd -S/ -q -U1V unsorted -a unsorted
     _compskip=all
@@ -338,7 +337,7 @@ dc_completion()
 
 completer_selector()
 {
-  if [[ ${BUFFER:0:$CURSOR} =~ '( |^)@(c|s)$' ]]; then
+  if [[ ${BUFFER:0:$CURSOR} =~ '( |^)@(c|s|m)$' ]]; then
     zle menu-complete
   else
     zle expand-or-complete
