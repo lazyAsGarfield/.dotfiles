@@ -304,9 +304,6 @@ let g:ycm_semantic_triggers =  {
 
 autocmd FileType cuda set ft=cuda.cpp
 
-" disable youcompleteme
-" let g:loaded_youcompleteme = 1
-
 " delimitMate opts
 let delimitMate_expand_cr=2
 let delimitMate_expand_space=1
@@ -783,11 +780,6 @@ else
   nnoremap <silent> <C-f> :CtrlP<CR>
 endif
 
-nmap LL :Limelight!!<CR>
-autocmd FileType nerdtree silent! nunmap LL
-autocmd FileType nerdtree autocmd BufEnter <buffer> silent! nunmap LL
-autocmd FileType nerdtree autocmd BufLeave <buffer> silent! nmap LL :Limelight!!<CR>
-
 autocmd FileType undotree nmap <nowait> <buffer> q :quit<CR>
 autocmd FileType undotree nmap <buffer> <C-j> j
 autocmd FileType undotree nmap <buffer> <C-k> k
@@ -1080,7 +1072,7 @@ let g:ycm_collect_identifiers_from_tags_files = 1
 
 silent! set shortmess+=c
 
-nmap <leader>p p
+nmap <leader>` p
 nmap <leader>x x
 nmap <leader><tab> :b#<CR>
 nmap , <space>
@@ -1090,7 +1082,6 @@ nmap <leader>; :
 
 if version >= 703
   nmap <leader>f <Plug>(easymotion-sn-to)
-  nmap <leader><leader>s <Plug>(easymotion-sn)
 
   let g:EasyMotion_timeout_len = 500
   let g:EasyMotion_off_screen_search = 0
@@ -1230,14 +1221,39 @@ function! Find_src_or_header(cmd)
   endif
 endfunction
 
+function! Find_include_header(cmd)
+  let line = getline(line('.'))
+  if line !~ '^#include '
+    echo 'Not on #include line'
+    return
+  endif
+  let fname = substitute(getline(line('.')), '^#include ["<]\(.*\)[">]$', '\1', "")
+  let loc = expand('%:p:h')
+  if loc =~? 'inc\(l\(ude\)\?\)\?$' || loc =~? 'src$'
+    let loc .= '/..'
+  endif
+  let cmd = "ag " . loc . " -g '" . fname . "$'"
+  let files = systemlist(cmd)
+  if len(files) > 0
+    exe a:cmd files[0]
+  else
+    echo "Did not find header file"
+  endif
+endfunction
+
 command! HeaderFiles call <SID>header_files()
 command! SrcFiles call <SID>src_files()
 
 autocmd FileType cpp,c nmap <buffer> <silent> <leader>sh :HeaderFiles<CR>
 autocmd FileType cpp,c nmap <buffer> <silent> <leader>ss :SrcFiles<CR>
+
 autocmd FileType cpp,c nmap <buffer> <silent> <leader>ax :call Find_src_or_header("sp")<CR>
 autocmd FileType cpp,c nmap <buffer> <silent> <leader>av :call Find_src_or_header("vsp")<CR>
 autocmd FileType cpp,c nmap <buffer> <silent> <leader>as :call Find_src_or_header("e")<CR>
+
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>ahx :call Find_include_header("sp")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>ahv :call Find_include_header("vsp")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>ahh :call Find_include_header("e")<CR>
 
 " let g:loaded_youcompleteme = 1
 
@@ -1257,3 +1273,12 @@ map g* <Plug>(incsearch-nohl-g*)
 map g# <Plug>(incsearch-nohl-g#)
 
 nmap <leader>m :Goyo<CR>
+
+nmap 0y "0y
+vmap 0y "0y
+nmap 0p "0p
+vmap 0p "0p
+nmap 0Y "0Y
+vmap 0Y "0Y
+nmap 0P "0P
+vmap 0P "0P

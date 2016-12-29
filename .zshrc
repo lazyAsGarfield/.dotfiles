@@ -279,6 +279,7 @@ compinit
 
 compdef _precommand detach
 compdef _dir_list saved
+compdef _gnu_generic firewall-cmd
 
 ZLE_REMOVE_SUFFIX_CHARS=" "
 # }}}
