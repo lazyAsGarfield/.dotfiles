@@ -99,15 +99,12 @@ __get_git_branch()
   if [[ $(git rev-parse --is-bare-repository 2>/dev/null) =~ true ]]; then
     git_info="/bare repo/"
   else
-    local branch_icon=""
     local killed=0
     local more_info=""
     git_info="$(git branch 2> /dev/null | grep '* ' | cut -c3-)"
     if [[ -n $git_info ]]; then
       if [[ -n $ZSH_VERSION ]]; then
-        [[ -f $HOME/.fonts/octicons-local.ttf ]] &&
-          branch_icon="\uf020 "
-        git_info="$LIGHT_BLUE$branch_icon$git_info"
+        git_info="$LIGHT_BLUE$git_info"
         local ahead_behind
         ahead_behind="$(timeout 0.1s bash -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
         ret=$?

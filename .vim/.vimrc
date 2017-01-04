@@ -1200,6 +1200,8 @@ function! Find_src_or_header(cmd)
   let loc = expand('%:p:h')
   if loc =~? 'inc\(l\(ude\)\?\)\?$' || loc =~? 'src$'
     let loc .= '/..'
+  elseif loc =~? 'inc\(l\(ude\)\?\)\?/[^/]\+$'
+    let loc .= '/../..'
   endif
   let cmd = "ag " . loc . " -g '" . fname . "\."
   let is_header = index(s:header_ext, expand('%:e')) != -1

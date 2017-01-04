@@ -166,14 +166,12 @@ _emacs_bindings()
 
   bindkey '^[m' copy-earlier-word
 
-  # bindkey '^ '   autosuggest-accept
-  # zle -N autosuggest-accept
   bindkey '^ ' autosuggest-accept
 
-  bindkey -M menuselect '^[' undo
-  bindkey -M menuselect '^M' .accept-line
-  bindkey -M menuselect ' '  accept-line
-  bindkey -M menuselect '^G' .send-break
+  bindkey -M menuselect '^['  undo
+  bindkey -M menuselect '^M'  .accept-line
+  bindkey -M menuselect ' '   accept-line
+  bindkey -M menuselect '^[f' accept-and-infer-next-history
 }
 
 _hybrid_bindings()
@@ -215,7 +213,7 @@ _hybrid_bindings()
 
   bindkey -M viins '^[a'                accept-and-hold
   bindkey -M viins '^[.'                insert-last-word
-  bindkey -M viins '^[m'                copy-earlier-word
+  bindkey -M viins '^[p'                copy-earlier-word
   bindkey -M viins '^[0'                digit-argument
   bindkey -M viins '^[1'                digit-argument
   bindkey -M viins '^[2'                digit-argument
