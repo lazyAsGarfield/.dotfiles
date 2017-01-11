@@ -1105,8 +1105,6 @@ nmap <leader>b <C-b>
 
 silent! set relativenumber
 
-nmap f :normal A fo<C-v><Esc>e<C-v><Esc>]m%ofc<C-v><Esc>e<C-v><Esc><C-v><C-o>k^<CR>:foldc<CR>
-
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
 
@@ -1181,15 +1179,27 @@ let s:header_ext = ['h', 'hpp', 'h\+\+']
 let s:src_ext_str = '(' . join(s:src_ext,'|') . ')'
 let s:header_ext_str = '(' . join(s:header_ext,'|') . ')'
 
+function! s:get_cpp_root()
+  let loc = expand('%:p:h')
+  if loc =~? 'inc\(l\(ude\)\?\)\?$' || loc =~? 'src$'
+    let loc .= '/..'
+  elseif loc =~? 'inc\(l\(ude\)\?\)\?/[^/]\+$'
+    let loc .= '/../..'
+  endif
+  return loc
+endfunction
+
 function! s:header_files()
-  call fzf#vim#files(getcwd(), {
+  let loc = s:get_cpp_root()
+  call fzf#vim#files(loc, {
         \ 'source': "ag -g '\\." .  s:header_ext_str . "$'",
         \ 'options': '--prompt "' . getcwd() . ' (Headers)> "'
         \ })
 endfunction
 
 function! s:src_files()
-  call fzf#vim#files(getcwd(), {
+  let loc = s:get_cpp_root()
+  call fzf#vim#files(loc, {
         \ 'source': "ag -g '\\." .  s:src_ext_str . "$'",
         \ 'options': '--prompt "' . getcwd() . ' (Sources)> "'
         \ })
@@ -1197,12 +1207,7 @@ endfunction
 
 function! Find_src_or_header(cmd)
   let fname = expand('%:t:r')
-  let loc = expand('%:p:h')
-  if loc =~? 'inc\(l\(ude\)\?\)\?$' || loc =~? 'src$'
-    let loc .= '/..'
-  elseif loc =~? 'inc\(l\(ude\)\?\)\?/[^/]\+$'
-    let loc .= '/../..'
-  endif
+  let loc = s:get_cpp_root()
   let cmd = "ag " . loc . " -g '" . fname . "\."
   let is_header = index(s:header_ext, expand('%:e')) != -1
   if is_header
@@ -1230,10 +1235,8 @@ function! Find_include_header(cmd)
     return
   endif
   let fname = substitute(getline(line('.')), '^#include ["<]\(.*\)[">]$', '\1', "")
-  let loc = expand('%:p:h')
-  if loc =~? 'inc\(l\(ude\)\?\)\?$' || loc =~? 'src$'
-    let loc .= '/..'
-  endif
+  let loc = s:get_cpp_root()
+  let cmd = "ag " . loc . " -g '" . fname . "\."
   let cmd = "ag " . loc . " -g '" . fname . "$'"
   let files = systemlist(cmd)
   if len(files) > 0
@@ -1246,16 +1249,23 @@ endfunction
 command! HeaderFiles call <SID>header_files()
 command! SrcFiles call <SID>src_files()
 
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>sh :HeaderFiles<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>ss :SrcFiles<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>ah :HeaderFiles<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>as :SrcFiles<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>at :call Find_src_or_header("e")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>ag :call Find_include_header("vsp")<CR>
 
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>ax :call Find_src_or_header("sp")<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>av :call Find_src_or_header("vsp")<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>as :call Find_src_or_header("e")<CR>
+function! Fold()
+  let cursor_pos = [line('.'), col('.')]
+  norm ][
+  if [line('.'), col('.')] != cursor_pos
+    let commstr = substitute(&commentstring, ' \?%s', '', '')
+    call append(line('.'), commstr . ' }}}')
+    call cursor(cursor_pos)
+    call setline(line('.'), getline(line('.')) . ' ' . commstr . ' {{{')
+  endif
+endfunction
 
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>ahx :call Find_include_header("sp")<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>ahv :call Find_include_header("vsp")<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>ahh :call Find_include_header("e")<CR>
+nmap <silent> f :call Fold()<CR>
 
 " let g:loaded_youcompleteme = 1
 

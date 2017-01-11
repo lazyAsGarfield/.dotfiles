@@ -59,3 +59,15 @@ def FlagsForFile( filename, **kwargs ):
     'do_cache': True
   }
 endsnippet
+
+snippet args "*args," i
+*args${1:,}${0}
+endsnippet
+
+snippet kwargs "**kwargs," i
+**kwargs${1:,}${0}
+endsnippet
+
+snippet akw "*args, **kwargs," i
+*args, **kwargs${1:,}${0}
+endsnippet
