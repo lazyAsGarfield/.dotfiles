@@ -1185,6 +1185,7 @@ function! s:get_cpp_root()
   endif
 
   let loc = expand('%:p:h')
+  let orig = loc
 
   if exists('b:cpp_root')
 
@@ -1193,8 +1194,6 @@ function! s:get_cpp_root()
     endif
 
   else
-
-    let orig = loc
 
     while loc != '/'
       let f = loc . '/.cpp_project_root'
