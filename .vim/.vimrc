@@ -52,6 +52,7 @@ Plug 'tikhomirov/vim-glsl'
 Plug 'adimit/prolog.vim'
 Plug 'JuliaEditorSupport/julia-vim'
 Plug 'haya14busa/incsearch.vim'
+Plug 'lervag/vimtex'
 
 " Extracted from https://github.com/klen/python-mode
 Plug '~/.vim/plugin/python-mode-motions'
@@ -1004,7 +1005,45 @@ let g:tagbar_map_closefold = 'h'
 " Undotree plugin
 nnoremap u :UndotreeToggle<CR>
 
+set cscopequickfix=s-,c-,d-,i-,t-,e-,g-,f-
+
 let g:tagbar_autofocus = 1
+
+if has("cscope")
+
+    " use both cscope and ctag
+    set cscopetag
+
+    " check cscope for definition of a symbol before checking ctags
+    set csto=0
+
+    " show msg when cscope db added
+    set cscopeverbose
+
+    function! s:maybe_open_qf()
+        let qf = getqflist()
+        if len(qf) > 1
+            bot copen
+            wincmd p
+        endif
+    endfunction
+
+    for [bind, prefix] in [['<C-\>', ''], ['<C-@>', 'vert s'], ['<C-@><C-@>', 's']]
+        for cmd in ['s', 'g', 'c', 't', 'e', 'd']
+            exec 'nmap <silent> ' . bind . cmd . ' :' . prefix . 'cs find ' . cmd . ' <C-R>=expand("<cword>")<CR><CR> \| :call <SID>maybe_open_qf()<CR>'
+            exec 'nmap <silent> ' . bind . 'f :' . prefix . 'cs find f <C-R>=expand("<cfile>")<CR><CR> \| :call <SID>maybe_open_qf()<CR>'
+            exec 'nmap <silent> ' . bind . 'i :' . prefix . 'cs find i ^<C-R>=expand("<cfile>")<CR>$<CR> \| :call <SID>maybe_open_qf()<CR>'
+        endfor
+    endfor
+
+    cab csa cs add
+    cab csh cs help
+    cab csf cs find
+    cab csk cs kill
+    cab csr cs reset
+    cab css cs show
+
+endif
 
 let g:NERDMenuMode = 3
 let g:NERDRemoveExtraSpaces = 1
@@ -1019,12 +1058,6 @@ let g:NERDCustomDelimiters = {
       \ }
 
 let g:cpp_experimental_template_highlight = 1
-
-" default flags files for c-like langs for YCM
-" won't work as g:ycm_global_ycm_extra_conf is read only at vim startup
-" autocmd FileType cpp let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/cpp/.ycm_extra_conf.py")
-" autocmd FileType c let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/c/.ycm_extra_conf.py")
-" autocmd FileType cuda.cpp let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/cuda/.ycm_extra_conf.py")
 
 let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")
 
@@ -1093,44 +1126,6 @@ nmap <silent> <leader>.s :so $MYVIMRC<CR>
 " easier redrawing - sometimes strange artifacts are visible
 map <leader><leader>r :redraw!<CR>
 
-set cscopequickfix=s-,c-,d-,i-,t-,e-,g-,f-
-
-if has("cscope")
-
-    " use both cscope and ctag
-    set cscopetag
-
-    " check cscope for definition of a symbol before checking ctags
-    set csto=0
-
-    " show msg when cscope db added
-    set cscopeverbose
-
-    function! s:maybe_open_qf()
-        " let qf = getqflist()
-        " if len(qf) > 1
-        "     bot copen
-        "     wincmd p
-        " endif
-    endfunction
-
-    for [bind, prefix] in [['<leader>ac', 'vert s']]
-        for cmd in ['s', 'g', 'c', 't', 'e', 'd']
-            exec 'nmap <silent> ' . bind . cmd . ' :' . prefix . 'cs find ' . cmd . ' <C-R>=expand("<cword>")<CR><CR> \| :call <SID>maybe_open_qf()<CR>'
-            exec 'nmap <silent> ' . bind . 'f :' . prefix . 'cs find f <C-R>=expand("<cfile>")<CR><CR> \| :call <SID>maybe_open_qf()<CR>'
-            exec 'nmap <silent> ' . bind . 'i :' . prefix . 'cs find i ^<C-R>=expand("<cfile>")<CR>$<CR> \| :call <SID>maybe_open_qf()<CR>'
-        endfor
-    endfor
-
-    cab csa cs add
-    cab csh cs help
-    cab csf cs find
-    cab csk cs kill
-    cab csr cs reset
-    cab css cs show
-
-endif
-
 " Don't indent namespace and template
 function! CppNoNamespaceAndTemplateIndent()
   let l:cline_num = line('.')
@@ -1166,9 +1161,14 @@ function! CppNoNamespaceAndTemplateIndent()
     let l:retv = l:pindent - &shiftwidth
   elseif l:pline =~# '\s*typename\s*.*>\s*$'
     let l:retv = l:pindent - &shiftwidth
-  elseif l:pline =~# '^\s*namespace.*'
-    let l:retv = 0
   endif
+
+  if l:pline =~# '\v^\s*(class|struct)\s+\w+\s*:\s*((public|protected|private)\s+)?\w+\s*$'
+    if l:retv > l:pindent
+      return l:retv - &shiftwidth
+    endif
+  endif
+
   return l:retv
 endfunction
 
@@ -1180,13 +1180,53 @@ let s:src_ext_str = '(' . join(s:src_ext,'|') . ')'
 let s:header_ext_str = '(' . join(s:header_ext,'|') . ')'
 
 function! s:get_cpp_root()
+  if exists('b:git_dir')
+    return fugitive#repo().tree()
+  endif
+
   let loc = expand('%:p:h')
+
+  if exists('b:cpp_root')
+
+    if b:cpp_root != ""
+      return b:cpp_root
+    endif
+
+  else
+
+    let orig = loc
+
+    while loc != '/'
+      let f = loc . '/.cpp_project_root'
+      if filereadable(f)
+        if getfsize(f) == 0
+          return loc
+        else
+          let r = readfile(f)
+          let r = map(r, 'v:val =~ "^/" ? fnamemodify(v:val, ":p") : fnamemodify("' . loc . '" . "/" . v:val, ":p")')
+          let r = filter(r, 'isdirectory(v:val) && "' . orig . '" =~# v:val' )
+          if len(r) > 0
+            let b:cpp_root = r[0]
+            return r[0]
+          endif
+        endif
+      endif
+      let loc = simplify(loc . '/..')
+    endwhile
+
+    let b:cpp_root = ""
+
+  endif
+
   if loc =~? 'inc\(l\(ude\)\?\)\?$' || loc =~? 'src$'
     let loc .= '/..'
+    return simplify(loc)
   elseif loc =~? 'inc\(l\(ude\)\?\)\?/[^/]\+$'
     let loc .= '/../..'
+    return simplify(loc)
   endif
-  return loc
+
+  return orig
 endfunction
 
 function! s:header_files()
@@ -1208,7 +1248,7 @@ endfunction
 function! Find_src_or_header(cmd)
   let fname = expand('%:t:r')
   let loc = s:get_cpp_root()
-  let cmd = "ag " . loc . " -g '" . fname . "\."
+  let cmd = "ag " . loc . " -g '\\b" . fname . "\\b\."
   let is_header = index(s:header_ext, expand('%:e')) != -1
   if is_header
     let cmd .= s:src_ext_str
@@ -1236,8 +1276,7 @@ function! Find_include_header(cmd)
   endif
   let fname = substitute(getline(line('.')), '^#include ["<]\(.*\)[">]$', '\1', "")
   let loc = s:get_cpp_root()
-  let cmd = "ag " . loc . " -g '" . fname . "\."
-  let cmd = "ag " . loc . " -g '" . fname . "$'"
+  let cmd = "ag " . loc . " -g '\\b" . fname . "$'"
   let files = systemlist(cmd)
   if len(files) > 0
     exe a:cmd files[0]
@@ -1294,3 +1333,16 @@ nmap 0Y "0Y
 vmap 0Y "0Y
 nmap 0P "0P
 vmap 0P "0P
+
+let g:tex_flavor = "latex"
+
+augroup latexSurround
+  autocmd!
+  autocmd FileType tex call s:latexSurround()
+augroup END
+
+function! s:latexSurround()
+  let b:surround_{char2nr("e")}
+        \ = "\\begin{\1environment: \1}\n\t\r\n\\end{\1\1}"
+  let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
+endfunction
