@@ -286,7 +286,6 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 	call <SID>X("Type", s:blue, "", "none")
 	call <SID>X("Define", s:purple, "", "none")
 	call <SID>X("Include", s:blue, "", "")
-	"call <SID>X("Ignore", "666666", "", "")
 
 	" Vim Highlighting
 	call <SID>X("vimCommand", s:red, "", "none")
@@ -499,12 +498,8 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 			call <SID>X("SpellRare", s:background, s:yellow, "underline")
 	endif
 
-	call <SID>X("Flake8_Error", s:background, s:red, "")
-	call <SID>X("Flake8_Warning", s:background, s:aqua, "")
-	call <SID>X("Flake8_Complexity", s:background, s:aqua, "")
-	call <SID>X("Flake8_Naming", s:background, s:aqua, "")
-	call <SID>X("Flake8_PyFlake", s:background, s:aqua, "")
-
+	call <SID>X("Variable", s:foreground, "", "")
+	call <SID>X("Member", s:blue, "", "")
 
 	" Delete Functions
 	delf <SID>X

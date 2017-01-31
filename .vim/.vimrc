@@ -31,6 +31,7 @@ Plug 'hynek/vim-python-pep8-indent'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-fugitive'
 Plug 'octol/vim-cpp-enhanced-highlight'
+Plug 'jeaye/color_coded'
 Plug 'lazyAsGarfield/delimitMate'
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
@@ -354,7 +355,7 @@ noremap k gk
 map <leader>q :q<CR>
 
 " disable search highlighting
-" map <silent> <leader>n :noh<CR>
+map <silent> <leader>n :noh<CR>
 
 " resizing splits more easily
 nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
@@ -1179,7 +1180,19 @@ let s:header_ext = ['h', 'hpp', 'h\+\+']
 let s:src_ext_str = '(' . join(s:src_ext,'|') . ')'
 let s:header_ext_str = '(' . join(s:header_ext,'|') . ')'
 
-function! s:get_cpp_root()
+function! s:cust_cpp_proj_file_loc()
+  let loc = expand('%:p:h')
+  while loc != '/'
+    let f = loc . '/.cpp_project_root'
+    if filereadable(f)
+      return loc
+    endif
+    let loc = simplify(loc . '/..')
+  endwhile
+  return ''
+endfunction
+
+function! Get_cpp_root(...)
   if exists('b:git_dir')
     return fugitive#repo().tree()
   endif
@@ -1195,25 +1208,22 @@ function! s:get_cpp_root()
 
   else
 
-    while loc != '/'
-      let f = loc . '/.cpp_project_root'
-      if filereadable(f)
-        if getfsize(f) == 0
-          return loc
-        else
-          let r = readfile(f)
-          let r = map(r, 'v:val =~ "^/" ? fnamemodify(v:val, ":p") : fnamemodify("' . loc . '" . "/" . v:val, ":p")')
-          let r = filter(r, 'isdirectory(v:val) && "' . orig . '" =~# v:val' )
-          if len(r) > 0
-            let b:cpp_root = r[0]
-            return r[0]
-          endif
+    let f = s:cust_cpp_proj_file_loc()
+    if f != ''
+      if getfsize(f) == 0
+        return loc
+      else
+        let r = readfile(f)
+        let r = map(r, 'v:val =~ "^/" ? fnamemodify(v:val, ":p") : fnamemodify("' . fnamemodify(f, ':p:h') . '" . "/" . v:val, ":p")')
+        let r = filter(r, 'isdirectory(v:val) && "' . orig . '" =~# v:val' )
+        if len(r) > 0
+          let b:cpp_root = r[0]
+          return r[0]
         endif
       endif
-      let loc = simplify(loc . '/..')
-    endwhile
+    endif
 
-    let b:cpp_root = ""
+    let b:cpp_root = ''
 
   endif
 
@@ -1225,11 +1235,11 @@ function! s:get_cpp_root()
     return simplify(loc)
   endif
 
-  return orig
+  return a:0 > 0 ? a:1 : orig
 endfunction
 
 function! s:header_files()
-  let loc = s:get_cpp_root()
+  let loc = Get_cpp_root()
   call fzf#vim#files(loc, {
         \ 'source': "ag -g '\\." .  s:header_ext_str . "$'",
         \ 'options': '--prompt "' . getcwd() . ' (Headers)> "'
@@ -1237,7 +1247,7 @@ function! s:header_files()
 endfunction
 
 function! s:src_files()
-  let loc = s:get_cpp_root()
+  let loc = Get_cpp_root()
   call fzf#vim#files(loc, {
         \ 'source': "ag -g '\\." .  s:src_ext_str . "$'",
         \ 'options': '--prompt "' . getcwd() . ' (Sources)> "'
@@ -1246,7 +1256,7 @@ endfunction
 
 function! Find_src_or_header(cmd)
   let fname = expand('%:t:r')
-  let loc = s:get_cpp_root()
+  let loc = Get_cpp_root()
   let cmd = "ag " . loc . " -g '\\b" . fname . "\\b\."
   let is_header = index(s:header_ext, expand('%:e')) != -1
   if is_header
@@ -1274,7 +1284,7 @@ function! Find_include_header(cmd)
     return
   endif
   let fname = substitute(getline(line('.')), '^#include ["<]\(.*\)[">]$', '\1', "")
-  let loc = s:get_cpp_root()
+  let loc = Get_cpp_root()
   let cmd = "ag " . loc . " -g '\\b" . fname . "$'"
   let files = systemlist(cmd)
   if len(files) > 0
@@ -1345,3 +1355,5 @@ function! s:latexSurround()
         \ = "\\begin{\1environment: \1}\n\t\r\n\\end{\1\1}"
   let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
 endfunction
+
+let g:cpp_concepts_highlight = 1
