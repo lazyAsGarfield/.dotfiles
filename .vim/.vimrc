@@ -1006,45 +1006,7 @@ let g:tagbar_map_closefold = 'h'
 " Undotree plugin
 nnoremap u :UndotreeToggle<CR>
 
-set cscopequickfix=s-,c-,d-,i-,t-,e-,g-,f-
-
 let g:tagbar_autofocus = 1
-
-if has("cscope")
-
-    " use both cscope and ctag
-    set cscopetag
-
-    " check cscope for definition of a symbol before checking ctags
-    set csto=0
-
-    " show msg when cscope db added
-    set cscopeverbose
-
-    function! s:maybe_open_qf()
-        let qf = getqflist()
-        if len(qf) > 1
-            bot copen
-            wincmd p
-        endif
-    endfunction
-
-    for [bind, prefix] in [['<C-\>', ''], ['<C-@>', 'vert s'], ['<C-@><C-@>', 's']]
-        for cmd in ['s', 'g', 'c', 't', 'e', 'd']
-            exec 'nmap <silent> ' . bind . cmd . ' :' . prefix . 'cs find ' . cmd . ' <C-R>=expand("<cword>")<CR><CR> \| :call <SID>maybe_open_qf()<CR>'
-            exec 'nmap <silent> ' . bind . 'f :' . prefix . 'cs find f <C-R>=expand("<cfile>")<CR><CR> \| :call <SID>maybe_open_qf()<CR>'
-            exec 'nmap <silent> ' . bind . 'i :' . prefix . 'cs find i ^<C-R>=expand("<cfile>")<CR>$<CR> \| :call <SID>maybe_open_qf()<CR>'
-        endfor
-    endfor
-
-    cab csa cs add
-    cab csh cs help
-    cab csf cs find
-    cab csk cs kill
-    cab csr cs reset
-    cab css cs show
-
-endif
 
 let g:NERDMenuMode = 3
 let g:NERDRemoveExtraSpaces = 1
@@ -1126,6 +1088,36 @@ nmap <silent> <leader>.s :so $MYVIMRC<CR>
 
 " easier redrawing - sometimes strange artifacts are visible
 map <leader><leader>r :redraw!<CR>
+
+set cscopequickfix=s-,c-,d-,i-,t-,e-,g-,f-
+
+if has("cscope")
+
+    " use both cscope and ctag
+    set cscopetag
+
+    " check cscope for definition of a symbol before checking ctags
+    set csto=0
+
+    " show msg when cscope db added
+    set cscopeverbose
+
+    for [bind, prefix] in [['<leader>ac', 'vert s']]
+        for cmd in ['s', 'g', 'c', 't', 'e', 'd']
+            exec 'nmap <silent> ' . bind . cmd . ' :' . prefix . 'cs find ' . cmd . ' <C-R>=expand("<cword>")<CR><CR>'
+            exec 'nmap <silent> ' . bind . 'f :' . prefix . 'cs find f <C-R>=expand("<cfile>")<CR><CR>'
+            exec 'nmap <silent> ' . bind . 'i :' . prefix . 'cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>'
+        endfor
+    endfor
+
+    cab csa cs add
+    cab csh cs help
+    cab csf cs find
+    cab csk cs kill
+    cab csr cs reset
+    cab css cs show
+
+endif
 
 " Don't indent namespace and template
 function! CppNoNamespaceAndTemplateIndent()
