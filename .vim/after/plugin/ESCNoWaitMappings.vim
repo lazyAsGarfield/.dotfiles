@@ -7,3 +7,5 @@ silent! iunmap 
 nnoremap <nowait>  
 vnoremap <nowait>  
 inoremap <nowait>  
+
+au BufReadPost * snoremap <nowait>  

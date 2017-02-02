@@ -382,8 +382,6 @@ vmap cp "+p
 nmap cP "+P
 vmap cP "+P
 
-imap +P a+
-
 " substitute all occurences of text selected in visual mode
 vnoremap <C-r><C-r> "hy:%s/<C-r>h/<C-r>h/g<left><left>
 vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>/<C-r>h/g<left><left>
@@ -768,7 +766,7 @@ nmap ga <Plug>(EasyAlign)
 if executable('fzf')
   nnoremap <C-p> :Mru<CR>
   nnoremap <C-b> :BuffersBetterPrompt<CR>
-  nnoremap <leader>ss :GitFilesOrCwd<CR>
+  nnoremap <leader>g :GitFilesOrCwd<CR>
   nnoremap <leader>sf :Files<CR>
   nnoremap <leader>sr :FilesGitRootOrCwd<CR>
 
@@ -1102,6 +1100,8 @@ if has("cscope")
     " show msg when cscope db added
     set cscopeverbose
 
+    set cscoperelative
+
     for [bind, prefix] in [['<leader>ac', 'vert s']]
         for cmd in ['s', 'g', 'c', 't', 'e', 'd']
             exec 'nmap <silent> ' . bind . cmd . ' :' . prefix . 'cs find ' . cmd . ' <C-R>=expand("<cword>")<CR><CR>'
@@ -1116,6 +1116,12 @@ if has("cscope")
     cab csk cs kill
     cab csr cs reset
     cab css cs show
+
+    if filereadable('cscope.out')
+      silent! cscope add cscope.out
+    elseif filereadable('cscope/cscope.out')
+      silent! cscope add cscope/cscope.out
+    endif
 
 endif
 
@@ -1349,3 +1355,5 @@ function! s:latexSurround()
 endfunction
 
 let g:cpp_concepts_highlight = 1
+
+au FileType tex let b:delimitMate_quotes = "\" ' *"

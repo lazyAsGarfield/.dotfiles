@@ -13,6 +13,7 @@ let s:line = "393939"
 let s:comment = "999999"
 let s:red = "f2777a"
 let s:dark_red = "e2676a"
+let s:light_orange = "f9a167"
 let s:orange = "f99157"
 let s:light_yellow = "ffdc86"
 let s:yellow = "ffcc66"
@@ -500,6 +501,7 @@ if has("gui_running") || &t_Co == 88 || &t_Co == 256
 
 	call <SID>X("Variable", s:foreground, "", "")
 	call <SID>X("Member", s:blue, "", "")
+	call <SID>X("TypeRef", s:orange, "", "")
 
 	" Delete Functions
 	delf <SID>X
