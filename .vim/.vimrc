@@ -20,6 +20,7 @@ if v:version >= 703
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
     endif
     Plug 'davidhalter/jedi-vim'
+    Plug 'jeaye/color_coded'
   endif
 endif
 if v:version >= 704
@@ -31,7 +32,6 @@ Plug 'hynek/vim-python-pep8-indent'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-fugitive'
 Plug 'octol/vim-cpp-enhanced-highlight'
-Plug 'jeaye/color_coded'
 Plug 'lazyAsGarfield/delimitMate'
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
@@ -1244,10 +1244,10 @@ function! s:header_files()
         \ })
 endfunction
 
-function! s:src_files()
+function! s:src_files(...)
   let loc = Get_cpp_root()
   call fzf#vim#files(loc, {
-        \ 'source': "ag -g '\\." .  s:src_ext_str . "$'",
+        \ 'source': "ag -g '\\." .  (a:0 > 0 ? a:1 : s:src_ext_str) . "$'",
         \ 'options': '--prompt "' . getcwd() . ' (Sources)> "'
         \ })
 endfunction
@@ -1292,13 +1292,29 @@ function! Find_include_header(cmd)
   endif
 endfunction
 
-command! HeaderFiles call <SID>header_files()
-command! SrcFiles call <SID>src_files()
+function! Edit_CMakeLists(cmd)
+  let loc = expand('%:p:h')
+  while loc != '/'
+    let f = loc . '/CMakeLists.txt'
+    if filereadable(f)
+      exec a:cmd . ' ' . f
+      return
+    endif
+    let loc = simplify(loc . '/..')
+  endwhile
+  echo "Did not find CMakeLists.txt"
+endfunction
 
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>ah :HeaderFiles<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>as :SrcFiles<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>at :call Find_src_or_header("e")<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>ag :call Find_include_header("vsp")<CR>
+command! HeaderFiles call <SID>header_files()
+command! -nargs=? SrcFiles call <SID>src_files(<args>)
+
+autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>ah :HeaderFiles<CR>
+autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>as :SrcFiles<CR>
+autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>at :call Find_src_or_header("e")<CR>
+autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>ag :call Find_include_header("vsp")<CR>
+autocmd FileType cpp,c nmap <buffer> <silent> <leader>al :call Edit_CMakeLists("vsp")<CR>
+
+autocmd FileType python nmap <buffer> <silent> <leader>as :SrcFiles "py"<CR>
 
 function! Fold()
   let cursor_pos = [line('.'), col('.')]
@@ -1357,3 +1373,4 @@ endfunction
 let g:cpp_concepts_highlight = 1
 
 au FileType tex let b:delimitMate_quotes = "\" ' *"
+au FileType tex set textwidth = 120
