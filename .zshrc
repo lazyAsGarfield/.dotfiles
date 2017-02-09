@@ -1,31 +1,34 @@
 # misc shell stuff {{{
-source "${0:a:h}/.shellrc"
+source "$DOTFILES_DIR/.shellrc"
 
 autoload -U colors && colors
 
+typeset -A __styles
+__styles=(
+NORMAL "%{%f%b%}"
+BOLD "%{$fg_bold[white]%}"
+
+RED "%{%b$fg[red]%}"
+LIGHT_RED "%{%b$fg_bold[red]%}"
+
+GREEN "%{%b$fg[green]%}"
+LIGHT_GREEN "%{%b$fg_bold[green]%}"
+
+YELLOW "%{%b$fg[yellow]%}"
+LIGHT_YELLOW "%{%b$fg_bold[yellow]%}"
+
+BLUE "%{%b$fg[blue]%}"
+LIGHT_BLUE "%{%b$fg_bold[blue]%}"
+
+MAGENTA "%{%b$fg[magenta]%}"
+LIGHT_MAGENTA "%{%b$fg_bold[magenta]%}"
+
+CYAN "%{%b$fg[cyan]%}"
+LIGHT_CYAN "%{%b$fg_bold[cyan]%}"
+)
+
 __prompt_command()
 {
-  local NORMAL="%{%f%b%}"
-  local BOLD="%{$fg_bold[white]%}"
-
-  local RED="%{%b$fg[red]%}"
-  local LIGHT_RED="%{%b$fg_bold[red]%}"
-
-  local GREEN="%{%b$fg[green]%}"
-  local LIGHT_GREEN="%{%b$fg_bold[green]%}"
-
-  local YELLOW="%{%b$fg[yellow]%}"
-  local LIGHT_YELLOW="%{%b$fg_bold[yellow]%}"
-
-  local BLUE="%{%b$fg[blue]%}"
-  local LIGHT_BLUE="%{%b$fg_bold[blue]%}"
-
-  local MAGENTA="%{%b$fg[magenta]%}"
-  local LIGHT_MAGENTA="%{%b$fg_bold[magenta]%}"
-
-  local CYAN="%{%b$fg[cyan]%}"
-  local LIGHT_CYAN="%{%b$fg_bold[cyan]%}"
-
   local virtual_env=""
   if [[ -z $VIRTUAL_ENV_DIABLE_PROMPT ]]; then
     if [[ -n $VIRTUAL_ENV ]]; then
@@ -36,36 +39,31 @@ __prompt_command()
   local git_branch="$(__get_git_branch)"
   local virtual_env="$(__get_virtual_env)"
 
-  local vim_norm_prompt="${LIGHT_YELLOW}[N]$NORMAL"
-  local vim_ins_prompt="${LIGHT_BLUE}[I]$NORMAL"
+  local vim_norm_prompt="${__styles[LIGHT_YELLOW]}[N]${__styles[NORMAL]}"
+  local vim_ins_prompt="${__styles[LIGHT_BLUE]}[I]${__styles[NORMAL]}"
   [[ -n $KEYMAP ]] &&
     local vim_prompt="${${KEYMAP/vicmd/$vim_norm_prompt}/(main|viins)/$vim_ins_prompt} " ||
     local vim_prompt=""
 
-  PROMPT="${BLUE}${virtual_env}${LIGHT_BLUE}[${NORMAL}%n${GREEN}@${BLUE}%m${YELLOW}:${BOLD}%1~${LIGHT_BLUE}] ${git_branch}${vim_prompt}${BOLD}$(__prompt_char) ${NORMAL}"
+  PROMPT="${__styles[BLUE]}${virtual_env}${__styles[LIGHT_BLUE]}[${__styles[NORMAL]}%n${__styles[GREEN]}@${__styles[BLUE]}%m${__styles[YELLOW]}:${__styles[BOLD]}%1~${__styles[LIGHT_BLUE]}] ${git_branch}${vim_prompt}${__styles[BOLD]}$(__prompt_char) ${__styles[NORMAL]}"
 
   zle && zle reset-prompt
 }
 
 precmd()
 {
-  # if in vi mode, prompt will be set other way
-  [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
-    PROMPT="" ||
-    __prompt_command
+  # in vi mode, prompt will be set other way
+  PROMPT=""
   __dir_history
 }
 
-prompt_command_if_vi_mode()
+zle-line-init zle-keymap-select()
 {
-  [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
-    __prompt_command
+  __prompt_command
 }
 
-
-
-zle -N zle-line-init prompt_command_if_vi_mode
-zle -N zle-keymap-select prompt_command_if_vi_mode
+zle -N zle-line-init
+zle -N zle-keymap-select
 
 HISTFILE=~/.histfile
 HISTSIZE=100000
@@ -98,7 +96,7 @@ zplug "zsh-users/zsh-autosuggestions", nice:10
 zplug "zsh-users/zsh-completions", nice:10
 
 if ! zplug check; then
-    zplug install
+  zplug install
 fi
 
 zplug load
@@ -108,19 +106,15 @@ alias -g ...='../..'
 alias -g ....='../../..'
 alias -g .....='../../../..'
 alias -g ......='../../../../..'
-alias -g LA=' 2>&1 | less'
 alias -g L='| less'
-alias -g LS='| less -S'
-alias -g LSA=' 2>&1 | less -S'
+alias -g LA=' 2>&1 | less'
 alias -g T='| tail'
 alias -g TA='2>&1 | tail'
 alias -g H='| head'
 alias -g HA='2>&1 | head'
-alias -g DN='/dev/null'
 alias -g N1=' > /dev/null '
 alias -g N2=' 2> /dev/null '
 alias -g N12=' > /dev/null 2>&1'
-alias -g M21=' 2>&1'
 
 alias guc='git reset --soft HEAD^'
 alias grm='git reset --mixed HEAD^'
@@ -139,113 +133,75 @@ compctl -K _completemarks unmark
 
 KEYTIMEOUT=1
 
-
 autoload -z edit-command-line
 zle -N edit-command-line
 
 autoload -Uz copy-earlier-word
 zle -N copy-earlier-word
 
-_emacs_bindings()
-{
-  bindkey -e
+bindkey -v
 
-  bindkey "${terminfo[khome]}" beginning-of-line
-  bindkey "${terminfo[kend]}"  end-of-line
-  bindkey "^[[3~"              delete-char
-  bindkey "^[3;5~"             delete-char
+bindkey -M viins "${terminfo[khome]}" beginning-of-line
+bindkey -M viins "${terminfo[kend]}"  end-of-line
+bindkey -M viins "^[[3~"              delete-char
+bindkey -M viins "^[3;5~"             delete-char
 
-  bindkey '^[[Z' reverse-menu-complete
-  if $(whence -w fzf-completion >/dev/null) ; then
-    bindkey '^I'   fzf-completion
-  else
-    bindkey '^I'   menu-complete
-  fi
-  bindkey '^['   undo
-  bindkey '^X^X' edit-command-line
+bindkey -M viins '^[[Z'               reverse-menu-complete
+if $(whence -w fzf-completion >/dev/null) ; then
+  bindkey -M viins '^I'               fzf-completion
+else
+  # bindkey -M viins '^I'               menu-complete
+fi
+bindkey -M viins '^G'                 send-break
+bindkey -M viins '^J'                 history-beginning-search-forward
+bindkey -M viins '^K'                 history-beginning-search-backward
+bindkey -M viins '^Y'                 yank
+bindkey -M viins '^U'                 kill-whole-line
+bindkey -M viins '^?'                 backward-delete-char
+bindkey -M viins '^X^X'               edit-command-line
+bindkey -M viins '^W'                 backward-kill-word
+bindkey -M viins '^B'                 undo
 
-  bindkey '^[m' copy-earlier-word
+bindkey -M viins '^ '                 autosuggest-accept
+bindkey -M viins '^[f'                forward-word
+bindkey -M viins '^[b'                backward-word
+bindkey -M viins '^F'                 forward-char
+bindkey -M viins '^B'                 backward-char
 
-  bindkey '^ ' autosuggest-accept
+bindkey -M viins '^A'                 beginning-of-line
+bindkey -M viins '^E'                 end-of-line
 
-  bindkey -M menuselect '^['  undo
-  bindkey -M menuselect '^M'  .accept-line
-  bindkey -M menuselect ' '   accept-line
-  bindkey -M menuselect '^[f' accept-and-infer-next-history
-}
+bindkey -M viins '^P'                 up-line-or-history
+bindkey -M viins '^N'                 down-line-or-history
 
-_hybrid_bindings()
-{
-  bindkey -v
+bindkey -M viins '^[a'                accept-and-hold
+bindkey -M viins '^[.'                insert-last-word
+bindkey -M viins '^[p'                copy-earlier-word
+bindkey -M viins '^[0'                digit-argument
+bindkey -M viins '^[1'                digit-argument
+bindkey -M viins '^[2'                digit-argument
+bindkey -M viins '^[3'                digit-argument
+bindkey -M viins '^[4'                digit-argument
+bindkey -M viins '^[5'                digit-argument
+bindkey -M viins '^[6'                digit-argument
+bindkey -M viins '^[7'                digit-argument
+bindkey -M viins '^[8'                digit-argument
+bindkey -M viins '^[9'                digit-argument
 
-  bindkey -M viins "${terminfo[khome]}" beginning-of-line
-  bindkey -M viins "${terminfo[kend]}"  end-of-line
-  bindkey -M viins "^[[3~"              delete-char
-  bindkey -M viins "^[3;5~"             delete-char
+bindkey -M vicmd "${terminfo[khome]}" beginning-of-line
+bindkey -M vicmd "${terminfo[kend]}"  end-of-line
+bindkey -M vicmd "^[[3~"              delete-char
+bindkey -M vicmd "^[3;5~"             delete-char
 
-  bindkey -M viins '^[[Z'               reverse-menu-complete
-  if $(whence -w fzf-completion >/dev/null) ; then
-    bindkey -M viins '^I'               fzf-completion
-  else
-    # bindkey -M viins '^I'               menu-complete
-  fi
-  bindkey -M viins '^G'                 send-break
-  bindkey -M viins '^J'                 history-beginning-search-forward
-  bindkey -M viins '^K'                 history-beginning-search-backward
-  bindkey -M viins '^Y'                 yank
-  bindkey -M viins '^U'                 kill-whole-line
-  bindkey -M viins '^?'                 backward-delete-char
-  bindkey -M viins '^X^X'               edit-command-line
-  bindkey -M viins '^W'                 backward-kill-word
-  bindkey -M viins '^B'                 undo
+bindkey -M vicmd '^G'                 send-break
+bindkey -M vicmd '^Y'                 yank
+bindkey -M vicmd '^U'                 kill-whole-line
+bindkey -M vicmd '^X^X'               edit-command-line
+bindkey -M vicmd '^W'                 backward-kill-word
 
-  bindkey -M viins '^ '                 autosuggest-accept
-  bindkey -M viins '^[f'                forward-word
-  bindkey -M viins '^[b'                backward-word
-  bindkey -M viins '^F'                 forward-char
-  bindkey -M viins '^B'                 backward-char
-
-  bindkey -M viins '^A'                 beginning-of-line
-  bindkey -M viins '^E'                 end-of-line
-
-  bindkey -M viins '^P'                 up-line-or-history
-  bindkey -M viins '^N'                 down-line-or-history
-
-  bindkey -M viins '^[a'                accept-and-hold
-  bindkey -M viins '^[.'                insert-last-word
-  bindkey -M viins '^[p'                copy-earlier-word
-  bindkey -M viins '^[0'                digit-argument
-  bindkey -M viins '^[1'                digit-argument
-  bindkey -M viins '^[2'                digit-argument
-  bindkey -M viins '^[3'                digit-argument
-  bindkey -M viins '^[4'                digit-argument
-  bindkey -M viins '^[5'                digit-argument
-  bindkey -M viins '^[6'                digit-argument
-  bindkey -M viins '^[7'                digit-argument
-  bindkey -M viins '^[8'                digit-argument
-  bindkey -M viins '^[9'                digit-argument
-
-  bindkey -M vicmd "${terminfo[khome]}" beginning-of-line
-  bindkey -M vicmd "${terminfo[kend]}"  end-of-line
-  bindkey -M vicmd "^[[3~"              delete-char
-  bindkey -M vicmd "^[3;5~"             delete-char
-
-  bindkey -M vicmd '^G'                 send-break
-  bindkey -M vicmd '^Y'                 yank
-  bindkey -M vicmd '^U'                 kill-whole-line
-  bindkey -M vicmd '^X^X'               edit-command-line
-  bindkey -M vicmd '^W'                 backward-kill-word
-}
-
-_emacs_bindings
-_hybrid_bindings
-
-tog()
-{
-  [[ -z $(bindkey -lL | grep main | grep emacs) ]] &&
-    _emacs_bindings ||
-    _hybrid_bindings
-}
+bindkey -M menuselect '^M'  .accept-line
+bindkey -M menuselect ' '   accept-line
+bindkey -M menuselect '^[f' accept-and-infer-next-history
 
 autoload -Uz add-zsh-hook
 

@@ -1,34 +1,35 @@
 source "$(dirname ${BASH_SOURCE[0]})/.shellrc"
 
+declare -A __styles
+__styles=(
+  [NORMAL]="\[\e[0m\]"
+  [BOLD]="\[\e[0;1;39m\]"
+
+  [RED]="\[\e[0;31m\]"
+  [LIGHT_RED]="\[\e[0;1;31m\]"
+
+  [GREEN]="\[\e[0;32m\]"
+  [LIGHT_GREEN]="\[\e[0;1;32m\]"
+
+  [YELLOW]="\[\e[0;33m\]"
+  [LIGHT_YELLOW]="\[\e[0;1;33m\]"
+
+  [BLUE]="\[\e[0;34m\]"
+  [LIGHT_BLUE]="\[\e[0;1;34m\]"
+
+  [MAGENTA]="\[\e[0;35m\]"
+  [LIGHT_MAGENTA]="\[\e[0;1;35m\]"
+
+  [CYAN]="\[\e[0;36m\]"
+  [LIGHT_CYAN]="\[\e[0;1;36m\]"
+)
+
 prompt_command()
 {
-  local NORMAL="\[\e[0m\]"
-  local BOLD="\[\e[0;1;39m\]"
-
-  local RED="\[\e[0;31m\]"
-  local LIGHT_RED="\[\e[0;1;31m\]"
-
-  local GREEN="\[\e[0;32m\]"
-  local LIGHT_GREEN="\[\e[0;1;32m\]"
-
-  local YELLOW="\[\e[0;33m\]"
-  local LIGHT_YELLOW="\[\e[0;1;33m\]"
-
-  local BLUE="\[\e[0;34m\]"
-  local LIGHT_BLUE="\[\e[0;1;34m\]"
-
-  local MAGENTA="\[\e[0;35m\]"
-  local LIGHT_MAGENTA="\[\e[0;1;35m\]"
-
-  local CYAN="\[\e[0;36m\]"
-  local LIGHT_CYAN="\[\e[0;1;36m\]"
-
-  local branch_color=$GREEN
-
   git_branch=$(__get_git_branch)
   virtual_env=$(__get_virtual_env)
 
-  PS1="$BLUE$virtual_env$LIGHT_BLUE[$NORMAL\u$GREEN@$BLUE\h$YELLOW:$BOLD\W$LIGHT_BLUE] $git_branch$BOLD$(__prompt_char) $NORMAL"
+  PS1="${__styles[BLUE]}$virtual_env${__styles[LIGHT_BLUE]}[${__styles[NORMAL]}\u${__styles[GREEN]}@${__styles[BLUE]}\h${__styles[YELLOW]}:${__styles[BOLD]}\W${__styles[LIGHT_BLUE]}] $git_branch${__styles[BOLD]}$(__prompt_char) ${__styles[NORMAL]}"
 }
 
 if [[ -z ${__prompt_cmd_set+x} ]]; then

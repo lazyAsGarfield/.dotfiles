@@ -104,7 +104,7 @@ __get_git_branch()
     git_info="$(git branch 2> /dev/null | grep '* ' | cut -c3-)"
     if [[ -n $git_info ]]; then
       if [[ -n $ZSH_VERSION ]]; then
-        git_info="$LIGHT_BLUE$git_info"
+        git_info="${__styles[LIGHT_BLUE]}$git_info"
         local ahead_behind
         ahead_behind="$(timeout 0.1s bash -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
         ret=$?
@@ -114,10 +114,10 @@ __get_git_branch()
           local ahead="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
           local behind="$(sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
           if [[ $behind -gt 0 ]]; then
-            more_info="$more_info$GREEN\u25BC$behind"
+            more_info="$more_info${__styles[GREEN]}\u25BC$behind"
           fi
           if [[ $ahead -gt 0 ]]; then
-            more_info="$more_info$GREEN\u25B2$ahead"
+            more_info="$more_info${__styles[GREEN]}\u25B2$ahead"
           fi
         fi
         more_info="$more_info "
@@ -130,7 +130,7 @@ __get_git_branch()
             killed=1
           else
             if [[ $untracked -gt 0 ]]; then
-              more_info="$more_info$LIGHT_BLUE$untracked\u25A1 "
+              more_info="$more_info${__styles[LIGHT_BLUE]}$untracked\u25A1 "
             fi
           fi
         fi
@@ -143,7 +143,7 @@ __get_git_branch()
             killed=1
           else
             if [[ $unstaged -gt 0 ]]; then
-              more_info="$more_info$LIGHT_BLUE$unstaged\u25EA "
+              more_info="$more_info${__styles[LIGHT_BLUE]}$unstaged\u25EA "
             fi
           fi
         fi
@@ -156,12 +156,12 @@ __get_git_branch()
             killed=1
           else
             if [[ $staged -gt 0 ]]; then
-              more_info="$more_info$LIGHT_BLUE$staged\u25A0 "
+              more_info="$more_info${__styles[LIGHT_BLUE]}$staged\u25A0 "
             fi
           fi
         fi
         if (( $killed )); then
-          git_info="$git_info $RED? "
+          git_info="$git_info ${__styles[RED]}? "
         else
           git_info="$git_info$more_info"
         fi
@@ -176,7 +176,7 @@ __get_git_branch()
 __get_virtual_env()
 {
   virtual_env=""
-  if [[ -z $VIRTUAL_ENV_DIABLE_PROMPT ]]; then
+  if [[ -z $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
     if [[ -n $VIRTUAL_ENV ]]; then
       virtual_env="($(basename $VIRTUAL_ENV)) "
     fi
