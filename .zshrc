@@ -119,6 +119,8 @@ alias -g N12=' > /dev/null 2>&1'
 alias guc='git reset --soft HEAD^'
 alias grm='git reset --mixed HEAD^'
 alias gdp='git diff HEAD^'
+alias gdcap='git diff --cached HEAD^'
+alias gapp='git apply'
 
 function _completemarks {
   reply=($(ls $MARKPATH))
