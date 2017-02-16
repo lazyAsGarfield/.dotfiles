@@ -1372,5 +1372,7 @@ endfunction
 
 let g:cpp_concepts_highlight = 1
 
-au FileType tex let b:delimitMate_quotes = "\" ' *"
+au FileType tex let b:delimitMate_quotes = "\" '"
 au FileType tex set textwidth = 120
+
+au FileType python let b:delimitMate_nesting_quotes = ['"', "'"]
