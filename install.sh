@@ -10,11 +10,10 @@ msg_and_run()
 {
   note="$1"
   shift
-  echo -n "$note... "
-  out=$("$@" 2>&1)
+  echo "### $note... ###"
+  "$@"
   res=$?
-  [[ $res -eq 0 ]] && echo "done" || echo "FAIL"
-  [[ -n $out ]] && echo "$out"
+  [[ $res -eq 0 ]] && echo "### OK ###" || echo -n "### FAIL ###"
   return $res
 }
 
@@ -297,10 +296,7 @@ if [[ -d $target_dir/.git ]]; then
     exec "$target_dir/install.sh"
   fi
 else
-  if [[ $(echo_read "Clone repo? [y]/n: ") != "n"* ]]; then
-    msg_and_run "Cloning" git clone --recursive http://github.com/bmalkus/.dotfiles "$target_dir"
-    echo
-  fi
+  msg_and_run "Cloning repo" git clone --recursive http://github.com/bmalkus/.dotfiles "$target_dir"
 fi
 
 if [[ $(echo_read "Configure vim? y/[n]: ") == "y" ]]; then
