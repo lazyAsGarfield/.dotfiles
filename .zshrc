@@ -133,7 +133,7 @@ compctl -K _completemarks unmark
 
 # bindings and so on {{{
 
-KEYTIMEOUT=1
+KEYTIMEOUT=1000
 
 autoload -z edit-command-line
 zle -N edit-command-line
@@ -206,6 +206,17 @@ bindkey -M menuselect ' '   accept-line
 bindkey -M menuselect '^[f' accept-and-infer-next-history
 
 autoload -Uz add-zsh-hook
+
+source $DOTFILES_DIR/fzf-utils.sh
+
+if [[ -n $TMUX ]]; then
+  fzf()
+  {
+    tmux set-environment pass_ctrl 1
+    command fzf "$@"
+    tmux set-environment pass_ctrl 0
+  }
+fi
 
 # }}}
 

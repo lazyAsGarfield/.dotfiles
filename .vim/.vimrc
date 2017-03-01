@@ -42,16 +42,17 @@ Plug 'airblade/vim-gitgutter'
 Plug 'moll/vim-bbye'
 Plug 'ntpeters/vim-better-whitespace'
 Plug 'tpope/vim-sleuth'
-Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'vim-airline/vim-airline-themes'
 Plug 'majutsushi/tagbar'
 Plug 'scrooloose/nerdcommenter'
 Plug 'tpope/vim-repeat'
-Plug 'tikhomirov/vim-glsl'
-Plug 'adimit/prolog.vim'
-Plug 'JuliaEditorSupport/julia-vim'
 Plug 'haya14busa/incsearch.vim'
 Plug 'lervag/vimtex'
+
+" Colors
+Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
+Plug 'sjl/badwolf'
+Plug 'w0ng/vim-hybrid'
 
 " Extracted from https://github.com/klen/python-mode
 Plug '~/.vim/plugin/python-mode-motions'
@@ -184,22 +185,12 @@ set lazyredraw
 if !exists("g:vimrc_init")
   let g:vimrc_init = 1
 
-  " silent! colorscheme atom-dark-256-mine
-  silent! colorscheme Tomorrow-Night-Eighties-Mine
+  set background=dark
+  silent! colorscheme hybrid
 
-  if has("gui_running")
-
-    " set guifont=DejaVu\ Sans\ Mono\ for\ Powerline
-    " set guifont=Consolas:h10
-
-    " start maximized
-    " autocmd GUIEnter * simalt ~s
-
-    " just make window larger (if above dosn't work):
-    winpos 0 0
-    set lines=100 columns=420
-
-  endif
+  set termguicolors
+  let &t_8f = "[38;2;%lu;%lu;%lum"
+  let &t_8b = "[48;2;%lu;%lu;%lum"
 
   " when editing a file, always jump to the last known cursor position.
   autocmd BufReadPost *
@@ -208,9 +199,7 @@ if !exists("g:vimrc_init")
         \ endif
 
   " 80/120 columns marker
-  " silent! let &colorcolumn="80,".join(range(120,999),",")
   silent! let &colorcolumn="80,120"
-  " call matchadd('ColorColumn', '\%=80v', -10)
 
   " indentation options
   set autoindent
@@ -419,7 +408,7 @@ endfunction
 
 command! -bang -nargs=? -complete=dir FilesBetterPrompt call fzf#vim#files(<q-args>, extend({
       \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-      \ 'options': '--prompt "' . (<q-args> ? getcwd() : s:full_path(<q-args>)) . ' (Files)> "'
+      \ 'options': '--preview "cat {}" --prompt "' . (<q-args> ? getcwd() : s:full_path(<q-args>)) . ' (Files)> "'
       \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
 
 function! s:is_remote()
@@ -447,7 +436,7 @@ function! s:git_files_if_in_repo(bang)
     let expanded = getcwd()
     return fzf#vim#files(expanded, extend({
           \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-          \ 'options': '--prompt "' . expanded . ' (Files)> "'
+          \ 'options': '--preview "cat {}" --prompt "' . expanded . ' (Files)> "'
           \ }, a:bang ? {} : g:fzf#vim#default_layout))
   else
     let git_root = fugitive#repo().tree()
@@ -455,10 +444,8 @@ function! s:git_files_if_in_repo(bang)
     let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
     try
       exec cdCmd . git_root
-      let z = { 'options': '--prompt "' . git_root . ' (GitFiles)> "' }
-      echo z
       call fzf#vim#gitfiles('', extend({
-            \ 'options': '--prompt "' . git_root . ' (GitFiles)> "'
+            \ 'options': '--preview "cat {}" --prompt "' . git_root . ' (GitFiles)> "'
             \ }, a:bang ? {} : g:fzf#vim#default_layout))
     finally
       exec cdCmd . save_cwd
@@ -476,14 +463,14 @@ function! s:git_root_or_cwd()
   if s:is_remote()
     return getcwd()
   endif
-  return exists('b:git_dir') ? fugitive#repo().tree() : getcwd()
+  return exists('b:git_dir') ? fugitive#repo().tree() : Get_cpp_root(getcwd())
 endfunction
 
 function! s:all_files_git_root_or_cwd(bang)
   let path = s:git_root_or_cwd()
   call fzf#vim#files(path, extend({
         \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-        \ 'options': '--prompt "' . path . ' (Files)> "'
+        \ 'options': '--preview "cat {}" --prompt "' . path . ' (Files)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
@@ -593,7 +580,7 @@ function! s:ag_in(bang, ...)
   endtry
   call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --ignore .git/', extend({
         \ 'dir': dir,
-        \ 'options': '--prompt "' . dir . ' (Ag)> "'
+        \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
@@ -604,7 +591,7 @@ function! s:ag_with_opts(bang, ...)
   let dir = s:git_root_or_cwd()
   call fzf#vim#ag(query, ag_opts . ' --ignore .git/', extend({
         \ 'dir': dir,
-        \ 'options': '--prompt "' . dir . ' (Ag)> "'
+        \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
         \ }, a:bang ? {} : g:fzf#vim#default_layout))
 endfunction
 
@@ -612,7 +599,8 @@ command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
 command! -nargs=* -bang Agcwd exec 'Agin<bang>'  getcwd() '<args>'
 command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<bang>0, <f-args>)
-" Ag command is set in after/plugin/override.vim
+
+runtime after/plugin/overrideAg.vim
 
 cnoreabbrev ag Ag
 cnoreabbrev agin Agin
@@ -1204,7 +1192,7 @@ function! s:header_files()
   let loc = Get_cpp_root()
   call fzf#vim#files(loc, {
         \ 'source': "ag -g '\\." .  s:header_ext_str . "$'",
-        \ 'options': '--prompt "' . getcwd() . ' (Headers)> "'
+          \ 'options': '--preview "cat {}" --prompt "' . getcwd() . ' (Headers)> "'
         \ })
 endfunction
 
@@ -1212,7 +1200,7 @@ function! s:src_files(...)
   let loc = Get_cpp_root()
   call fzf#vim#files(loc, {
         \ 'source': "ag -g '\\." .  (a:0 > 0 ? a:1 : s:src_ext_str) . "$'",
-        \ 'options': '--prompt "' . getcwd() . ' (Sources)> "'
+        \ 'options': '--preview "cat {}" --prompt "' . getcwd() . ' (Sources)> "'
         \ })
 endfunction
 
@@ -1339,3 +1327,19 @@ au FileType tex set textwidth=120
 
 au FileType python let b:delimitMate_nesting_quotes = ['"', "'"]
 nmap <silent> <leader>t :checktime<CR>
+
+function! SourceRange() range
+  let tmpsofile = tempname()
+  call writefile(getline(a:firstline, a:lastline), l:tmpsofile)
+  execute "source " . l:tmpsofile
+  call delete(l:tmpsofile)
+endfunction
+command! -range Source <line1>,<line2>call SourceRange()
+
+nnoremap <silent> <leader>.c :let pos = getpos('.') \|
+      \ exec "%Source" \|
+      \ call setpos('.', pos)<CR>
+
+vmap <leader>s :sort<CR>
+
+vmap <leader>cp S*gvS/
