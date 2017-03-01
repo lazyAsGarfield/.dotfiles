@@ -312,7 +312,7 @@ let g:gitgutter_sign_modified = '#'
 let g:gitgutter_sign_removed = 'v'
 let g:gitgutter_sign_modified_removed = '#v'
 
-highlight ExtraWhitespace ctermbg=137
+highlight ExtraWhitespace ctermbg=137 guibg=#cc4411
 
 " --------------- PLUGIN OPTS END ---------- }}}
 
