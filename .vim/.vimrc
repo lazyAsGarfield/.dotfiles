@@ -898,7 +898,7 @@ function! MoveToNextTab(...)
   exe l:line
 endfunc
 
-nnoremap <silent> t :tabnew<CR>
+nnoremap <silent> t :tabnew %<CR>
 nnoremap <silent> x :sp<CR>
 nnoremap <silent> v :vsp<CR>
 
@@ -1343,3 +1343,5 @@ nnoremap <silent> <leader>.c :let pos = getpos('.') \|
 vmap <leader>s :sort<CR>
 
 vmap <leader>cp S*gvS/
+
+hi! VertSplit guibg=#252525
