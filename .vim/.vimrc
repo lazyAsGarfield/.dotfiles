@@ -1345,3 +1345,7 @@ vmap <leader>s :sort<CR>
 vmap <leader>cp S*gvS/
 
 hi! VertSplit guibg=#252525
+
+function! Strip(str)
+  return substitute(a:str, '\v^(\n|\s)*(.{-})(\n|\s)*$', '\2', '')
+endfunction
