@@ -36,6 +36,8 @@ Plug 'lazyAsGarfield/delimitMate'
 Plug 'junegunn/vim-easy-align'
 Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
+Plug 'junegunn/limelight.vim'
+Plug 'junegunn/goyo.vim'
 Plug 'christoomey/vim-tmux-navigator'
 Plug 'tpope/vim-endwise'
 Plug 'airblade/vim-gitgutter'
@@ -302,6 +304,12 @@ let delimitMate_smart_matchpairs = '^\%(\w\|[£$]\|[^[:space:][:punct:]]\)'
 
 " Undotree settings
 let g:undotree_SetFocusWhenToggle = 1
+
+let g:goyo_width=120
+let g:goyo_height='95%'
+
+let g:limelight_default_coefficient = 0.54
+let g:limelight_paragraph_span = 1
 
 let g:tmux_navigator_no_mappings = 1
 
@@ -672,6 +680,34 @@ command! -nargs=? Regs call fzf#run({
       \ 'options': '-e -x +s --prompt "(Regs)> " --ansi --expect=alt-p,' .  s:yank_key,
       \ 'down':    '40%'
       \ })
+
+function! s:goyo_enter()
+  if !empty($TMUX)
+    silent! !tmux set -w status off
+    silent! !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
+  endif
+  set noshowmode
+  set noshowcmd
+  let g:scrolloff_saved=&scrolloff
+  " set scrolloff=999
+  Goyo x95%
+  " silent! Limelight
+endfunction
+
+function! s:goyo_leave()
+  if !empty($TMUX)
+    silent! !tmux set -w status on
+    silent! !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
+  endif
+  set showmode
+  set showcmd
+  exec 'set scrolloff=' . g:scrolloff_saved
+  silent! Limelight!
+  " silent! colorscheme Tomorrow-Night-Eighties-Mine
+endfunction
+
+autocmd! User GoyoEnter nested call <SID>goyo_enter()
+autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
 " --------------- PLUGIN COMMANDS END -------------- }}}
 
@@ -1297,6 +1333,9 @@ map *  <Plug>(incsearch-nohl-*)
 map #  <Plug>(incsearch-nohl-#)
 map g* <Plug>(incsearch-nohl-g*)
 map g# <Plug>(incsearch-nohl-g#)
+
+nmap <leader>mm :Goyo<CR>
+nmap <leader>ml :Limelight!!<CR>
 
 nmap 0y "0y
 vmap 0y "0y
