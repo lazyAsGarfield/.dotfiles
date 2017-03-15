@@ -283,7 +283,7 @@ let g:ycm_semantic_triggers =  {
   \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
   \             're!\[.*\]\s'],
   \   'ocaml' : ['.', '#'],
-  \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
+  \   'cpp,objcpp' : ['->', '.', '::'],
   \   'perl' : ['->'],
   \   'php' : ['->', '::'],
   \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
@@ -292,6 +292,8 @@ let g:ycm_semantic_triggers =  {
   \   'lua' : ['.', ':'],
   \   'erlang' : [':'],
   \ }
+
+  " \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
 
 autocmd FileType cuda set ft=cuda.cpp
 

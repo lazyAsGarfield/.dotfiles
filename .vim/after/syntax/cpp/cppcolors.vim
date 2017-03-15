@@ -1,6 +1,5 @@
 hi MacroInstantiation cterm=italic guifg=LightBlue ctermfg=LightBlue
 
-
 function! s:change_colors()
   try
     redir => s:h
