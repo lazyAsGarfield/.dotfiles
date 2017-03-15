@@ -8,6 +8,9 @@ let path='~/.vim/plugged'
 
 call plug#begin(path)
 
+" change leader key
+let mapleader=" "
+let maplocalleader=" "
 
 " ---------- nerdtree ---------- {{{
 
@@ -933,10 +936,6 @@ endif " exists("g:vimrc_init")
 " --------------- VIM OPTS END ------------- }}}
 
 " ---------- VIM MAPPINGS --------- {{{
-
-" change leader key
-let mapleader=" "
-let maplocalleader=" "
 
 " open/close quickfix/location-list window
 noremap [wq :bot copen<CR>
