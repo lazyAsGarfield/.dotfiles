@@ -8,304 +8,191 @@ let path='~/.vim/plugged'
 
 call plug#begin(path)
 
-Plug 'tpope/vim-surround'
+
+" ---------- nerdtree ---------- {{{
+
 if v:version >= 703
   Plug 'scrooloose/nerdtree'
+
+  let NERDTreeMouseMode = 2
+
+  function! NERDTreeEnableOrToggle()
+    try
+      NERDTreeToggle
+    catch
+      silent! NERDTree
+    endtry
+  endfunction
+
+  map <C-n> :call NERDTreeEnableOrToggle()<CR>
+
+  nmap n :NERDTreeFind<CR>
+
+  " autocmd FileType nerdtree nmap <buffer>  :quit<CR>
+  autocmd FileType nerdtree nmap <buffer> <C-v> s
+  autocmd FileType nerdtree nmap <buffer> <C-x> i
+  autocmd FileType nerdtree nmap <buffer> <C-j> j
+  autocmd FileType nerdtree nmap <buffer> <C-k> k
+  autocmd FileType nerdtree nmap <buffer> . I
+
+  let g:NERDTreeMapJumpLastChild = '<C-f>'
+  let g:NERDTreeMapJumpFirstChild = '<C-b>'
+  let g:NERDTreeMapJumpNextSibling = 'J'
+  let g:NERDTreeMapJumpPrevSibling = 'K'
+  let g:NERDMenuMode = 3
+  let g:NERDTreeCascadeSingleChildDir = 0
+endif
+
+" }}}
+
+" ---------- undotree ---------- {{{
+
+if v:version >= 703
   Plug 'mbbill/undotree'
+
+  let g:undotree_SetFocusWhenToggle = 1
+
+  autocmd FileType undotree nmap <nowait> <buffer> q :quit<CR>
+  autocmd FileType undotree nmap <buffer> <C-j> j
+  autocmd FileType undotree nmap <buffer> <C-k> k
+  autocmd FileType undotree nmap <buffer> <nowait>  :quit<CR>
+
+  nnoremap u :UndotreeToggle<CR>
+endif
+
+" }}}
+
+" -------- vim-easymotion ------ {{{
+
+if v:version >= 703
   Plug 'bmalkus/vim-easymotion'
+endif
+
+" }}}
+
+" ------------- YCM ------------ {{{
+
+if v:version >= 703
   if empty($__NO_YCM__)
     if empty($__NO_COMPL__)
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
     else
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
     endif
+
+    " let g:loaded_youcompleteme = 1
+
+    let g:ycm_complete_in_comments = 1
+    let g:ycm_seed_identifiers_with_syntax = 1
+    " let g:ycm_add_preview_to_completeopt = 1
+    " let g:ycm_autoclose_preview_window_after_insertion = 0
+    let g:ycm_always_populate_location_list = 1
+
+    let g:ycm_semantic_triggers =  {
+          \   'c' : ['->', '.'],
+          \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
+          \             're!\[.*\]\s'],
+          \   'ocaml' : ['.', '#'],
+          \   'cpp,objcpp' : ['->', '.', '::'],
+          \   'perl' : ['->'],
+          \   'php' : ['->', '::'],
+          \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
+          \   'python' : ['.'],
+          \   'ruby' : ['.', '::'],
+          \   'lua' : ['.', ':'],
+          \   'erlang' : [':'],
+          \ }
+
+    " \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
+
+    let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")
+
+    let g:ycm_warning_symbol = '>'
+    let g:ycm_error_symbol = '>>'
+    let g:ycm_collect_identifiers_from_tags_files = 1
+
+    nnoremap ycg :YcmCompleter GoTo<CR>
+    nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
+    nnoremap ycf :YcmCompleter FixIt<CR>
+    nnoremap ycd :YcmCompleter GetDoc<CR>
+    nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
+    nnoremap ycl :YcmDiags<CR>
+    nnoremap yct :YcmCompleter GetType<CR>
+    nnoremap ycr :YcmRestartServer<CR>
+
+  endif
+endif
+
+" }}}
+
+" ---------- jedi-vim ---------- {{{
+
+if v:version >= 703
+  if empty($__NO_YCM__)
     Plug 'davidhalter/jedi-vim'
-    Plug 'jeaye/color_coded'
   endif
+
+  " two below fix showing argument list when using YCM
+  let g:jedi#show_call_signatures_delay = 0
+  let g:jedi#show_call_signatures = "0"
+
+  let g:jedi#use_splits_not_buffers = "right"
+  let g:jedi#goto_command = "yjg"
+  let g:jedi#goto_assignments_command = "yja"
+  let g:jedi#goto_definitions_command = "yjd"
+  let g:jedi#documentation_command = "yjd"
+  let g:jedi#usages_command = "yju"
+  " let g:jedi#completions_command = "<C-Space>"
+  " let g:jedi#completions_command = "<Tab>"
+  let g:jedi#completions_command = ""
+  let g:jedi#rename_command = "yjr"
+
+  " disable completions from jedi-vim, using YCM instead
+  let g:jedi#completions_enabled = 0
+
 endif
-if v:version >= 704
+
+" }}}
+
+" ---------- ultisnips --------- {{{
+
+if v:version >= 704 && has('python')
   Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
+
+  let g:UltiSnipsExpandTrigger = 'e'
+  let g:UltiSnipsListSnippets = 's'
+  let g:UltiSnipsJumpForwardTrigger = 'f'
+  let g:UltiSnipsJumpBackwardTrigger = 'b'
+
+  let g:UltiSnipsEditSplit = 'vertical'
+  let g:UltiSnipsSnippetsDir = $DOTFILES_DIR . '/.vim/UltiSnips'
 endif
-Plug 'kien/ctrlp.vim'
-Plug 'bling/vim-airline'
-Plug 'hynek/vim-python-pep8-indent'
-Plug 'tpope/vim-unimpaired'
-Plug 'tpope/vim-fugitive'
-Plug 'octol/vim-cpp-enhanced-highlight'
+
+" }}}
+
+" --------- delimitMate -------- {{{
+
 Plug 'lazyAsGarfield/delimitMate'
-Plug 'junegunn/vim-easy-align'
-Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
-Plug 'junegunn/limelight.vim'
-Plug 'junegunn/goyo.vim'
-Plug 'christoomey/vim-tmux-navigator'
-Plug 'tpope/vim-endwise'
-Plug 'airblade/vim-gitgutter'
-Plug 'moll/vim-bbye'
-Plug 'ntpeters/vim-better-whitespace'
-Plug 'tpope/vim-sleuth'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'majutsushi/tagbar'
-Plug 'scrooloose/nerdcommenter'
-Plug 'tpope/vim-repeat'
-Plug 'haya14busa/incsearch.vim'
-Plug 'lervag/vimtex'
 
-" Colors
-Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
-Plug 'sjl/badwolf'
-Plug 'w0ng/vim-hybrid'
-
-" Extracted from https://github.com/klen/python-mode
-Plug '~/.vim/plugin/python-mode-motions'
-
-call plug#end()
-
-filetype plugin indent on
-
-" some options get overriden by plugins when re-sourcing vimrc, set them to
-" desired values
-runtime after/plugin/override.vim
-
-" --------------- PLUGINS END --------------- }}}
-
-" ---------- VIM OPTS ------------- {{{
-
-" enable mouse if possible
-if has('mouse')
-  set mouse+=a
-endif
-
-" tmux options
-if ( &term =~ '^screen' || &term =~ '^tmux' ) && exists('$TMUX')
-  " tmux knows the extended mouse mode
-  set ttymouse=xterm2
-  " tmux will send xterm-style keys when xterm-keys is on
-  exec "set <xUp>=\e[1;*A"
-  exec "set <xDown>=\e[1;*B"
-  exec "set <xRight>=\e[1;*C"
-  exec "set <xLeft>=\e[1;*D"
-  exec "set <xHome>=\e[1;*H"
-  exec "set <xEnd>=\e[1;*F"
-  exec "set <Insert>=\e[2;*~"
-  exec "set <Delete>=\e[3;*~"
-  exec "set <PageUp>=\e[5;*~"
-  exec "set <PageDown>=\e[6;*~"
-  exec "set <xF1>=\e[1;*P"
-  exec "set <xF2>=\e[1;*Q"
-  exec "set <xF3>=\e[1;*R"
-  exec "set <xF4>=\e[1;*S"
-  exec "set <F5>=\e[15;*~"
-  exec "set <F6>=\e[17;*~"
-  exec "set <F7>=\e[18;*~"
-  exec "set <F8>=\e[19;*~"
-  exec "set <F9>=\e[20;*~"
-  exec "set <F10>=\e[21;*~"
-  exec "set <F11>=\e[23;*~"
-  exec "set <F12>=\e[24;*~"
-endif
-
-" mouse fix for columns > 220
-if has('mouse_sgr')
-  set ttymouse=sgr
-endif
-
-" enable syntax highlighting
-syntax on
-
-" timeout for key codes (delayed ESC is annoying)
-set ttimeoutlen=0
-
-" enable persistent undo + its settings
-if has("persistent_undo")
-  if isdirectory($HOME . '/.vim/.undodir') == 0
-    :silent !mkdir -p $HOME/.vim/.undodir >/dev/null 2>&1
-  endif
-  set undolevels=15000
-  set undofile
-  set undodir=$HOME/.vim/.undodir/
-endif
-
-" completion options
-set completeopt=menuone
-
-" do not create a backup file
-" set nobackup
-" set noswapfile
-if isdirectory($HOME . '/.vim/.backupdir') == 0
-  :silent !mkdir -p $HOME/.vim/.backupdir >/dev/null 2>&1
-endif
-set backupdir=$HOME/.vim/.backupdir//
-set backup
-
-if isdirectory($HOME . '/.vim/.swapdir') == 0
-  :silent !mkdir -p $HOME/.vim/.swapdir >/dev/null 2>&1
-endif
-set directory=$HOME/.vim/.swapdir//
-set swapfile
-
-" Automatically read a file that has changed on disk
-set autoread
-
-" number of command line history lines kept
-set history=10000
-
-" default encoding
-set encoding=utf-8
-
-" allow backspacing over everything in insert mode
-set backspace=indent,eol,start
-
-" do incremental searching
-set incsearch
-
-" set search highlighting, bo do not highlight for now
-set hlsearch
-noh
-
-" line endings settings
-set fileformats=unix,dos
-
-" always show status line
-set laststatus=2
-
-" allow to hide buffer with unsaved changes
-set hidden
-
-" no characters in separators
-set fillchars=""
-
-" disable that annoying beeping
-autocmd GUIEnter * set vb t_vb=
-
-" display incomplete commands
-set showcmd
-
-set lazyredraw
-
-" some options have to be set only at init
-if !exists("g:vimrc_init")
-  let g:vimrc_init = 1
-
-  set background=dark
-  silent! colorscheme hybrid
-
-  set termguicolors
-  let &t_8f = "[38;2;%lu;%lu;%lum"
-  let &t_8b = "[48;2;%lu;%lu;%lum"
-
-  " when editing a file, always jump to the last known cursor position.
-  autocmd BufReadPost *
-        \ if line("'\"") > 1 && line("'\"") <= line("$") |
-        \   exe "normal! g`\"" |
-        \ endif
-
-  " 80/120 columns marker
-  silent! let &colorcolumn="80,120"
-
-  " indentation options
-  set autoindent
-  set expandtab
-  set shiftwidth=2
-  set softtabstop=2
-  set tabstop=2
-  set smarttab
-
-  " display line numbers
-  set number
-
-  " set folding method
-  set foldmethod=marker
-
-  " diff options
-  set diffopt+=vertical
-
-  " split settings
-  set splitbelow
-  set splitright
-
-  " show the cursor position all the time
-  set ruler
-
-  " show at least 5 lines below/above cursor
-  set scrolloff=5
-
-  " foldenable + foldcolumn
-  " silent! set nofoldenable
-  if &foldenable
-    silent! set foldcolumn=1
-  else
-    silent! set foldcolumn=0
-  endif
-
-  set nowrap
-endif " exists("g:vimrc_init")
-
-" --------------- VIM OPTS END ------------- }}}
-
-" ---------- PLUGIN OPTS ---------- {{{
-
-" NERDTree plugin options
-let NERDTreeMouseMode = 2
-
-" vim-commentary settings
-autocmd FileType c,cpp,cs,java,cuda,cuda.cpp setlocal commentstring=//\ %s
-autocmd FileType gnuplot setlocal commentstring=#\ %s
-autocmd FileType cmake setlocal commentstring=#\ %s
-
-" jedi-vim settings
-" two below fix showing argument list when using YCM
-let g:jedi#show_call_signatures_delay = 0
-let g:jedi#show_call_signatures = "0"
-
-let g:jedi#use_splits_not_buffers = "right"
-let g:jedi#goto_command = "yjg"
-let g:jedi#goto_assignments_command = "yja"
-let g:jedi#goto_definitions_command = "yjd"
-let g:jedi#documentation_command = "yjd"
-let g:jedi#usages_command = "yju"
-" let g:jedi#completions_command = "<C-Space>"
-" let g:jedi#completions_command = "<Tab>"
-let g:jedi#completions_command = ""
-let g:jedi#rename_command = "yjr"
-
-" disable completions from jedi-vim, using YCM instead
-let g:jedi#completions_enabled = 0
-
-let g:ycm_complete_in_comments = 1
-let g:ycm_seed_identifiers_with_syntax = 1
-" let g:ycm_add_preview_to_completeopt = 1
-" let g:ycm_autoclose_preview_window_after_insertion = 0
-let g:ycm_always_populate_location_list = 1
-
-let g:ycm_semantic_triggers =  {
-  \   'c' : ['->', '.'],
-  \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-  \             're!\[.*\]\s'],
-  \   'ocaml' : ['.', '#'],
-  \   'cpp,objcpp' : ['->', '.', '::'],
-  \   'perl' : ['->'],
-  \   'php' : ['->', '::'],
-  \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
-  \   'python' : ['.'],
-  \   'ruby' : ['.', '::'],
-  \   'lua' : ['.', ':'],
-  \   'erlang' : [':'],
-  \ }
-
-  " \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
-
-autocmd FileType cuda set ft=cuda.cpp
-
-" delimitMate opts
 let delimitMate_expand_cr=2
 let delimitMate_expand_space=1
 let delimitMate_balance_matchpairs=1
 let delimitMate_matchpairs = "(:),[:],{:}"
 let delimitMate_smart_matchpairs = '^\%(\w\|[£$]\|[^[:space:][:punct:]]\)'
 
-" Undotree settings
-let g:undotree_SetFocusWhenToggle = 1
+au FileType python let b:delimitMate_nesting_quotes = ['"', "'"]
+
+imap <C-k> <Plug>delimitMateJumpMany
+imap <C-l> <Plug>delimitMateS-Tab
+imap <C-h> <Plug>delimitMateS-BS
+imap <C-j> <C-k><CR>
+
+" }}}
+
+" -------- goyo/limelight ------ {{{
+
+Plug 'junegunn/limelight.vim'
+Plug 'junegunn/goyo.vim'
 
 let g:goyo_width=120
 let g:goyo_height='95%'
@@ -313,102 +200,93 @@ let g:goyo_height='95%'
 let g:limelight_default_coefficient = 0.54
 let g:limelight_paragraph_span = 1
 
+function! s:goyo_enter()
+  if !empty($TMUX)
+    silent! !tmux set -w status off
+    silent! !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
+  endif
+  set noshowmode
+  set noshowcmd
+  let g:scrolloff_saved=&scrolloff
+  " set scrolloff=999
+  Goyo x95%
+  " silent! Limelight
+endfunction
+
+function! s:goyo_leave()
+  if !empty($TMUX)
+    silent! !tmux set -w status on
+    silent! !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
+  endif
+  set showmode
+  set showcmd
+  exec 'set scrolloff=' . g:scrolloff_saved
+  silent! Limelight!
+  " silent! colorscheme Tomorrow-Night-Eighties-Mine
+endfunction
+
+autocmd! User GoyoEnter nested call <SID>goyo_enter()
+autocmd! User GoyoLeave nested call <SID>goyo_leave()
+
+nmap <leader>mm :Goyo<CR>
+nmap <leader>ml :Limelight!!<CR>
+
+" }}}
+
+" -------- tmux-navigator ------ {{{
+
+Plug 'christoomey/vim-tmux-navigator'
+
 let g:tmux_navigator_no_mappings = 1
 
-let g:gitgutter_override_sign_column_highlight = 0
-
-" those are better visible
-let g:gitgutter_sign_modified = '#'
-let g:gitgutter_sign_removed = 'v'
-let g:gitgutter_sign_modified_removed = '#v'
-
-highlight ExtraWhitespace ctermbg=137 guibg=#cc4411
-
-" --------------- PLUGIN OPTS END ---------- }}}
-
-" ---------- VIM MAPPINGS --------- {{{
-
-" change leader key
-let mapleader=" "
-let maplocalleader=" "
-
-" open/close quickfix/location-list window
-noremap [wq :bot copen<CR>
-noremap ]wq :cclose<CR>
-noremap [wl :bot lopen<CR>
-noremap ]wl :lclose<CR>
-
-" moving around wrapped lines more naturally
-noremap j gj
-noremap k gk
-
-" easier quitting
-map <leader>q :q<CR>
-
-" disable search highlighting
-map <silent> <leader>n :noh<CR>
-
-" resizing splits more easily
-nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
-nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
-nmap _ :exe "resize " . ((winheight(0) + 1) * 3/2)<CR>
-nmap - :exe "resize " . (winheight(0) * 2/3)<CR>
-
-" registers
-nmap cr "
-vmap cr "
-
-nmap cry "0
-vmap cry "0
-nmap crc "+
-vmap crc "+
-
-nmap cy "+y
-vmap cy "+y
-nmap cY "+Y
-vmap cY "+Y
-
-nmap cp "+p
-vmap cp "+p
-nmap cP "+P
-vmap cP "+P
-
-" substitute all occurences of text selected in visual mode
-vnoremap <C-r><C-r> "hy:%s/<C-r>h/<C-r>h/g<left><left>
-vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>/<C-r>h/g<left><left>
-
-" it's handy to have those when using byobu, as Shift + arrows moves around
-" byobu's splits
-nnoremap <C-Left> <C-w>h
-nnoremap <C-Down> <C-w>j
-nnoremap <C-Up> <C-w>k
-nnoremap <C-Right> <C-w>l
-
-func! ChangeFold()
-  if (&foldenable == 1)
-    set nofoldenable
-    set foldcolumn=0
-    echo 'Folding disabled'
-  else
-    set foldenable
-    set foldcolumn=1
-    echo 'Folding enabled'
+function! Navigate(dir)
+  if a:dir == 'l'
+    if exists(':TmuxNavigateLeft')
+      TmuxNavigateLeft
+    else
+      normal h
+    endif
+  elseif a:dir == 'r'
+    if exists(':TmuxNavigateRight')
+      TmuxNavigateRight
+    else
+      normal l
+    endif
+  elseif a:dir == 'u'
+    if exists(':TmuxNavigateUp')
+      TmuxNavigateUp
+    else
+      normal k
+    endif
+  elseif a:dir == 'd'
+    if exists(':TmuxNavigateDown')
+      TmuxNavigateDown
+    else
+      normal j
+    endif
   endif
-endfunc
+endfunction
 
-map zi :call ChangeFold()<CR>
+" when .vimrc loaded by other apps, like qt creator, use standard bindings
+if version >= 700
+  nnoremap <silent> <C-h> :call Navigate('l')<CR>
+  nnoremap <silent> <C-j> :call Navigate('d')<CR>
+  nnoremap <silent> <C-k> :call Navigate('u')<CR>
+  nnoremap <silent> <C-l> :call Navigate('r')<CR>
+else
+  nnoremap <C-h> <C-w>h
+  nnoremap <C-j> <C-w>j
+  nnoremap <C-k> <C-w>k
+  nnoremap <C-l> <C-w>l
+endif
 
-" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
-" so that you can undo CTRL-U after inserting a line break.
-inoremap <C-U> <C-G>u<C-U>
+" }}}
 
-autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
+" ---------- fzf/ctrlp --------- {{{
 
-autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
-
-" --------------- VIM MAPPINGS END -------------- }}}
-
-" ---------- PLUGIN COMMANDS ------ {{{
+Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'kien/ctrlp.vim'
 
 function! s:full_path(dir_or_file)
   " if fnamemodify() applied once, full_path may look like /blah/../
@@ -683,77 +561,9 @@ command! -nargs=? Regs call fzf#run({
       \ 'down':    '40%'
       \ })
 
-function! s:goyo_enter()
-  if !empty($TMUX)
-    silent! !tmux set -w status off
-    silent! !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
-  endif
-  set noshowmode
-  set noshowcmd
-  let g:scrolloff_saved=&scrolloff
-  " set scrolloff=999
-  Goyo x95%
-  " silent! Limelight
-endfunction
-
-function! s:goyo_leave()
-  if !empty($TMUX)
-    silent! !tmux set -w status on
-    silent! !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
-  endif
-  set showmode
-  set showcmd
-  exec 'set scrolloff=' . g:scrolloff_saved
-  silent! Limelight!
-  " silent! colorscheme Tomorrow-Night-Eighties-Mine
-endfunction
-
-autocmd! User GoyoEnter nested call <SID>goyo_enter()
-autocmd! User GoyoLeave nested call <SID>goyo_leave()
-
-" --------------- PLUGIN COMMANDS END -------------- }}}
-
-" ---------- PLUGIN MAPPINGS ------ {{{
-
-if version >= 703
-
-  " YCM mappings
-  nnoremap ycg :YcmCompleter GoTo<CR>
-  nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
-  nnoremap ycf :YcmCompleter FixIt<CR>
-  nnoremap ycd :YcmCompleter GetDoc<CR>
-  nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
-  nnoremap ycl :YcmDiags<CR>
-  nnoremap yct :YcmCompleter GetType<CR>
-  nnoremap ycr :YcmRestartServer<CR>
-
-  " NERDTree plugin
-  function! NERDTreeEnableOrToggle()
-    try
-      NERDTreeToggle
-    catch
-      silent! NERDTree
-    endtry
-  endfunction
-
-  map <C-n> :call NERDTreeEnableOrToggle()<CR>
-
-endif
-
-" delimitMate mappings
-imap <C-k> <Plug>delimitMateJumpMany
-imap <C-l> <Plug>delimitMateS-Tab
-imap <C-h> <Plug>delimitMateS-BS
-imap <C-j> <C-k><CR>
-
-" no need for mapping, using fzf instead
-let g:ctrlp_map = ''
-
-" EasyAlign mappings
-xmap ga <Plug>(EasyAlign)
-nmap ga <Plug>(EasyAlign)
-
 if executable('fzf')
+  let g:ctrlp_map = ''
+
   nnoremap <C-p> :Mru<CR>
   nnoremap <C-b> :BuffersBetterPrompt<CR>
   nnoremap <leader>g :GitFilesOrCwd<CR>
@@ -770,75 +580,441 @@ else
   nnoremap <silent> <C-f> :CtrlP<CR>
 endif
 
-autocmd FileType undotree nmap <nowait> <buffer> q :quit<CR>
-autocmd FileType undotree nmap <buffer> <C-j> j
-autocmd FileType undotree nmap <buffer> <C-k> k
-autocmd FileType undotree nmap <buffer> <nowait>  :quit<CR>
+" }}}
 
-" autocmd FileType nerdtree nmap <buffer>  :quit<CR>
-autocmd FileType nerdtree nmap <buffer> <C-v> s
-autocmd FileType nerdtree nmap <buffer> <C-x> i
-autocmd FileType nerdtree nmap <buffer> <C-j> j
-autocmd FileType nerdtree nmap <buffer> <C-k> k
-autocmd FileType nerdtree nmap <buffer> . I
+" ------------- git ------------ {{{
 
-let g:NERDTreeMapJumpLastChild = '<C-f>'
-let g:NERDTreeMapJumpFirstChild = '<C-b>'
-let g:NERDTreeMapJumpNextSibling = 'J'
-let g:NERDTreeMapJumpPrevSibling = 'K'
+Plug 'airblade/vim-gitgutter'
+Plug 'tpope/vim-fugitive'
 
-function! Navigate(dir)
-  if a:dir == 'l'
-    if exists(':TmuxNavigateLeft')
-      TmuxNavigateLeft
-    else
-      normal h
-    endif
-  elseif a:dir == 'r'
-    if exists(':TmuxNavigateRight')
-      TmuxNavigateRight
-    else
-      normal l
-    endif
-  elseif a:dir == 'u'
-    if exists(':TmuxNavigateUp')
-      TmuxNavigateUp
-    else
-      normal k
-    endif
-  elseif a:dir == 'd'
-    if exists(':TmuxNavigateDown')
-      TmuxNavigateDown
-    else
-      normal j
-    endif
-  endif
-endfunction
+let g:gitgutter_override_sign_column_highlight = 0
 
-" when .vimrc loaded by other apps, like qt creator, use standard bindings
-if version >= 700
-  nnoremap <silent> <C-h> :call Navigate('l')<CR>
-  nnoremap <silent> <C-j> :call Navigate('d')<CR>
-  nnoremap <silent> <C-k> :call Navigate('u')<CR>
-  nnoremap <silent> <C-l> :call Navigate('r')<CR>
-else
-  nnoremap <C-h> <C-w>h
-  nnoremap <C-j> <C-w>j
-  nnoremap <C-k> <C-w>k
-  nnoremap <C-l> <C-w>l
-endif
+" those are better visible
+let g:gitgutter_sign_modified = '#'
+let g:gitgutter_sign_removed = 'v'
+let g:gitgutter_sign_modified_removed = '#v'
 
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
 
-map <leader>D :Bdelete<CR>
-
 autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
 
-" --------------- PLUGIN MAPPINGS END -------------- }}}
+" }}}
+
+" ------- better-whitespace ---- {{{
+
+Plug 'ntpeters/vim-better-whitespace'
+
+highlight ExtraWhitespace ctermbg=137 guibg=#cc4411
+
+" }}}
+
+" --------- colors/themes ------ {{{
+
+Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
+Plug 'sjl/badwolf'
+Plug 'w0ng/vim-hybrid'
+
+Plug 'octol/vim-cpp-enhanced-highlight'
+
+Plug 'bling/vim-airline'
+Plug 'vim-airline/vim-airline-themes'
+
+if v:version >= 703
+  if empty($__NO_YCM__)
+    Plug 'jeaye/color_coded'
+  endif
+endif
+
+let g:airline_left_sep=''
+let g:airline_right_sep=''
+
+let g:cpp_experimental_template_highlight = 1
+let g:cpp_concepts_highlight = 1
+
+" }}}
+
+" ------------ tpope ----------- {{{
+
+Plug 'tpope/vim-surround'
+Plug 'tpope/vim-repeat'
+Plug 'tpope/vim-sleuth'
+Plug 'tpope/vim-unimpaired'
+Plug 'tpope/vim-endwise'
+
+" }}}
+
+" ------------ python ---------- {{{
+
+" Extracted from https://github.com/klen/python-mode
+Plug '~/.vim/plugin/python-mode-motions'
+Plug 'hynek/vim-python-pep8-indent'
+
+" }}}
+
+" ---------- easy-align -------- {{{
+
+Plug 'junegunn/vim-easy-align'
+
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
+
+" }}}
+
+" ------------ tagbar ---------- {{{
+
+Plug 'majutsushi/tagbar'
+
+let g:tagbar_autofocus = 1
+let g:tagbar_map_openfold = 'l'
+let g:tagbar_map_closefold = 'h'
+
+nmap g :TagbarToggle<CR>
+
+" }}}
+
+" ----------- vim-bbye --------- {{{
+
+Plug 'moll/vim-bbye'
+
+map <leader>D :Bdelete<CR>
+
+" }}}
+
+" -------- nerdcommenter ------- {{{
+
+Plug 'scrooloose/nerdcommenter'
+
+let g:NERDRemoveExtraSpaces = 1
+let g:NERDSpaceDelims = 1
+" prevent double space after '#' in python
+let g:NERDAltDelims_python = 1
+let g:NERDCompactSexyComs = 1
+let g:NERDDefaultAlign = 'left'
+
+let g:NERDCustomDelimiters = {
+      \ 'glsl': { 'left': '//', 'leftAlt': '/*', 'rightAlt': '*/' },
+      \ }
+
+" }}}
+
+" ---------- incsearch --------- {{{
+
+Plug 'haya14busa/incsearch.vim'
+
+let g:incsearch#auto_nohlsearch = 1
+
+map /  <Plug>(incsearch-forward)
+map ?  <Plug>(incsearch-backward)
+map g/ <Plug>(incsearch-stay)
+
+map n  <Plug>(incsearch-nohl-n)
+map N  <Plug>(incsearch-nohl-N)
+map *  <Plug>(incsearch-nohl-*)
+map #  <Plug>(incsearch-nohl-#)
+map g* <Plug>(incsearch-nohl-g*)
+map g# <Plug>(incsearch-nohl-g#)
+
+" }}}
+
+" ------------ latex ----------- {{{
+
+Plug 'lervag/vimtex'
+
+let g:tex_flavor = "latex"
+
+augroup latexSurround
+  autocmd!
+  autocmd FileType tex call s:latexSurround()
+augroup END
+
+function! s:latexSurround()
+  let b:surround_{char2nr("e")}
+        \ = "\\begin{\1environment: \1}\n\t\r\n\\end{\1\1}"
+  let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
+endfunction
+
+au FileType tex let b:delimitMate_quotes = "\" '"
+au FileType tex set textwidth=120
+
+" }}}
+
+call plug#end()
+
+filetype plugin indent on
+
+" some options get overriden by plugins when re-sourcing vimrc, set them to
+" desired values
+runtime after/plugin/override.vim
+
+
+" --------------- PLUGINS END --------------- }}}
+
+" ---------- VIM OPTS ------------- {{{
+
+" enable mouse if possible
+if has('mouse')
+  set mouse+=a
+endif
+
+" tmux options
+if ( &term =~ '^screen' || &term =~ '^tmux' ) && exists('$TMUX')
+  " tmux knows the extended mouse mode
+  set ttymouse=xterm2
+  " tmux will send xterm-style keys when xterm-keys is on
+  exec "set <xUp>=\e[1;*A"
+  exec "set <xDown>=\e[1;*B"
+  exec "set <xRight>=\e[1;*C"
+  exec "set <xLeft>=\e[1;*D"
+  exec "set <xHome>=\e[1;*H"
+  exec "set <xEnd>=\e[1;*F"
+  exec "set <Insert>=\e[2;*~"
+  exec "set <Delete>=\e[3;*~"
+  exec "set <PageUp>=\e[5;*~"
+  exec "set <PageDown>=\e[6;*~"
+  exec "set <xF1>=\e[1;*P"
+  exec "set <xF2>=\e[1;*Q"
+  exec "set <xF3>=\e[1;*R"
+  exec "set <xF4>=\e[1;*S"
+  exec "set <F5>=\e[15;*~"
+  exec "set <F6>=\e[17;*~"
+  exec "set <F7>=\e[18;*~"
+  exec "set <F8>=\e[19;*~"
+  exec "set <F9>=\e[20;*~"
+  exec "set <F10>=\e[21;*~"
+  exec "set <F11>=\e[23;*~"
+  exec "set <F12>=\e[24;*~"
+endif
+
+" mouse fix for columns > 220
+if has('mouse_sgr')
+  set ttymouse=sgr
+endif
+
+" enable syntax highlighting
+syntax on
+
+" timeout for key codes (delayed ESC is annoying)
+set ttimeoutlen=0
+
+" enable persistent undo + its settings
+if has("persistent_undo")
+  if isdirectory($HOME . '/.vim/.undodir') == 0
+    :silent !mkdir -p $HOME/.vim/.undodir >/dev/null 2>&1
+  endif
+  set undolevels=15000
+  set undofile
+  set undodir=$HOME/.vim/.undodir/
+endif
+
+" completion options
+set completeopt=menuone
+
+" do not create a backup file
+" set nobackup
+" set noswapfile
+if isdirectory($HOME . '/.vim/.backupdir') == 0
+  :silent !mkdir -p $HOME/.vim/.backupdir >/dev/null 2>&1
+endif
+set backupdir=$HOME/.vim/.backupdir//
+set backup
+
+if isdirectory($HOME . '/.vim/.swapdir') == 0
+  :silent !mkdir -p $HOME/.vim/.swapdir >/dev/null 2>&1
+endif
+set directory=$HOME/.vim/.swapdir//
+set swapfile
+
+" Automatically read a file that has changed on disk
+set autoread
+
+" number of command line history lines kept
+set history=10000
+
+" default encoding
+set encoding=utf-8
+
+" allow backspacing over everything in insert mode
+set backspace=indent,eol,start
+
+" do incremental searching
+set incsearch
+
+" set search highlighting, bo do not highlight for now
+set hlsearch
+noh
+
+" line endings settings
+set fileformats=unix,dos
+
+" always show status line
+set laststatus=2
+
+" allow to hide buffer with unsaved changes
+set hidden
+
+" no characters in separators
+set fillchars=""
+
+" disable that annoying beeping
+autocmd GUIEnter * set vb t_vb=
+
+" display incomplete commands
+set showcmd
+
+set lazyredraw
+
+" some options have to be set only at init
+if !exists("g:vimrc_init")
+  let g:vimrc_init = 1
+
+  set background=dark
+  silent! colorscheme hybrid
+
+  set termguicolors
+  let &t_8f = "[38;2;%lu;%lu;%lum"
+  let &t_8b = "[48;2;%lu;%lu;%lum"
+
+  " when editing a file, always jump to the last known cursor position.
+  autocmd BufReadPost *
+        \ if line("'\"") > 1 && line("'\"") <= line("$") |
+        \   exe "normal! g`\"" |
+        \ endif
+
+  " 80/120 columns marker
+  silent! let &colorcolumn="80,120"
+
+  " indentation options
+  set autoindent
+  set expandtab
+  set shiftwidth=2
+  set softtabstop=2
+  set tabstop=2
+  set smarttab
+
+  " display line numbers
+  set number
+
+  " set folding method
+  set foldmethod=marker
+
+  " diff options
+  set diffopt+=vertical
+
+  " split settings
+  set splitbelow
+  set splitright
+
+  " show the cursor position all the time
+  set ruler
+
+  " show at least 5 lines below/above cursor
+  set scrolloff=5
+
+  " foldenable + foldcolumn
+  " silent! set nofoldenable
+  if &foldenable
+    silent! set foldcolumn=1
+  else
+    silent! set foldcolumn=0
+  endif
+
+  set nowrap
+endif " exists("g:vimrc_init")
+
+" --------------- VIM OPTS END ------------- }}}
+
+" ---------- VIM MAPPINGS --------- {{{
+
+" change leader key
+let mapleader=" "
+let maplocalleader=" "
+
+" open/close quickfix/location-list window
+noremap [wq :bot copen<CR>
+noremap ]wq :cclose<CR>
+noremap [wl :bot lopen<CR>
+noremap ]wl :lclose<CR>
+
+" moving around wrapped lines more naturally
+noremap j gj
+noremap k gk
+
+" easier quitting
+map <leader>q :q<CR>
+
+" disable search highlighting
+map <silent> <leader>n :noh<CR>
+
+" resizing splits more easily
+nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
+nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
+nmap _ :exe "resize " . ((winheight(0) + 1) * 3/2)<CR>
+nmap - :exe "resize " . (winheight(0) * 2/3)<CR>
+
+" registers
+nmap cr "
+vmap cr "
+
+nmap cry "0
+vmap cry "0
+nmap crc "+
+vmap crc "+
+
+nmap cy "+y
+vmap cy "+y
+nmap cY "+Y
+vmap cY "+Y
+
+nmap cp "+p
+vmap cp "+p
+nmap cP "+P
+vmap cP "+P
+
+" substitute all occurences of text selected in visual mode
+vnoremap <C-r><C-r> "hy:%s/<C-r>h/<C-r>h/g<left><left>
+vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>/<C-r>h/g<left><left>
+
+" it's handy to have those when using byobu, as Shift + arrows moves around
+" byobu's splits
+nnoremap <C-Left> <C-w>h
+nnoremap <C-Down> <C-w>j
+nnoremap <C-Up> <C-w>k
+nnoremap <C-Right> <C-w>l
+
+func! ChangeFold()
+  if (&foldenable == 1)
+    set nofoldenable
+    set foldcolumn=0
+    echo 'Folding disabled'
+  else
+    set foldenable
+    set foldcolumn=1
+    echo 'Folding enabled'
+  endif
+endfunc
+
+map zi :call ChangeFold()<CR>
+
+" CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
+" so that you can undo CTRL-U after inserting a line break.
+inoremap <C-U> <C-G>u<C-U>
+
+autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
+
+autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
+
+" --------------- VIM MAPPINGS END -------------- }}}
 
 
 " new stuff, not categorized yet
+
+autocmd FileType cuda set ft=cuda.cpp
+
+" vim-commentary settings
+autocmd FileType c,cpp,cs,java,cuda,cuda.cpp setlocal commentstring=//\ %s
+autocmd FileType gnuplot setlocal commentstring=#\ %s
+autocmd FileType cmake setlocal commentstring=#\ %s
 
 function! s:cd_to_root_if_git_repo()
   if exists('b:git_dir')
@@ -881,11 +1057,6 @@ function! RemoveFromQF(ind)
 endfunction
 
 autocmd FileType qf nnoremap <silent> <nowait> <buffer> d :call RemoveFromQF(line('.'))<CR>
-
-let g:UltiSnipsExpandTrigger = 'e'
-let g:UltiSnipsListSnippets = 's'
-let g:UltiSnipsJumpForwardTrigger = 'f'
-let g:UltiSnipsJumpBackwardTrigger = 'b'
 
 function! MoveToPrevTab(...)
   let l:line = line('.')
@@ -981,41 +1152,6 @@ set cinoptions+=J1
 " Let's fix it
 au! syntaxset BufEnter *
 
-nmap n :NERDTreeFind<CR>
-
-let g:airline_left_sep=''
-let g:airline_right_sep=''
-
-nmap g :TagbarToggle<CR>
-
-let g:tagbar_map_openfold = 'l'
-let g:tagbar_map_closefold = 'h'
-
-" Undotree plugin
-nnoremap u :UndotreeToggle<CR>
-
-let g:tagbar_autofocus = 1
-
-let g:NERDMenuMode = 3
-let g:NERDRemoveExtraSpaces = 1
-let g:NERDSpaceDelims = 1
-" prevent double space after '#' in python
-let g:NERDAltDelims_python = 1
-let g:NERDCompactSexyComs = 1
-let g:NERDDefaultAlign = 'left'
-
-let g:NERDCustomDelimiters = {
-      \ 'glsl': { 'left': '//', 'leftAlt': '/*', 'rightAlt': '*/' },
-      \ }
-
-let g:cpp_experimental_template_highlight = 1
-
-let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")
-
-let g:ycm_warning_symbol = '>'
-let g:ycm_error_symbol = '>>'
-let g:ycm_collect_identifiers_from_tags_files = 1
-
 silent! set shortmess+=c
 
 nmap <leader>` p
@@ -1061,8 +1197,6 @@ nnoremap co<space> :<C-R>=b:better_whitespace_enabled ? 'DisableWhitespace' : 'E
 nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGutterEnable'<CR><CR>
 
 nmap <leader>= =
-
-let g:NERDTreeCascadeSingleChildDir = 0
 
 " save current file
 map <leader>w :w<CR>
@@ -1319,26 +1453,6 @@ endfunction
 
 nmap <silent> f :call Fold()<CR>
 
-" let g:loaded_youcompleteme = 1
-
-let g:UltiSnipsEditSplit = 'vertical'
-let g:UltiSnipsSnippetsDir = $DOTFILES_DIR . '/.vim/UltiSnips'
-
-map /  <Plug>(incsearch-forward)
-map ?  <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
-
-let g:incsearch#auto_nohlsearch = 1
-map n  <Plug>(incsearch-nohl-n)
-map N  <Plug>(incsearch-nohl-N)
-map *  <Plug>(incsearch-nohl-*)
-map #  <Plug>(incsearch-nohl-#)
-map g* <Plug>(incsearch-nohl-g*)
-map g# <Plug>(incsearch-nohl-g#)
-
-nmap <leader>mm :Goyo<CR>
-nmap <leader>ml :Limelight!!<CR>
-
 nmap 0y "0y
 vmap 0y "0y
 nmap 0p "0p
@@ -1347,26 +1461,6 @@ nmap 0Y "0Y
 vmap 0Y "0Y
 nmap 0P "0P
 vmap 0P "0P
-
-let g:tex_flavor = "latex"
-
-augroup latexSurround
-  autocmd!
-  autocmd FileType tex call s:latexSurround()
-augroup END
-
-function! s:latexSurround()
-  let b:surround_{char2nr("e")}
-        \ = "\\begin{\1environment: \1}\n\t\r\n\\end{\1\1}"
-  let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
-endfunction
-
-let g:cpp_concepts_highlight = 1
-
-au FileType tex let b:delimitMate_quotes = "\" '"
-au FileType tex set textwidth=120
-
-au FileType python let b:delimitMate_nesting_quotes = ['"', "'"]
 nmap <silent> <leader>t :checktime<CR>
 
 function! SourceRange() range
