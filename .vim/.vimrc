@@ -12,9 +12,23 @@ call plug#begin(path)
 " ---------- nerdtree ---------- {{{
 
 if v:version >= 703
+
   Plug 'scrooloose/nerdtree'
 
-  let NERDTreeMouseMode = 2
+  let g:NERDTreeMouseMode = 2
+  let g:NERDTreeMapJumpLastChild = '<C-f>'
+  let g:NERDTreeMapJumpFirstChild = '<C-b>'
+  let g:NERDTreeMapJumpNextSibling = 'J'
+  let g:NERDTreeMapJumpPrevSibling = 'K'
+  let g:NERDMenuMode = 3
+  let g:NERDTreeCascadeSingleChildDir = 0
+
+  " autocmd FileType nerdtree nmap <buffer>  :quit<CR>
+  autocmd FileType nerdtree nmap <buffer> <C-v> s
+  autocmd FileType nerdtree nmap <buffer> <C-x> i
+  autocmd FileType nerdtree nmap <buffer> <C-j> j
+  autocmd FileType nerdtree nmap <buffer> <C-k> k
+  autocmd FileType nerdtree nmap <buffer> . I
 
   function! NERDTreeEnableOrToggle()
     try
@@ -28,19 +42,6 @@ if v:version >= 703
 
   nmap n :NERDTreeFind<CR>
 
-  " autocmd FileType nerdtree nmap <buffer>  :quit<CR>
-  autocmd FileType nerdtree nmap <buffer> <C-v> s
-  autocmd FileType nerdtree nmap <buffer> <C-x> i
-  autocmd FileType nerdtree nmap <buffer> <C-j> j
-  autocmd FileType nerdtree nmap <buffer> <C-k> k
-  autocmd FileType nerdtree nmap <buffer> . I
-
-  let g:NERDTreeMapJumpLastChild = '<C-f>'
-  let g:NERDTreeMapJumpFirstChild = '<C-b>'
-  let g:NERDTreeMapJumpNextSibling = 'J'
-  let g:NERDTreeMapJumpPrevSibling = 'K'
-  let g:NERDMenuMode = 3
-  let g:NERDTreeCascadeSingleChildDir = 0
 endif
 
 " }}}
@@ -48,6 +49,7 @@ endif
 " ---------- undotree ---------- {{{
 
 if v:version >= 703
+
   Plug 'mbbill/undotree'
 
   let g:undotree_SetFocusWhenToggle = 1
@@ -58,6 +60,7 @@ if v:version >= 703
   autocmd FileType undotree nmap <buffer> <nowait>  :quit<CR>
 
   nnoremap u :UndotreeToggle<CR>
+
 endif
 
 " }}}
@@ -74,6 +77,7 @@ endif
 
 if v:version >= 703
   if empty($__NO_YCM__)
+
     if empty($__NO_COMPL__)
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
     else
@@ -81,13 +85,11 @@ if v:version >= 703
     endif
 
     " let g:loaded_youcompleteme = 1
-
     let g:ycm_complete_in_comments = 1
     let g:ycm_seed_identifiers_with_syntax = 1
     " let g:ycm_add_preview_to_completeopt = 1
     " let g:ycm_autoclose_preview_window_after_insertion = 0
     let g:ycm_always_populate_location_list = 1
-
     let g:ycm_semantic_triggers =  {
           \   'c' : ['->', '.'],
           \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
@@ -103,10 +105,9 @@ if v:version >= 703
           \   'erlang' : [':'],
           \ }
 
-    " \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
+          " \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
 
     let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")
-
     let g:ycm_warning_symbol = '>'
     let g:ycm_error_symbol = '>>'
     let g:ycm_collect_identifiers_from_tags_files = 1
@@ -128,9 +129,13 @@ endif
 " ---------- jedi-vim ---------- {{{
 
 if v:version >= 703
+
   if empty($__NO_YCM__)
     Plug 'davidhalter/jedi-vim'
   endif
+
+  " disable completions from jedi-vim, using YCM instead
+  let g:jedi#completions_enabled = 0
 
   " two below fix showing argument list when using YCM
   let g:jedi#show_call_signatures_delay = 0
@@ -147,9 +152,6 @@ if v:version >= 703
   let g:jedi#completions_command = ""
   let g:jedi#rename_command = "yjr"
 
-  " disable completions from jedi-vim, using YCM instead
-  let g:jedi#completions_enabled = 0
-
 endif
 
 " }}}
@@ -157,6 +159,7 @@ endif
 " ---------- ultisnips --------- {{{
 
 if v:version >= 704 && has('python')
+
   Plug 'SirVer/ultisnips' | Plug 'honza/vim-snippets'
 
   let g:UltiSnipsExpandTrigger = 'e'
@@ -166,6 +169,7 @@ if v:version >= 704 && has('python')
 
   let g:UltiSnipsEditSplit = 'vertical'
   let g:UltiSnipsSnippetsDir = $DOTFILES_DIR . '/.vim/UltiSnips'
+
 endif
 
 " }}}
@@ -200,6 +204,9 @@ let g:goyo_height='95%'
 let g:limelight_default_coefficient = 0.54
 let g:limelight_paragraph_span = 1
 
+autocmd! User GoyoEnter nested call <SID>goyo_enter()
+autocmd! User GoyoLeave nested call <SID>goyo_leave()
+
 function! s:goyo_enter()
   if !empty($TMUX)
     silent! !tmux set -w status off
@@ -224,9 +231,6 @@ function! s:goyo_leave()
   silent! Limelight!
   " silent! colorscheme Tomorrow-Night-Eighties-Mine
 endfunction
-
-autocmd! User GoyoEnter nested call <SID>goyo_enter()
-autocmd! User GoyoLeave nested call <SID>goyo_leave()
 
 nmap <leader>mm :Goyo<CR>
 nmap <leader>ml :Limelight!!<CR>
@@ -288,280 +292,286 @@ Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install -
 Plug 'junegunn/fzf.vim'
 Plug 'kien/ctrlp.vim'
 
-function! s:full_path(dir_or_file)
-  " if fnamemodify() applied once, full_path may look like /blah/../
-  " if a:dir_or_file is '..'
-  return fnamemodify(fnamemodify(a:dir_or_file, ':p'), ':p')
-endfunction
+if !executable('fzf')
 
-command! -bang -nargs=? -complete=dir FilesBetterPrompt call fzf#vim#files(<q-args>, extend({
-      \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-      \ 'options': '--preview "cat {}" --prompt "' . (<q-args> ? getcwd() : s:full_path(<q-args>)) . ' (Files)> "'
-      \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
+  nnoremap <silent> <C-p> :CtrlPMRU<CR>
+  nnoremap <silent> <C-b> :CtrlPBuffer<CR>
+  nnoremap <silent> <C-f> :CtrlP<CR>
 
-function! s:is_remote()
-  let file = expand('%')
-  return file =~# '^\(scp\|ftp\)://' || file =~# '^//'
-endfunction
+else
 
-function! s:mru_list_without_nonexistent()
-  if empty(expand('%')) || s:is_remote() || &readonly
-    let mru_list = ctrlp#mrufiles#list()
-  else
-    let mru_list = ctrlp#mrufiles#list()[1:]
-  endif
-  let cwd = fnameescape(getcwd())
-  call filter(mru_list, '!empty(findfile(v:val, cwd))')
-  return mru_list
-endfunction
+  function! s:full_path(dir_or_file)
+    " if fnamemodify() applied once, full_path may look like /blah/../
+    " if a:dir_or_file is '..'
+    return fnamemodify(fnamemodify(a:dir_or_file, ':p'), ':p')
+  endfunction
 
-function! s:git_files_if_in_repo(bang)
-  let expanded = expand('%:p:h')
-  if s:is_remote()
-    let expanded = getcwd()
-  endif
-  if ! exists('b:git_dir')
-    let expanded = getcwd()
-    return fzf#vim#files(expanded, extend({
+  command! -bang -nargs=? -complete=dir FilesBetterPrompt call fzf#vim#files(<q-args>, extend({
+        \ 'source': 'ag -g "" --hidden -U --ignore .git/',
+        \ 'options': '--preview "cat {}" --prompt "' . (<q-args> ? getcwd() : s:full_path(<q-args>)) . ' (Files)> "'
+        \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
+
+  function! s:is_remote()
+    let file = expand('%')
+    return file =~# '^\(scp\|ftp\)://' || file =~# '^//'
+  endfunction
+
+  function! s:mru_list_without_nonexistent()
+    if empty(expand('%')) || s:is_remote() || &readonly
+      let mru_list = ctrlp#mrufiles#list()
+    else
+      let mru_list = ctrlp#mrufiles#list()[1:]
+    endif
+    let cwd = fnameescape(getcwd())
+    call filter(mru_list, '!empty(findfile(v:val, cwd))')
+    return mru_list
+  endfunction
+
+  function! s:git_files_if_in_repo(bang)
+    let expanded = expand('%:p:h')
+    if s:is_remote()
+      let expanded = getcwd()
+    endif
+    if ! exists('b:git_dir')
+      let expanded = getcwd()
+      return fzf#vim#files(expanded, extend({
+            \ 'source': 'ag -g "" --hidden -U --ignore .git/',
+            \ 'options': '--preview "cat {}" --prompt "' . expanded . ' (Files)> "'
+            \ }, a:bang ? {} : g:fzf#vim#default_layout))
+    else
+      let git_root = fugitive#repo().tree()
+      let save_cwd = fnameescape(getcwd())
+      let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
+      try
+        exec cdCmd . git_root
+        call fzf#vim#gitfiles('', extend({
+              \ 'options': '--preview "cat {}" --prompt "' . git_root . ' (GitFiles)> "'
+              \ }, a:bang ? {} : g:fzf#vim#default_layout))
+      finally
+        exec cdCmd . save_cwd
+      endtry
+    endif
+  endfunction
+
+  command! -bang GitFilesOrCwd call s:git_files_if_in_repo(<bang>0)
+
+  command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
+        \ 'options': '--prompt "Buffers> "'
+        \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
+
+  function! s:git_root_or_cwd()
+    if s:is_remote()
+      return getcwd()
+    endif
+    return exists('b:git_dir') ? fugitive#repo().tree() : Get_cpp_root(getcwd())
+  endfunction
+
+  function! s:all_files_git_root_or_cwd(bang)
+    let path = s:git_root_or_cwd()
+    call fzf#vim#files(path, extend({
           \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-          \ 'options': '--preview "cat {}" --prompt "' . expanded . ' (Files)> "'
+          \ 'options': '--preview "cat {}" --prompt "' . path . ' (Files)> "'
           \ }, a:bang ? {} : g:fzf#vim#default_layout))
-  else
-    let git_root = fugitive#repo().tree()
+  endfunction
+
+  command! -bang FilesGitRootOrCwd call s:all_files_git_root_or_cwd(<bang>0)
+
+  " expands path relatively to cwd or git root if possible
+  " (similar to CtrlP plugin)
+  function! s:relpath(filepath_or_name)
+    let fullpath = fnamemodify(a:filepath_or_name, ':p')
     let save_cwd = fnameescape(getcwd())
     let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
     try
-      exec cdCmd . git_root
-      call fzf#vim#gitfiles('', extend({
-            \ 'options': '--preview "cat {}" --prompt "' . git_root . ' (GitFiles)> "'
-            \ }, a:bang ? {} : g:fzf#vim#default_layout))
+      exec cdCmd . fnameescape(s:git_root_or_cwd())
+      let ret = fnamemodify(fullpath, ':.')
     finally
       exec cdCmd . save_cwd
     endtry
-  endif
-endfunction
+    return ret
+  endfunction
 
-command! -bang GitFilesOrCwd call s:git_files_if_in_repo(<bang>0)
+  function! s:color_path(path)
+    if a:path =~ '^/'
+      return s:yellow(a:path)
+    else
+      return s:magenta(a:path)
+    endif
+  endfunction
 
-command! -bang BuffersBetterPrompt call fzf#vim#buffers(extend({
-      \ 'options': '--prompt "Buffers> "'
-      \ }, <bang>0 ? {} : g:fzf#vim#default_layout))
+  let s:default_action = {
+        \ 'ctrl-t': 'tab split',
+        \ 'ctrl-x': 'split',
+        \ 'ctrl-v': 'vsplit' }
 
-function! s:git_root_or_cwd()
-  if s:is_remote()
-    return getcwd()
-  endif
-  return exists('b:git_dir') ? fugitive#repo().tree() : Get_cpp_root(getcwd())
-endfunction
+  " below function is used in order to get actions like ctrl-v etc.
+  " and to transform path to proper version
+  function! s:mru_sink(lines)
+    if len(a:lines) <= 1
+      return
+    endif
+    let key = remove(a:lines, 0)
+    let cmd = get(s:default_action, key, 'e')
+    let save_cwd = fnameescape(getcwd())
+    let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
+    try
+      exec cdCmd . fnameescape(s:git_root_or_cwd())
+      let full_path_lines = map(a:lines, 'fnameescape(fnamemodify(v:val, ":p"))')
+    finally
+      exec cdCmd . save_cwd
+    endtry
+    if len(a:lines) > 1
+      augroup fzf_swap
+        autocmd SwapExists *
+              \ let v:swapchoice='o'
+              \| let b:swapname = v:swapname
+      augroup END
+    endif
+    let empty = empty(expand('%')) && line('$') == 1 && empty(getline(1)) && !&modified
+    try
+      for item in full_path_lines
+        if empty
+          exec 'e' item
+          let empty = 0
+        else
+          exec cmd item
+        endif
+        if exists('b:swapname')
+          augroup swap_exists_once
+            autocmd InsertEnter <buffer>
+                  \ echohl ErrorMsg
+                  \| echom 'E325: swap file exists: ' . b:swapname
+                  \| sleep 2
+                  \| echohl None
+                  \| autocmd! swap_exists_once
+          augroup END
+        endif
+      endfor
+    finally
+      silent! autocmd! fzf_swap
+    endtry
+  endfunction
 
-function! s:all_files_git_root_or_cwd(bang)
-  let path = s:git_root_or_cwd()
-  call fzf#vim#files(path, extend({
-        \ 'source': 'ag -g "" --hidden -U --ignore .git/',
-        \ 'options': '--preview "cat {}" --prompt "' . path . ' (Files)> "'
-        \ }, a:bang ? {} : g:fzf#vim#default_layout))
-endfunction
+  function! s:fzf_mru(bang)
+    call fzf#run({
+          \ 'source':  map(s:mru_list_without_nonexistent(), 's:color_path(s:relpath(v:val))'),
+          \ 'sink*': function("s:mru_sink"),
+          \ 'options': '-m -x +s --prompt "' . s:git_root_or_cwd() .
+          \ ' (MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
+          \ 'down':    '40%'
+          \ })
+  endfunction
 
-command! -bang FilesGitRootOrCwd call s:all_files_git_root_or_cwd(<bang>0)
+  command! -bang Mru call s:fzf_mru(<bang>0)
 
-" expands path relatively to cwd or git root if possible
-" (similar to CtrlP plugin)
-function! s:relpath(filepath_or_name)
-  let fullpath = fnamemodify(a:filepath_or_name, ':p')
-  let save_cwd = fnameescape(getcwd())
-  let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
-  try
-    exec cdCmd . fnameescape(s:git_root_or_cwd())
-    let ret = fnamemodify(fullpath, ':.')
-  finally
-    exec cdCmd . save_cwd
-  endtry
-  return ret
-endfunction
+  function! s:ag_in(bang, ...)
+    let tokens  = a:000
+    let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
+    let query   = (filter(copy(tokens), 'v:val !~ "^-"'))
+    let save_cwd = fnameescape(getcwd())
+    let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
+    " in case provided path is relative:
+    " treat it as relative to dir of current file, not cwd
+    try
+      exec cdCmd . fnameescape(expand('%:p:h'))
+      let dir = s:full_path(a:1)
+    finally
+      exec cdCmd . save_cwd
+    endtry
+    call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --ignore .git/', extend({
+          \ 'dir': dir,
+          \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
+          \ }, a:bang ? {} : g:fzf#vim#default_layout))
+  endfunction
 
-function! s:color_path(path)
-  if a:path =~ '^/'
-    return s:yellow(a:path)
-  else
-    return s:magenta(a:path)
-  endif
-endfunction
+  function! s:ag_with_opts(bang, ...)
+    let tokens  = a:000
+    let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
+    let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
+    let dir = s:git_root_or_cwd()
+    call fzf#vim#ag(query, ag_opts . ' --ignore .git/', extend({
+          \ 'dir': dir,
+          \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
+          \ }, a:bang ? {} : g:fzf#vim#default_layout))
+  endfunction
 
-let s:default_action = {
-  \ 'ctrl-t': 'tab split',
-  \ 'ctrl-x': 'split',
-  \ 'ctrl-v': 'vsplit' }
+  command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
-" below function is used in order to get actions like ctrl-v etc.
-" and to transform path to proper version
-function! s:mru_sink(lines)
-  if len(a:lines) <= 1
-    return
-  endif
-  let key = remove(a:lines, 0)
-  let cmd = get(s:default_action, key, 'e')
-  let save_cwd = fnameescape(getcwd())
-  let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
-  try
-    exec cdCmd . fnameescape(s:git_root_or_cwd())
-    let full_path_lines = map(a:lines, 'fnameescape(fnamemodify(v:val, ":p"))')
-  finally
-    exec cdCmd . save_cwd
-  endtry
-  if len(a:lines) > 1
-    augroup fzf_swap
-      autocmd SwapExists *
-            \ let v:swapchoice='o'
-            \| let b:swapname = v:swapname
-    augroup END
-  endif
-  let empty = empty(expand('%')) && line('$') == 1 && empty(getline(1)) && !&modified
-  try
-    for item in full_path_lines
-      if empty
-        exec 'e' item
-        let empty = 0
-      else
-        exec cmd item
-      endif
-      if exists('b:swapname')
-        augroup swap_exists_once
-          autocmd InsertEnter <buffer>
-                \ echohl ErrorMsg
-                \| echom 'E325: swap file exists: ' . b:swapname
-                \| sleep 2
-                \| echohl None
-                \| autocmd! swap_exists_once
-        augroup END
+  command! -nargs=* -bang Agcwd exec 'Agin<bang>'  getcwd() '<args>'
+  command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<bang>0, <f-args>)
+
+  runtime after/plugin/overrideAg.vim
+
+  cnoreabbrev ag Ag
+  cnoreabbrev agin Agin
+  cnoreabbrev agcwd Agcwd
+
+  function! s:ansi(str, col, bold)
+    return printf("\x1b[%s%sm%s\x1b[m", a:col, a:bold ? ';1' : '', a:str)
+  endfunction
+
+  for [s:c, s:a] in items({'black': 30, 'red': 31, 'green': 32, 'yellow': 33, 'blue': 34, 'magenta': 35, 'cyan': 36})
+    exec "function! s:".s:c."(str, ...)\n"
+          \ "  return s:ansi(a:str, ".s:a.", get(a:, 1, 0))\n"
+          \ "endfunction"
+  endfor
+
+  function! s:get_all_registers()
+    let reg_names = '"-+0123456789abcdefghijklmnopqrstuvwxyz=*:.%~/'
+    let res = []
+    for name in split(reg_names, '\zs')
+      let content = eval('@' . name)
+      let reg_str = s:blue('["' . name . ']') . ' ' . content
+      let reg_str = substitute(reg_str, '\n', s:yellow('\\n', 1), 'g')
+      if ! empty(content)
+        call add(res, reg_str)
       endif
     endfor
-  finally
-    silent! autocmd! fzf_swap
-  endtry
-endfunction
+    return res
+  endfunction
 
-function! s:fzf_mru(bang)
-  call fzf#run({
-        \ 'source':  map(s:mru_list_without_nonexistent(), 's:color_path(s:relpath(v:val))'),
-        \ 'sink*': function("s:mru_sink"),
-        \ 'options': '-m -x +s --prompt "' . s:git_root_or_cwd() .
-        \ ' (MRU)> " --ansi --expect='.join(keys(s:default_action), ','),
+  function! s:paste_buffer(key_with_str, visual)
+    let [key, str] = a:key_with_str
+    let reg = str[1:2]
+    exec 'normal ' . (a:visual ? 'gv' : '') . reg . (empty(key) ? 'p' : 'P')
+  endfunction
+
+  let s:yank_key = 'alt-c'
+
+  function! s:yank_to_buffer(key_with_str, visual)
+    let [key, str] = a:key_with_str
+    let reg = str[1:2]
+    exec 'normal ' . (a:visual ? 'gv'.reg.'y' : reg.'yy')
+  endfunction
+
+  function! s:registers_sink(key_with_str)
+    if len(a:key_with_str) > 1
+      let [key, str] = a:key_with_str
+      if tolower(key) == s:yank_key
+        call s:yank_to_buffer(a:key_with_str, 0)
+      else
+        call s:paste_buffer(a:key_with_str, 0)
+      endif
+    endif
+  endfunction
+
+  function! s:registers_sink_visual(key_with_str)
+    if len(a:key_with_str) > 1
+      let [key, str] = a:key_with_str
+      if tolower(key) == s:yank_key
+        call s:yank_to_buffer(a:key_with_str, 1)
+      else
+        call s:paste_buffer(a:key_with_str, 1)
+      endif
+    endif
+  endfunction
+
+  command! -nargs=? Regs call fzf#run({
+        \ 'source':  s:get_all_registers(),
+        \ 'sink*': function('s:registers_sink' . (<args>0 ? '_visual' : '')),
+        \ 'options': '-e -x +s --prompt "(Regs)> " --ansi --expect=alt-p,' .  s:yank_key,
         \ 'down':    '40%'
         \ })
-endfunction
-
-command! -bang Mru call s:fzf_mru(<bang>0)
-
-function! s:ag_in(bang, ...)
-  let tokens  = a:000
-  let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
-  let query   = (filter(copy(tokens), 'v:val !~ "^-"'))
-  let save_cwd = fnameescape(getcwd())
-  let cdCmd = (haslocaldir() ? 'lcd!' : 'cd!')
-  " in case provided path is relative:
-  " treat it as relative to dir of current file, not cwd
-  try
-    exec cdCmd . fnameescape(expand('%:p:h'))
-    let dir = s:full_path(a:1)
-  finally
-    exec cdCmd . save_cwd
-  endtry
-  call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --ignore .git/', extend({
-        \ 'dir': dir,
-        \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
-        \ }, a:bang ? {} : g:fzf#vim#default_layout))
-endfunction
-
-function! s:ag_with_opts(bang, ...)
-  let tokens  = a:000
-  let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
-  let query   = join(filter(copy(tokens), 'v:val !~ "^-"'))
-  let dir = s:git_root_or_cwd()
-  call fzf#vim#ag(query, ag_opts . ' --ignore .git/', extend({
-        \ 'dir': dir,
-        \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
-        \ }, a:bang ? {} : g:fzf#vim#default_layout))
-endfunction
-
-command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
-
-command! -nargs=* -bang Agcwd exec 'Agin<bang>'  getcwd() '<args>'
-command! -nargs=* -bang AgGitRootOrCwd call s:ag_with_opts(<bang>0, <f-args>)
-
-runtime after/plugin/overrideAg.vim
-
-cnoreabbrev ag Ag
-cnoreabbrev agin Agin
-cnoreabbrev agcwd Agcwd
-
-function! s:ansi(str, col, bold)
-  return printf("\x1b[%s%sm%s\x1b[m", a:col, a:bold ? ';1' : '', a:str)
-endfunction
-
-for [s:c, s:a] in items({'black': 30, 'red': 31, 'green': 32, 'yellow': 33, 'blue': 34, 'magenta': 35, 'cyan': 36})
-  exec "function! s:".s:c."(str, ...)\n"
-        \ "  return s:ansi(a:str, ".s:a.", get(a:, 1, 0))\n"
-        \ "endfunction"
-endfor
-
-function! s:get_all_registers()
-  let reg_names = '"-+0123456789abcdefghijklmnopqrstuvwxyz=*:.%~/'
-  let res = []
-  for name in split(reg_names, '\zs')
-    let content = eval('@' . name)
-    let reg_str = s:blue('["' . name . ']') . ' ' . content
-    let reg_str = substitute(reg_str, '\n', s:yellow('\\n', 1), 'g')
-    if ! empty(content)
-      call add(res, reg_str)
-    endif
-  endfor
-  return res
-endfunction
-
-function! s:paste_buffer(key_with_str, visual)
-  let [key, str] = a:key_with_str
-  let reg = str[1:2]
-  exec 'normal ' . (a:visual ? 'gv' : '') . reg . (empty(key) ? 'p' : 'P')
-endfunction
-
-let s:yank_key = 'alt-c'
-
-function! s:yank_to_buffer(key_with_str, visual)
-  let [key, str] = a:key_with_str
-  let reg = str[1:2]
-  exec 'normal ' . (a:visual ? 'gv'.reg.'y' : reg.'yy')
-endfunction
-
-function! s:registers_sink(key_with_str)
-  if len(a:key_with_str) > 1
-    let [key, str] = a:key_with_str
-    if tolower(key) == s:yank_key
-      call s:yank_to_buffer(a:key_with_str, 0)
-    else
-      call s:paste_buffer(a:key_with_str, 0)
-    endif
-  endif
-endfunction
-
-function! s:registers_sink_visual(key_with_str)
-  if len(a:key_with_str) > 1
-    let [key, str] = a:key_with_str
-    if tolower(key) == s:yank_key
-      call s:yank_to_buffer(a:key_with_str, 1)
-    else
-      call s:paste_buffer(a:key_with_str, 1)
-    endif
-  endif
-endfunction
-
-command! -nargs=? Regs call fzf#run({
-      \ 'source':  s:get_all_registers(),
-      \ 'sink*': function('s:registers_sink' . (<args>0 ? '_visual' : '')),
-      \ 'options': '-e -x +s --prompt "(Regs)> " --ansi --expect=alt-p,' .  s:yank_key,
-      \ 'down':    '40%'
-      \ })
-
-if executable('fzf')
   let g:ctrlp_map = ''
 
   nnoremap <C-p> :Mru<CR>
@@ -574,10 +584,7 @@ if executable('fzf')
   " a bit experimental mappings
   nnoremap <leader>l :Regs<CR>
   vnoremap <leader>l :<c-u>Regs 1<CR>
-else
-  nnoremap <silent> <C-p> :CtrlPMRU<CR>
-  nnoremap <silent> <C-b> :CtrlPBuffer<CR>
-  nnoremap <silent> <C-f> :CtrlP<CR>
+
 endif
 
 " }}}
@@ -594,10 +601,10 @@ let g:gitgutter_sign_modified = '#'
 let g:gitgutter_sign_removed = 'v'
 let g:gitgutter_sign_modified_removed = '#v'
 
+autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
+
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
-
-autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
 
 " }}}
 
@@ -691,7 +698,6 @@ let g:NERDSpaceDelims = 1
 let g:NERDAltDelims_python = 1
 let g:NERDCompactSexyComs = 1
 let g:NERDDefaultAlign = 'left'
-
 let g:NERDCustomDelimiters = {
       \ 'glsl': { 'left': '//', 'leftAlt': '/*', 'rightAlt': '*/' },
       \ }
@@ -723,6 +729,9 @@ Plug 'lervag/vimtex'
 
 let g:tex_flavor = "latex"
 
+au FileType tex let b:delimitMate_quotes = "\" '"
+au FileType tex set textwidth=120
+
 augroup latexSurround
   autocmd!
   autocmd FileType tex call s:latexSurround()
@@ -733,9 +742,6 @@ function! s:latexSurround()
         \ = "\\begin{\1environment: \1}\n\t\r\n\\end{\1\1}"
   let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
 endfunction
-
-au FileType tex let b:delimitMate_quotes = "\" '"
-au FileType tex set textwidth=120
 
 " }}}
 
@@ -870,6 +876,8 @@ if !exists("g:vimrc_init")
 
   set background=dark
   silent! colorscheme hybrid
+
+  hi! VertSplit guibg=#252525
 
   set termguicolors
   let &t_8f = "[38;2;%lu;%lu;%lum"
@@ -1039,7 +1047,7 @@ nmap <silent> <leader>ds :exec 'cd' g:_starting_cd \| let g:_cwd = getcwd() \| p
 nmap <silent> <leader>dg :CdRootGitRoot<CR>
 nmap <silent> <leader>dc :if ! haslocaldir() \| lcd %:p:h \|
       \ echo '<local> ' . getcwd() \| else \| exec 'cd ' . g:_cwd \|
-      \ echo '<global> ' .  getcwd() \| endif<CR>
+        \ echo '<global> ' .  getcwd() \| endif<CR>
 nmap <silent> <leader>dp :echo '=haslocaldir() ? '<local> ' : '<global> '<CR>' . getcwd()<CR>
 
 function! RemoveFromQF(ind)
@@ -1215,37 +1223,37 @@ set cscopequickfix=s-,c-,d-,i-,t-,e-,g-,f-
 
 if has("cscope")
 
-    " use both cscope and ctag
-    set cscopetag
+  " use both cscope and ctag
+  set cscopetag
 
-    " check cscope for definition of a symbol before checking ctags
-    set csto=0
+  " check cscope for definition of a symbol before checking ctags
+  set csto=0
 
-    " show msg when cscope db added
-    set cscopeverbose
+  " show msg when cscope db added
+  set cscopeverbose
 
-    set cscoperelative
+  set cscoperelative
 
-    for [bind, prefix] in [['<leader>ac', 'vert s']]
-        for cmd in ['s', 'g', 'c', 't', 'e', 'd']
-            exec 'nmap <silent> ' . bind . cmd . ' :' . prefix . 'cs find ' . cmd . ' <C-R>=expand("<cword>")<CR><CR>'
-            exec 'nmap <silent> ' . bind . 'f :' . prefix . 'cs find f <C-R>=expand("<cfile>")<CR><CR>'
-            exec 'nmap <silent> ' . bind . 'i :' . prefix . 'cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>'
-        endfor
+  for [bind, prefix] in [['<leader>ac', 'vert s']]
+    for cmd in ['s', 'g', 'c', 't', 'e', 'd']
+      exec 'nmap <silent> ' . bind . cmd . ' :' . prefix . 'cs find ' . cmd . ' <C-R>=expand("<cword>")<CR><CR>'
+      exec 'nmap <silent> ' . bind . 'f :' . prefix . 'cs find f <C-R>=expand("<cfile>")<CR><CR>'
+      exec 'nmap <silent> ' . bind . 'i :' . prefix . 'cs find i ^<C-R>=expand("<cfile>")<CR>$<CR>'
     endfor
+  endfor
 
-    cab csa cs add
-    cab csh cs help
-    cab csf cs find
-    cab csk cs kill
-    cab csr cs reset
-    cab css cs show
+  cab csa cs add
+  cab csh cs help
+  cab csf cs find
+  cab csk cs kill
+  cab csr cs reset
+  cab css cs show
 
-    if filereadable('cscope.out')
-      silent! cscope add cscope.out
-    elseif filereadable('cscope/cscope.out')
-      silent! cscope add cscope/cscope.out
-    endif
+  if filereadable('cscope.out')
+    silent! cscope add cscope.out
+  elseif filereadable('cscope/cscope.out')
+    silent! cscope add cscope/cscope.out
+  endif
 
 endif
 
@@ -1273,9 +1281,9 @@ function! CppNoNamespaceAndTemplateIndent()
   endif
 
   if l:pline =~# '^\s*template\s*<.*>\s*$'
-  let l:retv = l:pindent
+    let l:retv = l:pindent
   elseif l:pline =~# '^\s*template\s*<\s*$'
-  let l:retv = l:pindent + &shiftwidth
+    let l:retv = l:pindent + &shiftwidth
   elseif l:pline =~# '^\s*template\s*$'
     let l:retv = l:pindent
   elseif l:pline =~# '\s*typename\s*.*,\s*$'
@@ -1364,7 +1372,7 @@ function! s:header_files()
   let loc = Get_cpp_root()
   call fzf#vim#files(loc, {
         \ 'source': "ag -g '\\." .  s:header_ext_str . "$'",
-          \ 'options': '--preview "cat {}" --prompt "' . getcwd() . ' (Headers)> "'
+        \ 'options': '--preview "cat {}" --prompt "' . getcwd() . ' (Headers)> "'
         \ })
 endfunction
 
@@ -1438,8 +1446,6 @@ autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>at :call Find_src_or
 autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>ag :call Find_include_header("vsp")<CR>
 autocmd FileType cpp,c nmap <buffer> <silent> <leader>al :call Edit_CMakeLists("vsp")<CR>
 
-autocmd FileType python nmap <buffer> <silent> <leader>as :SrcFiles "py"<CR>
-
 function! Fold()
   let cursor_pos = [line('.'), col('.')]
   norm ][
@@ -1478,8 +1484,6 @@ nnoremap <silent> <leader>.c :let pos = getpos('.') \|
 vmap <leader>s :sort<CR>
 
 vmap <leader>cp S*gvS/
-
-hi! VertSplit guibg=#252525
 
 function! Strip(str)
   return substitute(a:str, '\v^(\n|\s)*(.{-})(\n|\s)*$', '\2', '')
