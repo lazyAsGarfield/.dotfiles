@@ -26,12 +26,14 @@ if v:version >= 703
   let g:NERDMenuMode = 3
   let g:NERDTreeCascadeSingleChildDir = 0
 
-  " autocmd FileType nerdtree nmap <buffer>  :quit<CR>
-  autocmd FileType nerdtree nmap <buffer> <C-v> s
-  autocmd FileType nerdtree nmap <buffer> <C-x> i
-  autocmd FileType nerdtree nmap <buffer> <C-j> j
-  autocmd FileType nerdtree nmap <buffer> <C-k> k
-  autocmd FileType nerdtree nmap <buffer> . I
+  augroup my_nerdtree_maps
+    " autocmd FileType nerdtree nmap <buffer>  :quit<CR>
+    autocmd FileType nerdtree nmap <buffer> <C-v> s
+    autocmd FileType nerdtree nmap <buffer> <C-x> i
+    autocmd FileType nerdtree nmap <buffer> <C-j> j
+    autocmd FileType nerdtree nmap <buffer> <C-k> k
+    autocmd FileType nerdtree nmap <buffer> . I
+  augroup END
 
   function! NERDTreeEnableOrToggle()
     try
@@ -632,7 +634,7 @@ Plug 'vim-airline/vim-airline-themes'
 
 if v:version >= 703
   if empty($__NO_YCM__)
-    Plug 'jeaye/color_coded'
+    Plug 'jeaye/color_coded', { 'do': 'mkdir -p build && cd $_ && cmake .. && make install' }
   endif
 endif
 
@@ -1150,7 +1152,7 @@ set cinoptions+=u0
 " set cinoptions+=w1
 set cinoptions+=W1s
 set cinoptions+=k2s
-" set cinoptions+=m1
+set cinoptions+=m1
 " set cinoptions+=M1
 set cinoptions+=j1
 set cinoptions+=J1

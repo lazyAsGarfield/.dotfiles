@@ -133,7 +133,7 @@ compctl -K _completemarks unmark
 
 # bindings and so on {{{
 
-KEYTIMEOUT=1000
+KEYTIMEOUT=20
 
 autoload -z edit-command-line
 zle -N edit-command-line
