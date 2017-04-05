@@ -27,6 +27,7 @@ if v:version >= 703
   let g:NERDTreeCascadeSingleChildDir = 0
 
   augroup my_nerdtree_maps
+    au!
     " autocmd FileType nerdtree nmap <buffer>  :quit<CR>
     autocmd FileType nerdtree nmap <buffer> <C-v> s
     autocmd FileType nerdtree nmap <buffer> <C-x> i
@@ -884,9 +885,11 @@ if !exists("g:vimrc_init")
 
   hi! VertSplit guibg=#252525
 
-  set termguicolors
-  let &t_8f = "[38;2;%lu;%lu;%lum"
-  let &t_8b = "[48;2;%lu;%lu;%lum"
+  if has('termguicolors')
+    set termguicolors
+    let &t_8f = "[38;2;%lu;%lu;%lum"
+    let &t_8b = "[48;2;%lu;%lu;%lum"
+  endif
 
   " when editing a file, always jump to the last known cursor position.
   autocmd BufReadPost *
