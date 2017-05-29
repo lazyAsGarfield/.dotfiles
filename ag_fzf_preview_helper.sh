@@ -2,7 +2,7 @@
 
 line_num=$(cut -f2 -d: <<< $1)
 
-lines=21
+lines=27
 lines_2=$((lines/2))
 
 true_beg=$((line_num - lines_2))

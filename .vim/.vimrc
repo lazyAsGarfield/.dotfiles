@@ -1019,8 +1019,6 @@ autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
 " --------------- VIM MAPPINGS END -------------- }}}
 
 
-" new stuff, not categorized yet
-
 autocmd FileType cuda set ft=cuda.cpp
 
 " vim-commentary settings
