@@ -29,15 +29,15 @@ LIGHT_CYAN "%{%b$fg_bold[cyan]%}"
 
 __prompt_command()
 {
-  local virtual_env=""
-  if [[ -z $VIRTUAL_ENV_DIABLE_PROMPT ]]; then
-    if [[ -n $VIRTUAL_ENV ]]; then
-      virtual_env="($(basename $VIRTUAL_ENV)) "
-    fi
-  fi
-
-  local git_branch="$(__get_git_branch)"
+  local git_branch=""
+  local prompt_char="$"
   local virtual_env="$(__get_virtual_env)"
+
+  df -T $PWD | grep sshfs >/dev/null 2>&1
+  if [[ $? -ne 0 ]]; then
+    local git_branch="$(__get_git_branch)"
+    local prompt_char="$(__prompt_char)"
+  fi
 
   local vim_norm_prompt="${__styles[LIGHT_YELLOW]}[N]${__styles[NORMAL]}"
   local vim_ins_prompt="${__styles[LIGHT_BLUE]}[I]${__styles[NORMAL]}"
@@ -45,7 +45,10 @@ __prompt_command()
     local vim_prompt="${${KEYMAP/vicmd/$vim_norm_prompt}/(main|viins)/$vim_ins_prompt} " ||
     local vim_prompt=""
 
-  PROMPT="${__styles[BLUE]}${virtual_env}${__styles[LIGHT_BLUE]}[${__styles[NORMAL]}%n${__styles[GREEN]}@${__styles[BLUE]}%m${__styles[YELLOW]}:${__styles[BOLD]}%1~${__styles[LIGHT_BLUE]}] ${git_branch}${vim_prompt}${__styles[BOLD]}$(__prompt_char) ${__styles[NORMAL]}"
+  local short_path="${__styles[BOLD]}%(4~|.../%2~|%~)"
+  # local short_path="${__styles[BOLD]}$(echo $PWD | perl -pe "s/(\w)[^\/]+\//\1\//g")"
+  local last_exit_code="%(?||${__styles[LIGHT_RED]}/%?/ )"
+  PROMPT="${__styles[BLUE]}${virtual_env}${__styles[LIGHT_BLUE]}[${__styles[NORMAL]}%n${__styles[GREEN]}@${__styles[BLUE]}%m${__styles[YELLOW]}:$short_path${__styles[LIGHT_BLUE]}] ${git_branch}${vim_prompt}$last_exit_code${__styles[BOLD]}$prompt_char ${__styles[NORMAL]}"
 
   zle && zle reset-prompt
 }
