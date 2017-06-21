@@ -8,4 +8,7 @@ nnoremap <nowait>  
 vnoremap <nowait>  
 inoremap <nowait>  
 
-au BufReadPost * snoremap <nowait>  
+augroup esc_mapping
+  au!
+  au BufReadPost * snoremap <nowait>  
+augroup END

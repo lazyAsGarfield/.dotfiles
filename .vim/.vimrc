@@ -207,7 +207,7 @@ Plug 'junegunn/goyo.vim'
 let g:goyo_width=120
 let g:goyo_height='95%'
 
-let g:limelight_default_coefficient = 0.54
+let g:limelight_default_coefficient = '0.54'
 let g:limelight_paragraph_span = 1
 
 autocmd! User GoyoEnter nested call <SID>goyo_enter()
@@ -294,13 +294,15 @@ endif
 
 " ---------- fzf/ctrlp --------- {{{
 
-Plug 'junegunn/fzf', { 'dir': '`readlink -f ~/.vim`/../.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf', { 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'kien/ctrlp.vim'
 
+let g:ctrlp_cmd = 'CtrlPMRU'
+let g:ctrlp_working_path_mode = 'ra'
+
 if !executable('fzf')
 
-  nnoremap <silent> <C-p> :CtrlPMRU<CR>
   nnoremap <silent> <C-b> :CtrlPBuffer<CR>
   nnoremap <silent> <C-f> :CtrlP<CR>
 
@@ -583,8 +585,7 @@ else
   nnoremap <C-p> :Mru<CR>
   nnoremap <C-b> :BuffersBetterPrompt<CR>
   nnoremap <leader>g :GitFilesOrCwd<CR>
-  nnoremap <leader>sf :Files<CR>
-  nnoremap <leader>sr :FilesGitRootOrCwd<CR>
+  nnoremap <leader>s :FilesGitRootOrCwd<CR>
 
   " good way of detecting if in visual mode
   " a bit experimental mappings
@@ -837,6 +838,9 @@ endif
 set directory=$HOME/.vim/.swapdir//
 set swapfile
 
+set novisualbell
+set belloff=all
+
 " Automatically read a file that has changed on disk
 set autoread
 
@@ -890,6 +894,9 @@ if !exists("g:vimrc_init")
     let &t_8f = "[38;2;%lu;%lu;%lum"
     let &t_8b = "[48;2;%lu;%lu;%lum"
   endif
+
+  set guioptions-=r
+  set guioptions-=L
 
   " when editing a file, always jump to the last known cursor position.
   autocmd BufReadPost *
@@ -968,8 +975,6 @@ nmap - :exe "resize " . (winheight(0) * 2/3)<CR>
 nmap cr "
 vmap cr "
 
-nmap cry "0
-vmap cry "0
 nmap crc "+
 vmap crc "+
 
@@ -1039,7 +1044,7 @@ endfunction
 command! CdRootGitRoot call s:cd_to_root_if_git_repo()
 
 autocmd VimEnter * if ! haslocaldir() | let g:_cwd = getcwd()  | endif
-autocmd CursorMoved,BufLeave * if ! haslocaldir() | let g:_cwd = getcwd() | endif
+autocmd BufLeave * if ! haslocaldir() | let g:_cwd = getcwd() | endif
 
 if ! exists('g:_starting_cd')
   let g:_starting_cd = getcwd()
@@ -1195,7 +1200,7 @@ nnoremap <leader>z z
 nmap <leader>B :b#<CR>
 nmap <leader>b <C-b>
 
-silent! set relativenumber
+silent! set norelativenumber
 
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
@@ -1490,3 +1495,27 @@ vmap <leader>cp S*gvS/
 function! Strip(str)
   return substitute(a:str, '\v^(\n|\s)*(.{-})(\n|\s)*$', '\2', '')
 endfunction
+
+function! s:CheckForModelines()
+   if !exists('+modelines') || &modelines < 1 || ( !&modeline && !exists('b:checked_modeline') )
+     return -1
+   endif
+   let mlines = []
+   if &modelines > line('$')
+     sil exe '%g/\<vim:\|\<vi:\|\<ex:/let mlines = mlines + [getline(".")]'
+   else
+     sil exe '1,'.&modelines.'g/\<vim:\|\<vi:\|\<ex:/let mlines = mlines + [getline(".")]'
+     sil exe '$-'.(&modelines-1).',$g/\<vim:\|\<vi:\|\<ex:/let mlines = mlines + [getline(".")]'
+   endif
+   if len(mlines) > 0
+     echo join(mlines, "\n")
+     let ans = confirm('Modelines found! Execute?', "&Yes\n&No", 2)
+     let &l:modeline = (ans == 1)
+     let b:checked_modeline = 1
+   endif
+endfunction
+
+augroup modelines
+  au!
+  au BufReadPost * call s:CheckForModelines()
+augroup END
