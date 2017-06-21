@@ -55,7 +55,7 @@ __prompt_command()
     local host="${__styles[GREEN]}@${__styles[BLUE]}%m"
   fi
 
-  PROMPT="${__styles[BLUE]}${virtual_env}${__styles[LIGHT_BLUE]}[${__styles[GREEN]}%n$host${__styles[YELLOW]}:$short_path${__styles[LIGHT_BLUE]}] ${git_branch}${vim_prompt}$last_exit_code${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
+  PROMPT="${__styles[BLUE]}${virtual_env}${__styles[CYAN]}[${__styles[CYAN]}%n$host${__styles[YELLOW]}:$short_path${__styles[CYAN]}] ${git_branch}${vim_prompt}$last_exit_code${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
 
   zle && zle reset-prompt
 }
