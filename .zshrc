@@ -6,7 +6,8 @@ autoload -U colors && colors
 typeset -A __styles
 __styles=(
 NORMAL "%{%f%b%}"
-BOLD "%{$fg_bold[white]%}"
+WHITE "%{$fg[white]%}"
+BOLD "%{%b$fg_bold[white]%}"
 
 RED "%{%b$fg[red]%}"
 LIGHT_RED "%{%b$fg_bold[red]%}"
@@ -39,16 +40,22 @@ __prompt_command()
     local prompt_char="$(__prompt_char)"
   fi
 
-  local vim_norm_prompt="${__styles[LIGHT_YELLOW]}[N]${__styles[NORMAL]}"
-  local vim_ins_prompt="${__styles[LIGHT_BLUE]}[I]${__styles[NORMAL]}"
-  [[ -n $KEYMAP ]] &&
-    local vim_prompt="${${KEYMAP/vicmd/$vim_norm_prompt}/(main|viins)/$vim_ins_prompt} " ||
+  # local vim_norm_prompt="${__styles[YELLOW]}[N]${__styles[NORMAL]}"
+  # local vim_ins_prompt="${__styles[BLUE]}[I]${__styles[NORMAL]}"
+  # [[ -n $KEYMAP ]] &&
+  #   local vim_prompt="${${KEYMAP/vicmd/$vim_norm_prompt}/(main|viins)/$vim_ins_prompt} " ||
     local vim_prompt=""
 
   local short_path="${__styles[BOLD]}%(4~|.../%2~|%~)"
   # local short_path="${__styles[BOLD]}$(echo $PWD | perl -pe "s/(\w)[^\/]+\//\1\//g")"
   local last_exit_code="%(?||${__styles[LIGHT_RED]}/%?/ )"
-  PROMPT="${__styles[BLUE]}${virtual_env}${__styles[LIGHT_BLUE]}[${__styles[NORMAL]}%n${__styles[GREEN]}@${__styles[BLUE]}%m${__styles[YELLOW]}:$short_path${__styles[LIGHT_BLUE]}] ${git_branch}${vim_prompt}$last_exit_code${__styles[BOLD]}$prompt_char ${__styles[NORMAL]}"
+
+  local host=""
+  if [[ -n $SSH_CLIENT ]]; then
+    local host="${__styles[YELLOW]}@${__styles[BLUE]}%m"
+  fi
+
+  PROMPT="${__styles[YELLOW]}$__PROMPT_TAG__${__styles[BLUE]}${virtual_env}${__styles[CYAN]}[${__styles[CYAN]}%n$host${__styles[YELLOW]}:$short_path${__styles[CYAN]}] ${git_branch}${vim_prompt}$last_exit_code${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
 
   zle && zle reset-prompt
 }
@@ -63,6 +70,15 @@ precmd()
 zle-line-init zle-keymap-select()
 {
   __prompt_command
+}
+
+prompt_tag()
+{
+  if [[ -n $1 ]]; then
+    __PROMPT_TAG__="$1 "
+  else
+    __PROMPT_TAG__=""
+  fi
 }
 
 zle -N zle-line-init
