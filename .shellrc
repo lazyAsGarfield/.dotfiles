@@ -28,6 +28,14 @@ alias j='jump'
 
 alias ssh='TERM=screen-256color ssh'
 
+if command -v tmuxifier >/dev/null 2>&1; then
+  alias mux=tmuxifier
+
+  export TMUXIFIER_LAYOUT_PATH="$HOME/.tmux-layouts"
+  mkdir -p "$TMUXIFIER_LAYOUT_PATH"
+  eval "$(tmuxifier init -)"
+fi
+
 # http://jeroenjanssens.com/2013/08/16/quickly-navigate-your-filesystem-from-the-command-line.html
 export MARKPATH=$HOME/.marks
 

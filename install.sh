@@ -233,15 +233,15 @@ install_version_utils()
   if [[ ! -d $1 ]]; then
     msg_and_run "Creating $1" mkdir -p "$1"
   fi
-  msg_and_run "Linking version_cmp" ln -s "$target_dir/version_cmp" $version_utils_dest
+  msg_and_run "Linking version_cmp" ln -s "$target_dir/version_cmp" $bins_dest
 
-  if [[ -h ${version_utils_dest}/version_lt && ! -e ${version_utils_dest}/version_lt ]]; then
+  if [[ -h ${bins_dest}/version_lt && ! -e ${bins_dest}/version_lt ]]; then
     echo "Removing old version_lt link"
-    unlink ${version_utils_dest}/version_lt
+    unlink ${bins_dest}/version_lt
   fi
-  if [[ -h ${version_utils_dest}/version_lte && ! -e ${version_utils_dest}/version_lte ]]; then
+  if [[ -h ${bins_dest}/version_lte && ! -e ${bins_dest}/version_lte ]]; then
     echo "Removing old version_lte link"
-    unlink ${version_utils_dest}/version_lte
+    unlink ${bins_dest}/version_lte
   fi
 
   if [[ $(echo_read "Add $1 to \$PATH in $HOME/.bash_profile? y/[n]: ") == "y" ]]; then
@@ -278,9 +278,9 @@ bashrc_line="source \$DOTFILES_DIR/.bashrc"
 zshrc_line="source \$DOTFILES_DIR/.zshrc"
 dir_utils_line="source \$DOTFILES_DIR/dir_utils.sh"
 
-version_utils_dest="$HOME/.local/bin"
+bins_dest="$HOME/.local/bin"
 
-PATH_lines="PATH=\"\$PATH\":\"$version_utils_dest\""$'\n'"export PATH"
+PATH_lines="PATH=\"\$PATH\":\"$bins_dest\""$'\n'"export PATH"
 
 if [[ -d $target_dir/.git ]]; then
   q="Pull from remote repo? (script will be restarted) y/[n]: "
@@ -313,6 +313,10 @@ fi
 if [[ $(echo_read "Configure tmux? y/[n]: ") == "y" ]]; then
   ask_and_link "$target_dir/.tmux-non-byobu.conf" "$HOME/.tmux.conf"
   changed=1
+
+  if [[ $(echo_read "Configure tmuxifier? y/[n]: ") == "y" ]]; then
+    ask_and_link "$target_dir" "$bins_dest/tmuxifier"
+  fi
 fi
 [[ -n $changed ]] && echo
 
@@ -349,7 +353,7 @@ fi
 
 [[ -n $changed ]] && echo
 
-q="Create link to version_cmp in $(eval "echo $version_utils_dest")? y/[n]: "
+q="Create link to version_cmp in $(eval "echo $bins_dest")? y/[n]: "
 if [[ $(echo_read "$q") == "y" ]]; then
-  install_version_utils $(eval "echo $version_utils_dest")
+  install_version_utils $(eval "echo $bins_dest")
 fi
