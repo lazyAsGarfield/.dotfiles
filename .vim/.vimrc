@@ -1026,11 +1026,6 @@ autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
 
 autocmd FileType cuda set ft=cuda.cpp
 
-" vim-commentary settings
-autocmd FileType c,cpp,cs,java,cuda,cuda.cpp setlocal commentstring=//\ %s
-autocmd FileType gnuplot setlocal commentstring=#\ %s
-autocmd FileType cmake setlocal commentstring=#\ %s
-
 function! s:cd_to_root_if_git_repo()
   if exists('b:git_dir')
     exec 'cd' fugitive#repo().tree()
