@@ -16,4 +16,7 @@ function! s:change_colors()
   endtry
 endfunction
 
-au VimEnter,ColorScheme * call <SID>change_colors()
+augroup set_cpp_hi
+  au!
+  au VimEnter,ColorScheme * call <SID>change_colors()
+augroup END

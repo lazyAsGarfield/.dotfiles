@@ -19,8 +19,6 @@ alias ....='cd ../../..'
 alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 
-alias pjson='python -m json.tool'
-
 alias s='saved'
 alias c='local_cd_hist'
 
