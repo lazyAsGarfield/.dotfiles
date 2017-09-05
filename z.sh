@@ -52,7 +52,7 @@ _z() {
         while read line; do
             # only count directories
             [ -d "${line%%\|*}" ] && echo $line
-        done < "$datafile" | awk -v path="$*" -v now="$(date +%s)" -F"|" '
+        done < "$datafile" | gawk -v path="$*" -v now="$(date +%s)" -F"|" '
             BEGIN {
                 rank[path] = 1
                 time[path] = now
@@ -87,7 +87,7 @@ _z() {
     elif [ "$1" = "--complete" -a -s "$datafile" ]; then
         while read line; do
             [ -d "${line%%\|*}" ] && echo $line
-        done < "$datafile" | awk -v q="$2" -F"|" '
+        done < "$datafile" | gawk -v q="$2" -F"|" '
             BEGIN {
                 if( q == tolower(q) ) imatch = 1
                 q = substr(q, 3)
@@ -114,7 +114,7 @@ _z() {
                     l) local list=1; [[ "${1:2}" =~ ^[0-9]+$ ]] && limit=${1:2};;
                     r) local typ="rank";;
                     t) local typ="recent";;
-                    x) sed -i -e "\:^${PWD}|.*:d" "$datafile";;
+                    x) gsed -i -e "\:^${PWD}|.*:d" "$datafile";;
                 esac; opt=${opt:1}; done;;
              *) if [ $# -eq 1 ]; then
                      if [[ "$1" =~ ^[0-9]+$ ]]; then
@@ -139,7 +139,7 @@ _z() {
         export limit
         cd="$(while read line; do
         [ -d "${line%%\|*}" ] && echo $line
-        done < "$datafile" | awk -v t="$(date +%s)" -v list="$list" -v typ="$typ" -v q="$fnd" -v only="$only" -F"|" '
+        done < "$datafile" | gawk -v t="$(date +%s)" -v list="$list" -v typ="$typ" -v q="$fnd" -v only="$only" -F"|" '
             function frecent(rank, time) {
                 # relate frequency and time
                 dx = t - time
@@ -215,7 +215,7 @@ _z() {
                     output(imatches, ibest_match, common(imatches))
                 }
             }
-        ' 2> >(awk -v args="$args" -v typ="$typ" -v limit="$limit" '
+        ' 2> >(gawk -v args="$args" -v typ="$typ" -v limit="$limit" '
         {
           if ( i < limit ) {
             if ( $1 != "common:" && args <= 1 && !typ )

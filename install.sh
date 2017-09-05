@@ -41,10 +41,10 @@ add_lines()
 {
   echo "Updating $2"
   IFS=$'\n' lines=($1)
-  # echo "$1" | sed -e 's/^/  >> /'
+  # echo "$1" | gsed -e 's/^/  >> /'
   for line in "${lines[@]}"; do
     echo "  \"$line\""
-    line_nr=$(cat "$2" 2>/dev/null | grep -n -e "$line" -e "$(sed 's/"//g' <<< "$line")" | cut -d":" -f1 | paste -sd ',')
+    line_nr=$(cat "$2" 2>/dev/null | grep -n -e "$line" -e "$(gsed 's/"//g' <<< "$line")" | cut -d":" -f1 | paste -sd ',')
     ret=0
     if [[ -n $line_nr ]]; then
       echo "    - Already exists at line $line_nr"
@@ -69,7 +69,7 @@ remove_lines()
       echo "    - Not found"
       ret=1
     else
-      out=$(sed -i "$line_nr"d "$2" 2>&1) && echo "    - Removed" || (echo "    - FAIL"; ret=1)
+      out=$(gsed -i "$line_nr"d "$2" 2>&1) && echo "    - Removed" || (echo "    - FAIL"; ret=1)
       [[ -n $out ]] && echo "$out"
     fi
   done
@@ -256,7 +256,7 @@ install_version_utils()
 target_dir=
 
 if [[ -n $1 ]]; then
-  target_dir="$(readlink -f -- "$1")"
+  target_dir="$(greadlink -f -- "$1")"
 fi
 
 if [[ -z $target_dir ]]; then
@@ -266,7 +266,7 @@ if [[ -z $target_dir ]]; then
     if [[ -z $target_dir ]]; then
       target_dir="$HOME/.dotfiles"
     else
-      target_dir="$(sed -r 's|/+$||' <<< "$target_dir")"
+      target_dir="$(gsed -r 's|/+$||' <<< "$target_dir")"
     fi
   else
     target_dir="$DOTFILES_DIR"

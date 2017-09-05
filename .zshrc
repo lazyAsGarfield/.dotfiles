@@ -298,7 +298,7 @@ my-accept-line()
     output="$($cmd -g$arg)"
     [[ -z $output ]] && break
     output="${output//\//\\/}"
-    BUFFER=$(sed -Ee "s/( |^)@(c-?|s)[0-9]+( |$)/\1$output\3/" <<< "$BUFFER")
+    BUFFER=$(gsed -Ee "s/( |^)@(c-?|s)[0-9]+( |$)/\1$output\3/" <<< "$BUFFER")
   done
   zle .accept-line
 }
@@ -315,7 +315,7 @@ dc_completion()
     elif [[ ${BASH_REMATCH[3]} == "s" ]]; then
       IFS=$'\n' unsorted=( $(saved | tr -s ' ' | cut -d' ' -f3-) )
     else
-      IFS=$'\n' unsorted=( $(ls -1 "$HOME/.marks" | xargs -L1 -I{} readlink -f "$MARKPATH/{}") )
+      IFS=$'\n' unsorted=( $(ls -1 "$HOME/.marks" | xargs -L1 -I{} greadlink -f "$MARKPATH/{}") )
     fi
     compadd -S/ -q -U1V unsorted -a unsorted
     _compskip=all
