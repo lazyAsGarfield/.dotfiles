@@ -296,7 +296,7 @@ if [[ -d $target_dir/.git ]]; then
     exec "$target_dir/install.sh"
   fi
 else
-  msg_and_run "Cloning repo" git clone --recursive http://github.com/bmalkus/.dotfiles "$target_dir"
+  msg_and_run "Cloning repo" git clone --recursive https://github.com/bmalkus/.dotfiles "$target_dir"
 fi
 
 if [[ $(echo_read "Configure vim? y/[n]: ") == "y" ]]; then
@@ -315,7 +315,10 @@ if [[ $(echo_read "Configure tmux? y/[n]: ") == "y" ]]; then
   changed=1
 
   if [[ $(echo_read "Configure tmuxifier? y/[n]: ") == "y" ]]; then
-    ask_and_link "$target_dir" "$bins_dest/tmuxifier"
+    if [[ ! -d $bins_dest ]]; then
+      msg_and_run "Creating $bins_dest" mkdir -p "$bins_dest"
+    fi
+    ask_and_link "$target_dir"/.tmuxifier/bin/tmuxifier "$bins_dest/tmuxifier"
   fi
 fi
 [[ -n $changed ]] && echo
