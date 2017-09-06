@@ -33,3 +33,8 @@
 [pull]
   default = rebase
 
+[include]
+	path = .gitconfig.local
+
+[core]
+	ignore = ~/.cvsignore

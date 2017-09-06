@@ -38,7 +38,7 @@ alias_if_needed()
 }
 
 alias_if_needed ls
-alias_if_needed awk
+alias_if_needed "awk"
 alias_if_needed sed
 alias_if_needed timeout
 alias_if_needed wc
@@ -88,9 +88,9 @@ command -v vimx >/dev/null 2>&1 &&
 
 # in order to keep aliases in one place
 if [[ -n $ZSH_VERSION ]]; then
-  alias sr="source $HOME/.zshrc"
+  alias sr=". $HOME/.zshrc"
 else
-  alias sr="source $HOME/.bashrc"
+  alias sr=". $HOME/.bashrc"
 fi
 
 export FZF_DEFAULT_OPTS="--color fg:187,bg:233,hl:103,fg+:222,bg+:234,hl+:104 \
@@ -117,7 +117,7 @@ fi
 
 export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
-source $DOTFILES_DIR/z.sh
+. $DOTFILES_DIR/z.sh
 
 __get_git_branch()
 {
@@ -129,8 +129,8 @@ __get_git_branch()
     local more_info=""
     git_info="$(git branch 2> /dev/null | grep '* ' | cut -c3-)"
     if [[ -n $git_info ]]; then
+      git_info="${__styles[YELLOW]}$git_info"
       if [[ -n $ZSH_VERSION ]]; then
-        git_info="${__styles[YELLOW]}$git_info"
         local ahead_behind
         ahead_behind="$(gtimeout 0.1s $SHELL -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
         ret=$?
@@ -191,8 +191,6 @@ __get_git_branch()
         else
           git_info="$git_info$more_info"
         fi
-      else
-        git_info="$git_info "
       fi
     fi
   fi
@@ -216,7 +214,7 @@ __prompt_char()
   echo '$'
 }
 
-function __add_to_hist()
+__add_to_hist()
 {
   local hist_size="${#__cd_history__[@]}"
   if [[ ${__cd_history__[$hist_size]} != $1 && ! -z $1 ]]; then
@@ -230,5 +228,9 @@ __dir_history()
     __add_to_hist $OLDPWD
   fi
 }
+
+. "$DOTFILES_DIR/dir_utils.sh"
+
+[ -r "$HOME/.shellrc.local" ] && . "$HOME/.shellrc.local"
 
 # vim: ft=zsh

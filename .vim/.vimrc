@@ -82,9 +82,9 @@ endif
 " ------------- YCM ------------ {{{
 
 if v:version >= 703
-  if empty($__NO_YCM__)
+  if !empty($__YCM__)
 
-    if empty($__NO_COMPL__)
+    if !empty($__COMPL__)
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
     else
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
@@ -136,7 +136,7 @@ endif
 
 if v:version >= 703
 
-  if empty($__NO_YCM__)
+  if !empty($__YCM__)
     Plug 'davidhalter/jedi-vim'
   endif
 
@@ -559,7 +559,7 @@ Plug 'bling/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 if v:version >= 703
-  if empty($__NO_YCM__)
+  if !empty($__YCM__)
     " Plug 'jeaye/color_coded', { 'do': 'mkdir -p build && cd $_ && cmake .. && make install' }
   endif
 endif
@@ -752,12 +752,6 @@ if has("persistent_undo")
   set undodir=$HOME/.vim/.undodir/
 endif
 
-" completion options
-set completeopt=menuone
-
-" do not create a backup file
-" set nobackup
-" set noswapfile
 if isdirectory($HOME . '/.vim/.backupdir') == 0
   :silent !mkdir -p $HOME/.vim/.backupdir >/dev/null 2>&1
 endif
@@ -769,6 +763,9 @@ if isdirectory($HOME . '/.vim/.swapdir') == 0
 endif
 set directory=$HOME/.vim/.swapdir//
 set swapfile
+
+" completion options
+set completeopt=menuone
 
 set novisualbell
 set belloff=all

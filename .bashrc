@@ -1,4 +1,6 @@
-source "$(dirname ${BASH_SOURCE[0]})/.shellrc"
+. "$DOTFILES_DIR/.shellrc"
+
+[ -r ~/.fzf.bash ] && . ~/.fzf.bash
 
 declare -A __styles
 __styles=(
@@ -26,10 +28,22 @@ __styles=(
 
 prompt_command()
 {
-  git_branch=$(__get_git_branch)
-  virtual_env=$(__get_virtual_env)
+  local git_branch=""
+  local prompt_char="$"
+  local virtual_env="$(__get_virtual_env)"
 
-  PS1="${__styles[BLUE]}$virtual_env${__styles[LIGHT_BLUE]}[${__styles[NORMAL]}\u${__styles[GREEN]}@${__styles[BLUE]}\h${__styles[YELLOW]}:${__styles[BOLD]}\W${__styles[LIGHT_BLUE]}] $git_branch${__styles[BOLD]}$(__prompt_char) ${__styles[NORMAL]}"
+  df -T $PWD | grep sshfs >/dev/null 2>&1
+  if [[ $? -ne 0 ]]; then
+    local git_branch="$(__get_git_branch)"
+    local prompt_char="$(__prompt_char)"
+  fi
+
+  local host=""
+  if [[ -n $SSH_CLIENT ]]; then
+    local host="${__styles[YELLOW]}@${__styles[BLUE]}\h"
+  fi
+
+  PS1="${__styles[BLUE]}$virtual_env${__styles[CYAN]}[${__styles[CYAN]}\u${__styles[YELLOW]}:${__styles[BOLD]}\W${__styles[CYAN]}] $git_branch ${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
 }
 
 if [[ -z ${__prompt_cmd_set+x} ]]; then
@@ -46,3 +60,4 @@ _completemarks() {
 
 complete -F _completemarks jump unmark j
 
+[ -r "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"

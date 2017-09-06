@@ -1,5 +1,7 @@
 # misc shell stuff {{{
-source "$DOTFILES_DIR/.shellrc"
+. "$DOTFILES_DIR/.shellrc"
+
+[ -r ~/.fzf.zsh ] && . ~/.fzf.zsh
 
 autoload -U colors && colors
 
@@ -55,7 +57,7 @@ __prompt_command()
     local host="${__styles[YELLOW]}@${__styles[BLUE]}%m"
   fi
 
-  PROMPT="${__styles[YELLOW]}$__PROMPT_TAG__${__styles[BLUE]}${virtual_env}${__styles[CYAN]}[${__styles[CYAN]}%n$host${__styles[YELLOW]}:$short_path${__styles[CYAN]}] ${git_branch}${vim_prompt}$last_exit_code${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
+  PROMPT="${__styles[BLUE]}${virtual_env}${__styles[CYAN]}[${__styles[CYAN]}%n$host${__styles[YELLOW]}:$short_path${__styles[CYAN]}] ${git_branch}${vim_prompt}$last_exit_code${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
 
   zle && zle reset-prompt
 }
@@ -70,15 +72,6 @@ precmd()
 zle-line-init zle-keymap-select()
 {
   __prompt_command
-}
-
-prompt_tag()
-{
-  if [[ -n $1 ]]; then
-    __PROMPT_TAG__="$1 "
-  else
-    __PROMPT_TAG__=""
-  fi
 }
 
 zle -N zle-line-init
@@ -104,7 +97,7 @@ zplugs=()
 
 zstyle ":zplug:tag" lazy true
 
-source $DOTFILES_DIR/.zplug/init.zsh
+. $DOTFILES_DIR/.zplug/init.zsh
 
 ZPLUG_HOME=$DOTFILES_DIR/.zplug
 
@@ -226,7 +219,7 @@ bindkey -M menuselect '^[f' accept-and-infer-next-history
 
 autoload -Uz add-zsh-hook
 
-source $DOTFILES_DIR/fzf-utils.sh
+. $DOTFILES_DIR/fzf-utils.sh
 
 if [[ -n $TMUX ]]; then
   fzf()
@@ -338,3 +331,5 @@ zle -N completer_selector
 bindkey -M viins '^I' completer_selector
 
 # }}}
+
+[ -r "$HOME/.zshrc.local" ] && . "$HOME/.zshrc.local"
