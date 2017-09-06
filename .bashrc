@@ -43,12 +43,12 @@ prompt_command()
     local host="${__styles[YELLOW]}@${__styles[BLUE]}\h"
   fi
 
-  PS1="${__styles[BLUE]}$virtual_env${__styles[CYAN]}[${__styles[CYAN]}\u${__styles[YELLOW]}:${__styles[BOLD]}\W${__styles[CYAN]}] $git_branch ${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
+  PS1="${__styles[BLUE]}$virtual_env${__styles[CYAN]}[${__styles[CYAN]}\u${__styles[YELLOW]}:${__styles[BOLD]}\W${__styles[CYAN]}] $git_branch${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
 }
 
 if [[ -z ${__prompt_cmd_set+x} ]]; then
   __prompt_cmd_set=1
-  PROMPT_COMMAND="$PROMPT_COMMAND history -a; prompt_command; __dir_history"
+  PROMPT_COMMAND="$PROMPT_COMMAND history -a; prompt_command; __dir_history; [ -n "$TMUX" ] && tmux set -g pane-border-format ' #{pane_current_command} ' 2>/dev/null"
 fi
 
 _completemarks() {

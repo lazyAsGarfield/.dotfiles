@@ -67,6 +67,7 @@ precmd()
   # in vi mode, prompt will be set other way
   PROMPT=""
   __dir_history
+  [ -n "$TMUX" ] && tmux set -g pane-border-format " #{pane_current_command} " 2>/dev/null
 }
 
 zle-line-init zle-keymap-select()

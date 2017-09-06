@@ -25,8 +25,6 @@ ln -s "$target_dir/.tmux.conf"
 ln -s "$target_dir/.vim"
 ln -s "$target_dir/.vim/.vimrc"
 
-ln -s "$target_dir/.terminfo"
-
 if [ ! -f "$target_dir/.vim/vim-plug/autoload/plug.vim" ]; then
   echo "Downloading plug.vim"
   curl -#fLo "$target_dir/.vim/vim-plug/autoload/plug.vim" --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
