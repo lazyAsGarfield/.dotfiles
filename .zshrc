@@ -1,8 +1,6 @@
 # misc shell stuff {{{
 . "$DOTFILES_DIR/.shellrc"
 
-[ -r ~/.fzf.zsh ] && . ~/.fzf.zsh
-
 autoload -U colors && colors
 
 typeset -A __styles
@@ -153,69 +151,31 @@ zle -N edit-command-line
 autoload -Uz copy-earlier-word
 zle -N copy-earlier-word
 
-bindkey -v
+bindkey -e
 
-bindkey -M viins "${terminfo[khome]}" beginning-of-line
-bindkey -M viins "${terminfo[kend]}"  end-of-line
-bindkey -M viins "^[[3~"              delete-char
-bindkey -M viins "^[3;5~"             delete-char
+bindkey "${terminfo[khome]}" beginning-of-line
+bindkey "${terminfo[kend]}"  end-of-line
+bindkey "^[[3~"              delete-char
+bindkey "^[3;5~"             delete-char
 
-bindkey -M viins '^[[Z'               reverse-menu-complete
+bindkey '^[[Z'               reverse-menu-complete
 if $(whence -w fzf-completion >/dev/null) ; then
-  bindkey -M viins '^I'               fzf-completion
+  bindkey '^I'               fzf-completion
 else
   # bindkey -M viins '^I'               menu-complete
 fi
-bindkey -M viins '^G'                 send-break
-bindkey -M viins '^J'                 history-beginning-search-forward
-bindkey -M viins '^K'                 history-beginning-search-backward
-bindkey -M viins '^Y'                 yank
-bindkey -M viins '^U'                 kill-whole-line
-bindkey -M viins '^?'                 backward-delete-char
-bindkey -M viins '^X^X'               edit-command-line
-bindkey -M viins '^W'                 backward-kill-word
-bindkey -M viins '^B'                 undo
+bindkey '^X^X'               edit-command-line
 
-bindkey -M viins '^ '                 autosuggest-accept
-bindkey -M viins '^[f'                forward-word
-bindkey -M viins '^[b'                backward-word
-bindkey -M viins '^F'                 forward-char
-bindkey -M viins '^B'                 backward-char
+bindkey '^ '                 autosuggest-accept
 
-bindkey -M viins '^A'                 beginning-of-line
-bindkey -M viins '^E'                 end-of-line
+bindkey '^[p'                copy-earlier-word
 
-bindkey -M viins '^P'                 up-line-or-history
-bindkey -M viins '^N'                 down-line-or-history
+bindkey '^['                 undo
 
-bindkey -M viins '^[a'                accept-and-hold
-bindkey -M viins '^[.'                insert-last-word
-bindkey -M viins '^[p'                copy-earlier-word
-bindkey -M viins '^[0'                digit-argument
-bindkey -M viins '^[1'                digit-argument
-bindkey -M viins '^[2'                digit-argument
-bindkey -M viins '^[3'                digit-argument
-bindkey -M viins '^[4'                digit-argument
-bindkey -M viins '^[5'                digit-argument
-bindkey -M viins '^[6'                digit-argument
-bindkey -M viins '^[7'                digit-argument
-bindkey -M viins '^[8'                digit-argument
-bindkey -M viins '^[9'                digit-argument
-
-bindkey -M vicmd "${terminfo[khome]}" beginning-of-line
-bindkey -M vicmd "${terminfo[kend]}"  end-of-line
-bindkey -M vicmd "^[[3~"              delete-char
-bindkey -M vicmd "^[3;5~"             delete-char
-
-bindkey -M vicmd '^G'                 send-break
-bindkey -M vicmd '^Y'                 yank
-bindkey -M vicmd '^U'                 kill-whole-line
-bindkey -M vicmd '^X^X'               edit-command-line
-bindkey -M vicmd '^W'                 backward-kill-word
-
-bindkey -M menuselect '^M'  .accept-line
-bindkey -M menuselect ' '   accept-line
-bindkey -M menuselect '^[f' accept-and-infer-next-history
+bindkey -M menuselect '^['   undo
+bindkey -M menuselect '^M'   .accept-line
+bindkey -M menuselect ' '    accept-line
+bindkey -M menuselect '^[f'  accept-and-infer-next-history
 
 autoload -Uz add-zsh-hook
 
@@ -328,8 +288,12 @@ zle -N dc_completion
 compdef dc_completion -first-
 
 zle -N completer_selector
-bindkey -M viins '^I' completer_selector
+bindkey '^I' completer_selector
 
 # }}}
+
+[ -r ~/.fzf.zsh ] && . ~/.fzf.zsh
+
+bindkey '^T' transpose-chars
 
 [ -r "$HOME/.zshrc.local" ] && . "$HOME/.zshrc.local"

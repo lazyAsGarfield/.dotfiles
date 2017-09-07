@@ -147,16 +147,20 @@ if v:version >= 703
   let g:jedi#show_call_signatures_delay = 0
   let g:jedi#show_call_signatures = "0"
 
-  let g:jedi#use_splits_not_buffers = "right"
+  " let g:jedi#use_splits_not_buffers = "right"
   let g:jedi#goto_command = "yjg"
   let g:jedi#goto_assignments_command = "yja"
-  let g:jedi#goto_definitions_command = "yjd"
-  let g:jedi#documentation_command = "yjd"
+  let g:jedi#documentation_command = "K"
   let g:jedi#usages_command = "yju"
   " let g:jedi#completions_command = "<C-Space>"
   " let g:jedi#completions_command = "<Tab>"
   let g:jedi#completions_command = ""
   let g:jedi#rename_command = "yjr"
+
+  autocmd FileType python nmap <C-]> yjg
+
+  autocmd FileType python nnoremap <C-LeftMouse> <LeftMouse>:call jedi#goto()<CR>
+
 
 endif
 
@@ -245,50 +249,50 @@ nmap <leader>ml :Limelight!!<CR>
 
 " -------- tmux-navigator ------ {{{
 
-Plug 'christoomey/vim-tmux-navigator'
+" Plug 'christoomey/vim-tmux-navigator'
 
-let g:tmux_navigator_no_mappings = 1
+" let g:tmux_navigator_no_mappings = 1
 
-function! Navigate(dir)
-  if a:dir == 'l'
-    if exists(':TmuxNavigateLeft')
-      TmuxNavigateLeft
-    else
-      normal h
-    endif
-  elseif a:dir == 'r'
-    if exists(':TmuxNavigateRight')
-      TmuxNavigateRight
-    else
-      normal l
-    endif
-  elseif a:dir == 'u'
-    if exists(':TmuxNavigateUp')
-      TmuxNavigateUp
-    else
-      normal k
-    endif
-  elseif a:dir == 'd'
-    if exists(':TmuxNavigateDown')
-      TmuxNavigateDown
-    else
-      normal j
-    endif
-  endif
-endfunction
+" function! Navigate(dir)
+"   if a:dir == 'l'
+"     if exists(':TmuxNavigateLeft')
+"       TmuxNavigateLeft
+"     else
+"       normal h
+"     endif
+"   elseif a:dir == 'r'
+"     if exists(':TmuxNavigateRight')
+"       TmuxNavigateRight
+"     else
+"       normal l
+"     endif
+"   elseif a:dir == 'u'
+"     if exists(':TmuxNavigateUp')
+"       TmuxNavigateUp
+"     else
+"       normal k
+"     endif
+"   elseif a:dir == 'd'
+"     if exists(':TmuxNavigateDown')
+"       TmuxNavigateDown
+"     else
+"       normal j
+"     endif
+"   endif
+" endfunction
 
-" when .vimrc loaded by other apps, like qt creator, use standard bindings
-if version >= 700
-  nnoremap <silent> <C-h> :call Navigate('l')<CR>
-  nnoremap <silent> <C-j> :call Navigate('d')<CR>
-  nnoremap <silent> <C-k> :call Navigate('u')<CR>
-  nnoremap <silent> <C-l> :call Navigate('r')<CR>
-else
-  nnoremap <C-h> <C-w>h
-  nnoremap <C-j> <C-w>j
-  nnoremap <C-k> <C-w>k
-  nnoremap <C-l> <C-w>l
-endif
+" " when .vimrc loaded by other apps, like qt creator, use standard bindings
+" if version >= 700
+"   nnoremap <silent> <C-h> :call Navigate('l')<CR>
+"   nnoremap <silent> <C-j> :call Navigate('d')<CR>
+"   nnoremap <silent> <C-k> :call Navigate('u')<CR>
+"   nnoremap <silent> <C-l> :call Navigate('r')<CR>
+" else
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+" endif
 
 " }}}
 
@@ -817,6 +821,11 @@ if !exists("g:vimrc_init")
   silent! colorscheme hybrid
 
   hi! VertSplit guibg=#252525
+  hi! MatchParen guifg=#5F5F87 guibg=#1d1f21
+  hi! clear TabLine
+  hi! clear TabLineFill
+  hi! TabLine guifg=#d5d8d6 guibg=#3c3c3c
+  hi! TabLineFill guifg=#d5d8d6 guibg=#3c3c3c
 
   if has('termguicolors')
     set termguicolors
@@ -1113,8 +1122,6 @@ silent! set norelativenumber
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
 
-inoremap jj 
-
 nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
 nnoremap co<space> :<C-R>=b:better_whitespace_enabled ? 'DisableWhitespace' : 'EnableWhitespace'<CR><CR>
 nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGutterEnable'<CR><CR>
@@ -1123,7 +1130,7 @@ nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGut
 map <leader>w :w<CR>
 
 " quickly edit/reload the vimrc file
-nmap <silent> <leader>v :e $MYVIMRC<CR>
+nmap <silent> <leader>v :<C-R>=(expand('%')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
 
 " easier redrawing - sometimes strange artifacts are visible
 map <leader><leader>r :redraw!<CR>
@@ -1376,3 +1383,5 @@ function! Strip(str)
 endfunction
 
 highlight ExtraWhitespace ctermbg=137 guibg=#cc4411
+
+inoremap jj <esc>
