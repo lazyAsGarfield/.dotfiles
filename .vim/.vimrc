@@ -28,11 +28,8 @@ if v:version >= 703
 
   augroup my_nerdtree_maps
     au!
-    " autocmd FileType nerdtree nmap <buffer>  :quit<CR>
     autocmd FileType nerdtree nmap <buffer> <C-v> s
     autocmd FileType nerdtree nmap <buffer> <C-x> i
-    autocmd FileType nerdtree nmap <buffer> <C-j> j
-    autocmd FileType nerdtree nmap <buffer> <C-k> k
     autocmd FileType nerdtree nmap <buffer> . I
   augroup END
 
@@ -60,11 +57,6 @@ if v:version >= 703
 
   let g:undotree_SetFocusWhenToggle = 1
 
-  autocmd FileType undotree nmap <nowait> <buffer> q :quit<CR>
-  autocmd FileType undotree nmap <buffer> <C-j> j
-  autocmd FileType undotree nmap <buffer> <C-k> k
-  autocmd FileType undotree nmap <buffer> <nowait>  :quit<CR>
-
   nnoremap u :UndotreeToggle<CR>
 
 endif
@@ -74,7 +66,15 @@ endif
 " -------- vim-easymotion ------ {{{
 
 if v:version >= 703
-  Plug 'bmalkus/vim-easymotion'
+  Plug 'easymotion/vim-easymotion'
+
+  if version >= 703
+    nmap <leader>f <Plug>(easymotion-s2)
+
+    let g:EasyMotion_off_screen_search = 0
+    let g:EasyMotion_inc_highlight = 1
+    let g:EasyMotion_history_highlight = 0
+  endif
 endif
 
 " }}}
@@ -125,14 +125,15 @@ if v:version >= 703
     nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
     nnoremap ycl :YcmDiags<CR>
     nnoremap yct :YcmCompleter GetType<CR>
-    nnoremap ycr :YcmRestartServer<CR>
 
   endif
 endif
 
 " }}}
 
-" ---------- jedi-vim ---------- {{{
+" ------------ python ---------- {{{
+
+Plug 'hynek/vim-python-pep8-indent'
 
 if v:version >= 703
 
@@ -147,21 +148,14 @@ if v:version >= 703
   let g:jedi#show_call_signatures_delay = 0
   let g:jedi#show_call_signatures = "0"
 
-  " let g:jedi#use_splits_not_buffers = "right"
   let g:jedi#goto_command = "yjg"
   let g:jedi#goto_assignments_command = "yja"
   let g:jedi#documentation_command = "K"
   let g:jedi#usages_command = "yju"
-  " let g:jedi#completions_command = "<C-Space>"
-  " let g:jedi#completions_command = "<Tab>"
   let g:jedi#completions_command = ""
   let g:jedi#rename_command = "yjr"
 
   autocmd FileType python nmap <C-]> yjg
-
-  autocmd FileType python nnoremap <C-LeftMouse> <LeftMouse>:call jedi#goto()<CR>
-
-
 endif
 
 " }}}
@@ -203,99 +197,6 @@ imap <C-j> <C-k><CR>
 
 " }}}
 
-" -------- goyo/limelight ------ {{{
-
-Plug 'junegunn/limelight.vim'
-Plug 'junegunn/goyo.vim'
-
-let g:goyo_width=120
-let g:goyo_height='95%'
-
-let g:limelight_default_coefficient = '0.54'
-let g:limelight_paragraph_span = 1
-
-autocmd! User GoyoEnter nested call <SID>goyo_enter()
-autocmd! User GoyoLeave nested call <SID>goyo_leave()
-
-function! s:goyo_enter()
-  if !empty($TMUX)
-    silent! !tmux set -w status off
-    silent! !tmux list-panes -F '\#F' | grep -q Z || tmux resize-pane -Z
-  endif
-  set noshowmode
-  set noshowcmd
-  let g:scrolloff_saved=&scrolloff
-  " set scrolloff=999
-  Goyo x95%
-  " silent! Limelight
-endfunction
-
-function! s:goyo_leave()
-  if !empty($TMUX)
-    silent! !tmux set -w status on
-    silent! !tmux list-panes -F '\#F' | grep -q Z && tmux resize-pane -Z
-  endif
-  set showmode
-  set showcmd
-  exec 'set scrolloff=' . g:scrolloff_saved
-  silent! Limelight!
-  " silent! colorscheme Tomorrow-Night-Eighties-Mine
-endfunction
-
-nmap <leader>mm :Goyo<CR>
-nmap <leader>ml :Limelight!!<CR>
-
-" }}}
-
-" -------- tmux-navigator ------ {{{
-
-" Plug 'christoomey/vim-tmux-navigator'
-
-" let g:tmux_navigator_no_mappings = 1
-
-" function! Navigate(dir)
-"   if a:dir == 'l'
-"     if exists(':TmuxNavigateLeft')
-"       TmuxNavigateLeft
-"     else
-"       normal h
-"     endif
-"   elseif a:dir == 'r'
-"     if exists(':TmuxNavigateRight')
-"       TmuxNavigateRight
-"     else
-"       normal l
-"     endif
-"   elseif a:dir == 'u'
-"     if exists(':TmuxNavigateUp')
-"       TmuxNavigateUp
-"     else
-"       normal k
-"     endif
-"   elseif a:dir == 'd'
-"     if exists(':TmuxNavigateDown')
-"       TmuxNavigateDown
-"     else
-"       normal j
-"     endif
-"   endif
-" endfunction
-
-" " when .vimrc loaded by other apps, like qt creator, use standard bindings
-" if version >= 700
-"   nnoremap <silent> <C-h> :call Navigate('l')<CR>
-"   nnoremap <silent> <C-j> :call Navigate('d')<CR>
-"   nnoremap <silent> <C-k> :call Navigate('u')<CR>
-"   nnoremap <silent> <C-l> :call Navigate('r')<CR>
-" else
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-" endif
-
-" }}}
-
 " ---------- fzf/ctrlp --------- {{{
 
 Plug 'junegunn/fzf', { 'do': './install --all' }
@@ -315,8 +216,7 @@ if !executable('fzf')
 else
 
   function! s:full_path(dir_or_file)
-    " if fnamemodify() applied once, full_path may look like /blah/../
-    " if a:dir_or_file is '..'
+    " if fnamemodify() applied once, full_path may look like /blah/../ when a:dir_or_file is '..'
     return fnamemodify(fnamemodify(a:dir_or_file, ':p'), ':p')
   endfunction
 
@@ -362,7 +262,7 @@ else
   command! GitFilesOrCwd call s:git_files_if_in_repo()
 
   function! s:git_root_or_cwd()
-    return exists('b:git_dir') ? fugitive#repo().tree() : Get_cpp_root(getcwd())
+    return exists('b:git_dir') ? fugitive#repo().tree() : getcwd()
   endfunction
 
   function! s:all_files_git_root_or_cwd()
@@ -594,14 +494,6 @@ nnoremap <C-F10> :Start!<CR>
 
 " }}}
 
-" ------------ python ---------- {{{
-
-" Extracted from https://github.com/klen/python-mode
-Plug '~/.vim/plugin/python-mode-motions'
-Plug 'hynek/vim-python-pep8-indent'
-
-" }}}
-
 " ---------- easy-align -------- {{{
 
 Plug 'junegunn/vim-easy-align'
@@ -620,14 +512,7 @@ let g:tagbar_map_openfold = 'l'
 let g:tagbar_map_closefold = 'h'
 
 nmap g :TagbarToggle<CR>
-
-" }}}
-
-" ----------- vim-bbye --------- {{{
-
-Plug 'moll/vim-bbye'
-
-map <leader>D :Bdelete<CR>
+let g:tagbar_map_showproto = "<space><space>"
 
 " }}}
 
@@ -695,7 +580,6 @@ filetype plugin indent on
 " some options get overriden by plugins when re-sourcing vimrc, set them to
 " desired values
 runtime after/plugin/override.vim
-
 
 " --------------- PLUGINS END --------------- }}}
 
@@ -813,19 +697,14 @@ set showcmd
 
 set lazyredraw
 
+set wildmenu
+
 " some options have to be set only at init
 if !exists("g:vimrc_init")
   let g:vimrc_init = 1
 
   set background=dark
   silent! colorscheme hybrid
-
-  hi! VertSplit guibg=#252525
-  hi! MatchParen guifg=#5F5F87 guibg=#1d1f21
-  hi! clear TabLine
-  hi! clear TabLineFill
-  hi! TabLine guifg=#d5d8d6 guibg=#3c3c3c
-  hi! TabLineFill guifg=#d5d8d6 guibg=#3c3c3c
 
   if has('termguicolors')
     set termguicolors
@@ -871,6 +750,8 @@ if !exists("g:vimrc_init")
 
   " show at least 5 lines below/above cursor
   set scrolloff=5
+  set sidescrolloff=5
+  set sidescroll=1
 
   " foldenable + foldcolumn
   " silent! set nofoldenable
@@ -883,9 +764,55 @@ if !exists("g:vimrc_init")
   set nowrap
 endif " exists("g:vimrc_init")
 
+" Cstyle indentation settings
+set cinoptions=
+set cinoptions+=l1
+set cinoptions+=g0
+set cinoptions+=N-s
+set cinoptions+=t0
+set cinoptions+=(0
+set cinoptions+=u0
+" set cinoptions+=U1
+" set cinoptions+=w1
+set cinoptions+=W1s
+set cinoptions+=k2s
+set cinoptions+=m1
+" set cinoptions+=M1
+set cinoptions+=j1
+set cinoptions+=J1
+
+" Sometimes autocommands interfere with each other and break syntax
+" Let's fix it
+au! syntaxset BufEnter *
+
+silent! set shortmess+=c
+
+highlight ExtraWhitespace ctermbg=137 guibg=#cc4411
+
+hi! VertSplit guibg=#252525
+hi! MatchParen guifg=#5F5F87 guibg=#1d1f21
+hi! clear TabLine
+hi! clear TabLineFill
+hi! TabLine guifg=#d5d8d6 guibg=#3c3c3c
+hi! TabLineFill guifg=#d5d8d6 guibg=#3c3c3c
+
 " --------------- VIM OPTS END ------------- }}}
 
 " ---------- VIM MAPPINGS --------- {{{
+
+nnoremap <C-h> <C-w>h
+nnoremap <C-j> <C-w>j
+nnoremap <C-k> <C-w>k
+nnoremap <C-l> <C-w>l
+
+cnoremap <C-a> <C-b>
+cnoremap b <C-Left>
+cnoremap f <C-Right>
+
+cabbrev Q q
+cabbrev WQ wq
+cabbrev Wq wq
+cabbrev W w
 
 function! s:toggleWindow(name)
   for i in range(1, winnr('$'))
@@ -925,13 +852,6 @@ nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
 nmap _ :exe "resize " . ((winheight(0) + 1) * 3/2)<CR>
 nmap - :exe "resize " . (winheight(0) * 2/3)<CR>
 
-" registers
-nmap cr "
-vmap cr "
-
-nmap crc "+
-vmap crc "+
-
 nmap cy "+y
 vmap cy "+y
 nmap cY "+Y
@@ -942,66 +862,40 @@ vmap cp "+p
 nmap cP "+P
 vmap cP "+P
 
-" substitute all occurences of text selected in visual mode
-vnoremap <C-r><C-r> "hy:%s/<C-r>h/<C-r>h/g<left><left>
-vnoremap <C-r><C-e> "hy:%s/\<<C-r>h\>/<C-r>h/g<left><left>
-
-" it's handy to have those when using byobu, as Shift + arrows moves around
-" byobu's splits
-nnoremap <C-Left> <C-w>h
-nnoremap <C-Down> <C-w>j
-nnoremap <C-Up> <C-w>k
-nnoremap <C-Right> <C-w>l
-
-func! ChangeFold()
-  if (&foldenable == 1)
-    set nofoldenable
-    set foldcolumn=0
-    echo 'Folding disabled'
-  else
-    set foldenable
-    set foldcolumn=1
-    echo 'Folding enabled'
-  endif
-endfunc
-
-map zi :call ChangeFold()<CR>
-
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
 
 autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
 
-autocmd FileType qf nnoremap <nowait> <buffer> q :quit<CR>
+nmap <leader><tab> :b#<CR>
 
-" --------------- VIM MAPPINGS END -------------- }}}
+silent! set norelativenumber
 
-function! s:cd_to_root_if_git_repo()
-  if exists('b:git_dir')
-    exec 'cd' fugitive#repo().tree()
-    let g:_cwd = getcwd()
-    pwd
-  else
-    echo 'Not in git repo'
-  endif
-endfunction
+nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
 
-command! CdRootGitRoot call s:cd_to_root_if_git_repo()
+" save current file
+map <leader>w :w<CR>
 
-autocmd VimEnter * if ! haslocaldir() | let g:_cwd = getcwd()  | endif
-autocmd BufLeave * if ! haslocaldir() | let g:_cwd = getcwd() | endif
+" quickly edit/reload the vimrc file
+nmap <silent> <leader>v :<C-R>=(expand('%')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
 
-if ! exists('g:_starting_cd')
-  let g:_starting_cd = getcwd()
-endif
+nmap 0y "0y
+vmap 0y "0y
+nmap 0p "0p
+vmap 0p "0p
+nmap 0Y "0Y
+vmap 0Y "0Y
+nmap 0P "0P
+vmap 0P "0P
+nmap <silent> <leader>t :checktime<CR>
 
-nmap <silent> <leader>ds :exec 'cd' g:_starting_cd \| let g:_cwd = getcwd() \| pwd<CR>
-nmap <silent> <leader>dg :CdRootGitRoot<CR>
-nmap <silent> <leader>dc :if ! haslocaldir() \| lcd %:p:h \|
-      \ echo '<local> ' . getcwd() \| else \| exec 'cd ' . g:_cwd \|
-        \ echo '<global> ' .  getcwd() \| endif<CR>
-nmap <silent> <leader>dp :echo '=haslocaldir() ? '<local> ' : '<global> '<CR>' . getcwd()<CR>
+inoremap jj <esc>
+
+vmap K k
+
+" refresh <nowait> ESC mappings
+runtime after/plugin/ESCNoWaitMappings.vim
 
 function! MoveToPrevTab(...)
   let l:line = line('.')
@@ -1067,273 +961,6 @@ nnoremap <silent> H :tabm-1<CR>
 nnoremap l gt
 nnoremap <silent> L :tabm+1<CR>
 
-vmap K k
-
-" Cstyle indentation settings
-set cinoptions=
-set cinoptions+=l1
-set cinoptions+=g0
-set cinoptions+=N-s
-set cinoptions+=t0
-set cinoptions+=(0
-set cinoptions+=u0
-" set cinoptions+=U1
-" set cinoptions+=w1
-set cinoptions+=W1s
-set cinoptions+=k2s
-set cinoptions+=m1
-" set cinoptions+=M1
-set cinoptions+=j1
-set cinoptions+=J1
-
-" Sometimes autocommands interfere with each other and break syntax
-" Let's fix it
-au! syntaxset BufEnter *
-
-silent! set shortmess+=c
-
-nmap <leader>` p
-nmap <leader>x x
-nmap <leader><tab> :b#<CR>
-nmap , <space>
-
-
-if version >= 703
-  nmap <leader>f <Plug>(easymotion-sn-to)
-
-  let g:EasyMotion_timeout_len = 500
-  let g:EasyMotion_off_screen_search = 0
-  let g:EasyMotion_inc_highlight = 1
-  let g:EasyMotion_history_highlight = 0
-
-endif
-
-" typing in wrong order may be annoying
-" map q<leader> :q<CR>
-command! Q q
-command! Wq wq
-command! WQ wq
-command! W w
-
-nnoremap <leader>z z
-
-silent! set norelativenumber
-
-" refresh <nowait> ESC mappings
-runtime after/plugin/ESCNoWaitMappings.vim
-
-nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
-nnoremap co<space> :<C-R>=b:better_whitespace_enabled ? 'DisableWhitespace' : 'EnableWhitespace'<CR><CR>
-nnoremap cog :<C-R>=gitgutter#utility#is_active() ? 'GitGutterDisable' : 'GitGutterEnable'<CR><CR>
-
-" save current file
-map <leader>w :w<CR>
-
-" quickly edit/reload the vimrc file
-nmap <silent> <leader>v :<C-R>=(expand('%')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
-
-" easier redrawing - sometimes strange artifacts are visible
-map <leader><leader>r :redraw!<CR>
-
-" Don't indent namespace and template
-function! CppNoNamespaceAndTemplateIndent()
-  let l:cline_num = line('.')
-  let l:cline = getline(l:cline_num)
-  let l:pline_num = prevnonblank(l:cline_num - 1)
-  let l:pline = getline(l:pline_num)
-  while l:pline =~# '\(^\s*{\s*\|^\s*//\|^\s*/\*\|\*/\s*$\)'
-    let l:pline_num = prevnonblank(l:pline_num - 1)
-    let l:pline = getline(l:pline_num)
-  endwhile
-  let l:retv = cindent('.')
-  let l:pindent = indent(l:pline_num)
-
-  " experimental
-  if l:cline =~# '^\s*>\s*$' &&
-    (
-    l:pline =~# '^\s*template' ||
-    l:pline =~# '^\s*typename' ||
-    l:pline =~# '^\s*class'
-    )
-    return l:pindent
-  endif
-
-  if l:pline =~# '^\s*template\s*<.*>\s*$'
-    let l:retv = l:pindent
-  elseif l:pline =~# '^\s*template\s*<\s*$'
-    let l:retv = l:pindent + &shiftwidth
-  elseif l:pline =~# '^\s*template\s*$'
-    let l:retv = l:pindent
-  elseif l:pline =~# '\s*typename\s*.*,\s*$'
-    let l:retv = l:pindent
-  elseif l:cline =~# '^\s*>.*$'
-    let l:retv = l:pindent - &shiftwidth
-  elseif l:pline =~# '\s*typename\s*.*>\s*$'
-    let l:retv = l:pindent - &shiftwidth
-  endif
-
-  if l:pline =~# '\v^\s*(class|struct)\s+\w+\s*:\s*((public|protected|private)\s+)?\w+\s*$'
-    if l:retv > l:pindent
-      return l:retv - &shiftwidth
-    endif
-  endif
-
-  return l:retv
-endfunction
-
-autocmd FileType cpp setlocal indentexpr=CppNoNamespaceAndTemplateIndent()
-
-let s:src_ext = ['c', 'cpp', 'c\+\+', 'hpp', 'h\+\+']
-let s:header_ext = ['h', 'hpp', 'h\+\+']
-let s:src_ext_str = '(' . join(s:src_ext,'|') . ')'
-let s:header_ext_str = '(' . join(s:header_ext,'|') . ')'
-
-function! s:cust_cpp_proj_file_loc()
-  let loc = expand('%:p:h')
-  while loc != '/'
-    let f = loc . '/.cpp_project_root'
-    if filereadable(f)
-      return loc
-    endif
-    let loc = simplify(loc . '/..')
-  endwhile
-  return ''
-endfunction
-
-function! Get_cpp_root(...)
-  if exists('b:git_dir')
-    return fugitive#repo().tree()
-  endif
-
-  let loc = expand('%:p:h')
-  let orig = loc
-
-  if exists('b:cpp_root')
-
-    if b:cpp_root != ""
-      return b:cpp_root
-    endif
-
-  else
-
-    let f = s:cust_cpp_proj_file_loc()
-    if f != ''
-      if getfsize(f) == 0
-        return loc
-      else
-        let r = readfile(f)
-        let r = map(r, 'v:val =~ "^/" ? fnamemodify(v:val, ":p") : fnamemodify("' . fnamemodify(f, ':p:h') . '" . "/" . v:val, ":p")')
-        let r = filter(r, 'isdirectory(v:val) && "' . orig . '" =~# v:val' )
-        if len(r) > 0
-          let b:cpp_root = r[0]
-          return r[0]
-        endif
-      endif
-    endif
-
-    let b:cpp_root = ''
-
-  endif
-
-  if loc =~? 'inc\(l\(ude\)\?\)\?$' || loc =~? 'src$'
-    let loc .= '/..'
-    return simplify(loc)
-  elseif loc =~? 'inc\(l\(ude\)\?\)\?/[^/]\+$'
-    let loc .= '/../..'
-    return simplify(loc)
-  endif
-
-  return a:0 > 0 ? a:1 : orig
-endfunction
-
-function! s:header_files()
-  let loc = Get_cpp_root()
-  call fzf#vim#files(loc, {
-        \ 'source': "ag -g '\\." .  s:header_ext_str . "$'",
-        \ 'options': '--preview "cat {}" --prompt "' . getcwd() . ' (Headers)> "'
-        \ })
-endfunction
-
-function! s:src_files(...)
-  let loc = Get_cpp_root()
-  call fzf#vim#files(loc, {
-        \ 'source': "ag -g '\\." .  (a:0 > 0 ? a:1 : s:src_ext_str) . "$'",
-        \ 'options': '--preview "cat {}" --prompt "' . getcwd() . ' (Sources)> "'
-        \ })
-endfunction
-
-function! Find_src_or_header(cmd)
-  let fname = expand('%:t:r')
-  let loc = Get_cpp_root()
-  let cmd = "ag " . loc . " -g '\\b" . fname . "\\b\."
-  let is_header = index(s:header_ext, expand('%:e')) != -1
-  if is_header
-    let cmd .= s:src_ext_str
-  else
-    let cmd .= s:header_ext_str
-  endif
-  let cmd .= "$'"
-  let files = systemlist(cmd)
-  if len(files) > 0
-    exe a:cmd files[0]
-  else
-    if is_header
-      echo "Did not find source file"
-    else
-      echo "Did not find header file"
-    endif
-  endif
-endfunction
-
-function! Find_include_header(cmd)
-  let line = getline(line('.'))
-  if line !~ '^#include '
-    echo 'Not on #include line'
-    return
-  endif
-  let fname = substitute(getline(line('.')), '^#include ["<]\(.*\)[">]$', '\1', "")
-  let loc = Get_cpp_root()
-  let cmd = "ag " . loc . " -g '\\b" . fname . "$'"
-  let files = systemlist(cmd)
-  if len(files) > 0
-    exe a:cmd files[0]
-  else
-    echo "Did not find header file"
-  endif
-endfunction
-
-function! Edit_CMakeLists(cmd)
-  let loc = expand('%:p:h')
-  while loc != '/'
-    let f = loc . '/CMakeLists.txt'
-    if filereadable(f)
-      exec a:cmd . ' ' . f
-      return
-    endif
-    let loc = simplify(loc . '/..')
-  endwhile
-  echo "Did not find CMakeLists.txt"
-endfunction
-
-command! HeaderFiles call <SID>header_files()
-command! -nargs=? SrcFiles call <SID>src_files(<args>)
-
-autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>ah :HeaderFiles<CR>
-autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>as :SrcFiles<CR>
-autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>at :call Find_src_or_header("e")<CR>
-autocmd FileType cpp,c,cmake nmap <buffer> <silent> <leader>ag :call Find_include_header("vsp")<CR>
-autocmd FileType cpp,c nmap <buffer> <silent> <leader>al :call Edit_CMakeLists("vsp")<CR>
-
-nmap 0y "0y
-vmap 0y "0y
-nmap 0p "0p
-vmap 0p "0p
-nmap 0Y "0Y
-vmap 0Y "0Y
-nmap 0P "0P
-vmap 0P "0P
-nmap <silent> <leader>t :checktime<CR>
-
 function! SourceRange() range
   let tmpsofile = tempname()
   call writefile(getline(a:firstline, a:lastline), l:tmpsofile)
@@ -1342,46 +969,8 @@ function! SourceRange() range
 endfunction
 command! -range Source <line1>,<line2>call SourceRange()
 
-nnoremap <silent> <leader>. :let pos = getpos('.') \|
-      \ exec pos[1] . "," . pos[1] . "Source" \|
-      \ call setpos('.', pos)<CR>
-
-vmap <silent> <leader>. :Source<CR>
-
-vmap <leader>s :sort<CR>
-
-function! s:CheckForModelines()
-   if !exists('+modelines') || &modelines < 1 || ( !&modeline && !exists('b:checked_modeline') )
-     return -1
-   endif
-   let mlines = []
-   if &modelines > line('$')
-     sil exe '%g/\<vim:\|\<vi:\|\<ex:/let mlines = mlines + [getline(".")]'
-   else
-     sil exe '1,'.&modelines.'g/\<vim:\|\<vi:\|\<ex:/let mlines = mlines + [getline(".")]'
-     sil exe '$-'.(&modelines-1).',$g/\<vim:\|\<vi:\|\<ex:/let mlines = mlines + [getline(".")]'
-   endif
-   if len(mlines) > 0
-     echo join(mlines, "\n")
-     let ans = confirm('Modelines found! Execute?', "&Yes\n&No", 2)
-     let &l:modeline = (ans == 1)
-     let b:checked_modeline = 1
-   endif
-endfunction
-
-augroup modelines
-  au!
-  au BufReadPost * call s:CheckForModelines()
-augroup END
+" --------------- VIM MAPPINGS END -------------- }}}
 
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif
-
-function! Strip(str)
-  return substitute(a:str, '\v^(\n|\s)*(.{-})(\n|\s)*$', '\2', '')
-endfunction
-
-highlight ExtraWhitespace ctermbg=137 guibg=#cc4411
-
-inoremap jj <esc>

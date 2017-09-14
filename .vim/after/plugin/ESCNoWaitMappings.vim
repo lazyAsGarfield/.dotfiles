@@ -4,9 +4,11 @@
 silent! nunmap 
 silent! vunmap 
 silent! iunmap 
+silent! cunmap <esc>
 nnoremap <nowait>  
 vnoremap <nowait>  
 inoremap <nowait>  
+cnoremap <nowait> <esc> <C-c>
 
 augroup esc_mapping
   au!
