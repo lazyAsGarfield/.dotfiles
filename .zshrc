@@ -1,5 +1,6 @@
+. "$HOME/.shellrc"
+
 # misc shell stuff {{{
-. "$DOTFILES_DIR/.shellrc"
 
 autoload -U colors && colors
 

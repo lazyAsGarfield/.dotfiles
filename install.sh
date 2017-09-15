@@ -17,6 +17,7 @@ ln -s "$target_dir/.profile"
 ln -s "$target_dir/.zprofile"
 ln -s "$target_dir/.bash_profile"
 
+ln -s "$target_dir/.shellrc"
 ln -s "$target_dir/.zshrc"
 ln -s "$target_dir/.bashrc"
 

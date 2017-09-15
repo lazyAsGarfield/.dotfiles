@@ -1,4 +1,4 @@
-. "$DOTFILES_DIR/.shellrc"
+. "$HOME/.shellrc"
 
 [ -r ~/.fzf.bash ] && . ~/.fzf.bash
 

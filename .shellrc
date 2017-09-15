@@ -1,3 +1,5 @@
+[ -z "$PROFILE" ] && . "$HOME/.profile"
+
 alias ls='gls --color=auto'
 alias grep='grep --color=auto'
 alias ll='ls -lFh'
@@ -45,9 +47,12 @@ alias_if_needed wc
 alias_if_needed readlink
 alias_if_needed sort
 
-if command -v tmuxifier >/dev/null 2>&1; then
-  alias mux=tmuxifier
 
+
+if tmux_path=$(type -p tmuxifier 2>/dev/null) && [ -z "$tmux_path" ] &&
+  tmuxifier_path=$(type -p tmuxifier 2>/dev/null) && [ -z "$tmuxifier_path" ] ; then
+
+  alias mux=tmuxifier
   export TMUXIFIER_LAYOUT_PATH="$HOME/.tmux-layouts"
   mkdir -p "$TMUXIFIER_LAYOUT_PATH"
   eval "$(tmuxifier init -)"
