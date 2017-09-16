@@ -1,3 +1,3 @@
 . "$HOME/.profile"
 
-[ "$-" == *i* ] && . "$HOME/.bashrc"
+[[ "$-" == *i* ]] && . "$HOME/.bashrc"
