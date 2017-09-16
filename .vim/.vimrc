@@ -890,12 +890,12 @@ nmap 0P "0P
 vmap 0P "0P
 nmap <silent> <leader>t :checktime<CR>
 
-inoremap jj <esc>
-
 vmap K k
 
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
+
+inoremap jj <esc>
 
 function! MoveToPrevTab(...)
   let l:line = line('.')
