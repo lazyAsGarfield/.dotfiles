@@ -26,6 +26,7 @@
   last = log -p -1
   lol = log --graph --decorate --pretty=oneline --abbrev-commit
   lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
+  ctags = "!sh -c '[ -f .git/hooks/ctags ] || git init; .git/hooks/ctags' git-ctags"
 
 [push]
   default = simple
@@ -38,3 +39,6 @@
 
 [core]
 	ignore = ~/.cvsignore
+
+[init]
+	templatedir = ~/.git_template

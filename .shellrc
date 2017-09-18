@@ -33,9 +33,12 @@ alias ssh='TERM=screen-256color ssh'
 alias_if_needed()
 {
   gcmd="g$1"
-  path_to="$(which $gcmd)"
+  path_to="$(which $gcmd 2>/dev/null)"
   if [[ ! -x "$path_to" ]]; then
+    export _$1=$1
     alias $gcmd=$1
+  else
+    export _$1=$gcmd
   fi
 }
 
@@ -157,7 +160,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local untracked
-          untracked="$(gtimeout 0.1s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | gwc -l")"
+          untracked="$(gtimeout 0.1s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1
@@ -170,7 +173,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local unstaged
-          unstaged="$(gtimeout 0.1s $SHELL -c "git diff --numstat 2>/dev/null | gwc -l")"
+          unstaged="$(gtimeout 0.1s $SHELL -c "git diff --numstat 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1
@@ -183,7 +186,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local staged
-          staged="$(gtimeout 0.1s $SHELL -c "git diff --cached --numstat 2>/dev/null | gwc -l")"
+          staged="$(gtimeout 0.1s $SHELL -c "git diff --cached --numstat 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1

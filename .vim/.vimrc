@@ -507,12 +507,14 @@ nmap ga <Plug>(EasyAlign)
 
 Plug 'majutsushi/tagbar'
 
-let g:tagbar_autofocus = 1
+let g:tagbar_autofocus = 0
 let g:tagbar_map_openfold = 'l'
 let g:tagbar_map_closefold = 'h'
 
 nmap g :TagbarToggle<CR>
 let g:tagbar_map_showproto = "<space><space>"
+
+let g:tagbar_sort = 0
 
 " }}}
 

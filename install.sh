@@ -11,6 +11,7 @@ cd
 ln -s "$target_dir/.gdbinit"
 
 ln -s "$target_dir/.gitconfig"
+ln -s "$target_dir/.git_template"
 ln -s "$target_dir/.cvsignore"
 
 ln -s "$target_dir/.profile"
