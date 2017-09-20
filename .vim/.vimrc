@@ -82,9 +82,9 @@ endif
 " ------------- YCM ------------ {{{
 
 if v:version >= 703
-  if !empty($__YCM__)
+  if !empty($__VIM_YCM__)
 
-    if !empty($__COMPL__)
+    if !empty($__VIM_COMPL__)
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
     else
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
@@ -137,7 +137,7 @@ Plug 'hynek/vim-python-pep8-indent'
 
 if v:version >= 703
 
-  if !empty($__YCM__)
+  if !empty($__VIM_YCM__)
     Plug 'davidhalter/jedi-vim'
   endif
 
@@ -155,7 +155,8 @@ if v:version >= 703
   let g:jedi#completions_command = ""
   let g:jedi#rename_command = "yjr"
 
-  autocmd FileType python nmap <C-]> yjg
+  " autocmd FileType python nmap <C-]> yjg
+  autocmd FileType python nmap <buffer> <C-]> g<C-]>
 endif
 
 " }}}
@@ -443,6 +444,14 @@ autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
 
+if !exists('g:vimrc_init')
+  augroup my_enter
+    autocmd VimEnter * GitGutterSignsDisable
+    autocmd VimEnter * au! my_enter
+  augroup END
+endif
+
+
 " }}}
 
 " ------- better-whitespace ---- {{{
@@ -453,7 +462,6 @@ Plug 'ntpeters/vim-better-whitespace'
 
 " --------- colors/themes ------ {{{
 
-Plug 'chriskempson/tomorrow-theme', { 'rtp': 'vim' }
 Plug 'sjl/badwolf'
 Plug 'w0ng/vim-hybrid'
 
@@ -463,7 +471,7 @@ Plug 'bling/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
 if v:version >= 703
-  if !empty($__YCM__)
+  if !empty($__VIM_YCM__)
     " Plug 'jeaye/color_coded', { 'do': 'mkdir -p build && cd $_ && cmake .. && make install' }
   endif
 endif
@@ -555,23 +563,27 @@ map g# <Plug>(incsearch-nohl-g#)
 
 " ------------ latex ----------- {{{
 
-Plug 'lervag/vimtex'
+if !empty($__VIM_LATEX__)
 
-let g:tex_flavor = "latex"
+  Plug 'lervag/vimtex'
 
-au FileType tex let b:delimitMate_quotes = "\" '"
-au FileType tex set textwidth=120
+  let g:tex_flavor = "latex"
 
-augroup latexSurround
-  autocmd!
-  autocmd FileType tex call s:latexSurround()
-augroup END
+  au FileType tex let b:delimitMate_quotes = "\" '"
+  au FileType tex set textwidth=120
 
-function! s:latexSurround()
-  let b:surround_{char2nr("e")}
-        \ = "\\begin{\1environment: \1}\n\t\r\n\\end{\1\1}"
-  let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
-endfunction
+  augroup latexSurround
+    autocmd!
+    autocmd FileType tex call s:latexSurround()
+  augroup END
+
+  function! s:latexSurround()
+    let b:surround_{char2nr("e")}
+          \ = "\\begin{\1environment: \1}\n\t\r\n\\end{\1\1}"
+    let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
+  endfunction
+
+endif
 
 " }}}
 
@@ -706,7 +718,8 @@ if !exists("g:vimrc_init")
   let g:vimrc_init = 1
 
   set background=dark
-  silent! colorscheme hybrid
+  " silent! colorscheme hybrid
+  silent! colorscheme jellybeans
 
   if has('termguicolors')
     set termguicolors
@@ -724,7 +737,7 @@ if !exists("g:vimrc_init")
         \ endif
 
   " 80/120 columns marker
-  silent! let &colorcolumn="80,120"
+  silent! let &colorcolumn="120"
 
   " indentation options
   set autoindent
@@ -797,6 +810,8 @@ hi! clear TabLine
 hi! clear TabLineFill
 hi! TabLine guifg=#d5d8d6 guibg=#3c3c3c
 hi! TabLineFill guifg=#d5d8d6 guibg=#3c3c3c
+
+au BufReadPost,BufNewFile ~/.vimrc* set tw=0
 
 " --------------- VIM OPTS END ------------- }}}
 
@@ -976,3 +991,6 @@ command! -range Source <line1>,<line2>call SourceRange()
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif
+
+set listchars=trail:·
+set list

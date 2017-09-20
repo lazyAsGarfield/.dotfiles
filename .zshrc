@@ -81,6 +81,7 @@ HISTSIZE=100000
 SAVEHIST=100000
 
 setopt appendhistory
+setopt histignoredups
 setopt autocd
 setopt nocdablevars
 setopt nomultios
@@ -89,6 +90,8 @@ setopt no_beep
 setopt no_nomatch
 setopt extendedhistory
 setopt nolistambiguous
+setopt histreduceblanks
+setopt histexpiredupsfirst
 
 zmodload zsh/complist
 

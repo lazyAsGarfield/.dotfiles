@@ -52,8 +52,9 @@ alias_if_needed sort
 
 
 
-if tmux_path=$(type -p tmuxifier 2>/dev/null) && [ -z "$tmux_path" ] &&
-  tmuxifier_path=$(type -p tmuxifier 2>/dev/null) && [ -z "$tmuxifier_path" ] ; then
+if tmux_path=$(type -p tmuxifier 2>/dev/null) && [ -n "$tmux_path" ] &&
+  tmuxifier_path=$(type -p tmuxifier 2>/dev/null) && [ -n "$tmuxifier_path" ] &&
+  [ -z "$TMUXIFIER_LAYOUT_PATH" ]; then
 
   alias mux=tmuxifier
   export TMUXIFIER_LAYOUT_PATH="$HOME/.tmux-layouts"
