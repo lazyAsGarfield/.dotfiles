@@ -120,11 +120,6 @@ if v:version >= 703
 
     nnoremap ycg :YcmCompleter GoTo<CR>
     nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
-    nnoremap ycf :YcmCompleter FixIt<CR>
-    nnoremap ycd :YcmCompleter GetDoc<CR>
-    nnoremap ycdd :YcmShowDetailedDiagnostic<CR>
-    nnoremap ycl :YcmDiags<CR>
-    nnoremap yct :YcmCompleter GetType<CR>
 
   endif
 endif
@@ -149,13 +144,14 @@ if v:version >= 703
   let g:jedi#show_call_signatures = "0"
 
   let g:jedi#goto_command = "yjg"
-  let g:jedi#goto_assignments_command = "yja"
   let g:jedi#documentation_command = "K"
   let g:jedi#usages_command = "yju"
-  let g:jedi#completions_command = ""
-  let g:jedi#rename_command = "yjr"
 
-  " autocmd FileType python nmap <C-]> yjg
+  let g:jedi#goto_assignments_command = ""
+  let g:jedi#completions_command = ""
+  let g:jedi#rename_command = ""
+
+
   autocmd FileType python nmap <buffer> <C-]> g<C-]>
 endif
 
@@ -260,8 +256,6 @@ else
     endif
   endfunction
 
-  command! GitFilesOrCwd call s:git_files_if_in_repo()
-
   function! s:git_root_or_cwd()
     return exists('b:git_dir') ? fugitive#repo().tree() : getcwd()
   endfunction
@@ -273,8 +267,6 @@ else
           \ 'options': '--preview "cat {}" --prompt "' . path . ' (Files)> "'
           \ })
   endfunction
-
-  command! FilesGitRootOrCwd call s:all_files_git_root_or_cwd()
 
   " expands path relatively to cwd or git root if possible
   " (similar to CtrlP plugin)
@@ -372,8 +364,6 @@ else
           \ })
   endfunction
 
-  command! Mru call s:fzf_mru()
-
   function! s:ag_in(bang, ...)
     let tokens  = a:000
     let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
@@ -404,6 +394,12 @@ else
           \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
           \ }, a:bang ? 1 : 0)
   endfunction
+
+  command! GitFilesOrCwd call s:git_files_if_in_repo()
+
+  command! FilesGitRootOrCwd call s:all_files_git_root_or_cwd()
+
+  command! Mru call s:fzf_mru()
 
   command! -nargs=+ -complete=dir -bang Agin call s:ag_in(<bang>0, <f-args>)
 
@@ -438,8 +434,6 @@ let g:gitgutter_override_sign_column_highlight = 0
 let g:gitgutter_sign_modified = '#'
 let g:gitgutter_sign_removed = 'v'
 let g:gitgutter_sign_modified_removed = '#v'
-
-autocmd FileType gitcommit nnoremap <nowait> <buffer> ? :help fugitive-:Gstatus<CR>
 
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
@@ -492,6 +486,9 @@ Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-dispatch'
+Plug 'tpope/vim-rsi'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-scriptease'
 
 nnoremap <F8> :Make<CR>
 nnoremap <C-F8> :Make!<CR>
@@ -508,21 +505,6 @@ Plug 'junegunn/vim-easy-align'
 
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
-
-" }}}
-
-" ------------ tagbar ---------- {{{
-
-Plug 'majutsushi/tagbar'
-
-let g:tagbar_autofocus = 0
-let g:tagbar_map_openfold = 'l'
-let g:tagbar_map_closefold = 'h'
-
-nmap g :TagbarToggle<CR>
-let g:tagbar_map_showproto = "<space><space>"
-
-let g:tagbar_sort = 0
 
 " }}}
 
@@ -711,8 +693,6 @@ set showcmd
 
 set lazyredraw
 
-set wildmenu
-
 " some options have to be set only at init
 if !exists("g:vimrc_init")
   let g:vimrc_init = 1
@@ -748,7 +728,7 @@ if !exists("g:vimrc_init")
   set smarttab
 
   " display line numbers
-  set number
+  " set number
 
   " set folding method
   set foldmethod=marker
@@ -768,13 +748,12 @@ if !exists("g:vimrc_init")
   set sidescrolloff=5
   set sidescroll=1
 
-  " foldenable + foldcolumn
-  " silent! set nofoldenable
-  if &foldenable
-    silent! set foldcolumn=1
-  else
-    silent! set foldcolumn=0
-  endif
+  set foldcolumn=0
+  " if &foldenable
+  "   silent! set foldcolumn=1
+  " else
+  "   silent! set foldcolumn=0
+  " endif
 
   set nowrap
 endif " exists("g:vimrc_init")
@@ -821,10 +800,6 @@ nnoremap <C-h> <C-w>h
 nnoremap <C-j> <C-w>j
 nnoremap <C-k> <C-w>k
 nnoremap <C-l> <C-w>l
-
-cnoremap <C-a> <C-b>
-cnoremap b <C-Left>
-cnoremap f <C-Right>
 
 cabbrev Q q
 cabbrev WQ wq
@@ -992,5 +967,15 @@ if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif
 
-set listchars=trail:·
+set listchars=trail:-
 set list
+
+set wildmenu
+set wildmode=longest:full,full
+
+cnoremap <C-p> <up>
+cnoremap <C-n> <down>
+
+cnoremap <C-a> <C-b>
+cnoremap b <C-Left>
+cnoremap f <C-Right>
