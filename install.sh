@@ -6,30 +6,38 @@ if [ ! -d $target_dir/.git ]; then
   git clone --recursive https://github.com/bmalkus/.dotfiles "$target_dir"
 fi
 
+_install()
+{
+  target=$(basename "$1")
+  [ -L "$target" ] && unlink "$target"
+  [ -e "$target" ] && mv "$target" "${target}.old" && echo "$target -> ${target}.old"
+  ln -s "$1"
+}
+
 cd
 
-ln -s "$target_dir/.gdbinit"
+_install "$target_dir/.gdbinit"
 
-ln -s "$target_dir/.gitconfig"
-ln -s "$target_dir/.git_template"
-ln -s "$target_dir/.cvsignore"
+_install "$target_dir/.gitconfig"
+_install "$target_dir/.git_template"
+_install "$target_dir/.cvsignore"
 
-ln -s "$target_dir/.profile"
-ln -s "$target_dir/.zprofile"
-ln -s "$target_dir/.bash_profile"
+_install "$target_dir/.profile"
+_install "$target_dir/.zprofile"
+_install "$target_dir/.bash_profile"
 
-ln -s "$target_dir/.shellrc"
-ln -s "$target_dir/.zshrc"
-ln -s "$target_dir/.bashrc"
+_install "$target_dir/.shellrc"
+_install "$target_dir/.zshrc"
+_install "$target_dir/.bashrc"
 
-ln -s "$target_dir/.tmux.conf"
+_install "$target_dir/.tmux.conf"
 
-ln -s "$target_dir/.vim"
-ln -s "$target_dir/.vim/.vimrc"
+_install "$target_dir/.vim"
+_install "$target_dir/.vim/.vimrc"
 
-ln -s "$target_dir/.docker"
+_install "$target_dir/.docker"
 
-ln -s "$target_dir/.terminfo"
+_install "$target_dir/.terminfo"
 
 if [ ! -f "$target_dir/.vim/vim-plug/autoload/plug.vim" ]; then
   echo "Downloading plug.vim"
