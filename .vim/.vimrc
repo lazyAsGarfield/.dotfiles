@@ -31,6 +31,7 @@ if v:version >= 703
     autocmd FileType nerdtree nmap <buffer> <C-v> s
     autocmd FileType nerdtree nmap <buffer> <C-x> i
     autocmd FileType nerdtree nmap <buffer> . I
+    autocmd FileType nerdtree nmap <buffer> <leader><tab> q
   augroup END
 
   function! NERDTreeEnableOrToggle()
@@ -41,9 +42,32 @@ if v:version >= 703
     endtry
   endfunction
 
-  map <C-n> :call NERDTreeEnableOrToggle()<CR>
+  function! NERDTreeNewOrReuse()
+    if exists('t:netrwNERDTree')
+      let nr = bufnr('%')
+      exec "b " . t:netrwNERDTree
+      let b:NERDTree._previousBuf = nr
+    else
+      e .
+      let t:netrwNERDTree = bufname('%')
+    endif
+  endfunction
 
-  nmap n :NERDTreeFind<CR>
+  map <C-n> :<C-r>=expand('%') =~ 'NERD_tree' ? 'normal q' : 'call NERDTreeNewOrReuse()'<CR><CR>
+
+  function! NERDTreeFindCurrentBuffer()
+    let path = expand("%:p")
+    call NERDTreeNewOrReuse()
+    let p = g:NERDTreePath.New(path)
+    if !p.isUnder(b:NERDTree.root.path)
+      call b:NERDTree.changeRoot(g:NERDTreeDirNode.New(p.getParent(), b:NERDTree))
+    endif
+    let node = b:NERDTree.root.reveal(p)
+    call b:NERDTree.render()
+    call node.putCursorHere(1,0)
+  endfunction
+
+  nmap n :<C-r>=expand('%') =~ 'NERD_tree' ? 'normal q' : 'call NERDTreeFindCurrentBuffer()'<CR><CR>
 
 endif
 
@@ -438,6 +462,8 @@ let g:gitgutter_sign_modified_removed = '#v'
 nmap [h <Plug>GitGutterPrevHunk
 nmap ]h <Plug>GitGutterNextHunk
 
+cnoreabbrev GG GitGutter
+
 if !exists('g:vimrc_init')
   augroup my_enter
     autocmd VimEnter * GitGutterSignsDisable
@@ -464,12 +490,6 @@ Plug 'octol/vim-cpp-enhanced-highlight'
 Plug 'bling/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 
-if v:version >= 703
-  if !empty($__VIM_YCM__)
-    " Plug 'jeaye/color_coded', { 'do': 'mkdir -p build && cd $_ && cmake .. && make install' }
-  endif
-endif
-
 let g:airline_left_sep=''
 let g:airline_right_sep=''
 
@@ -489,6 +509,7 @@ Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-rsi'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-scriptease'
+Plug 'tpope/vim-commentary'
 
 nnoremap <F8> :Make<CR>
 nnoremap <C-F8> :Make!<CR>
@@ -496,6 +517,8 @@ nnoremap <F9> :Dispatch<CR>
 nnoremap <C-F9> :Dispatch!<CR>
 nnoremap <F10> :Start<CR>
 nnoremap <C-F10> :Start!<CR>
+
+autocmd FileType c,cpp setlocal commentstring=//\ %s
 
 " }}}
 
@@ -505,22 +528,6 @@ Plug 'junegunn/vim-easy-align'
 
 xmap ga <Plug>(EasyAlign)
 nmap ga <Plug>(EasyAlign)
-
-" }}}
-
-" -------- nerdcommenter ------- {{{
-
-Plug 'scrooloose/nerdcommenter'
-
-let g:NERDRemoveExtraSpaces = 1
-let g:NERDSpaceDelims = 1
-" prevent double space after '#' in python
-let g:NERDAltDelims_python = 1
-let g:NERDCompactSexyComs = 1
-let g:NERDDefaultAlign = 'left'
-let g:NERDCustomDelimiters = {
-      \ 'glsl': { 'left': '//', 'leftAlt': '/*', 'rightAlt': '*/' },
-      \ }
 
 " }}}
 
@@ -870,7 +877,7 @@ nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
 map <leader>w :w<CR>
 
 " quickly edit/reload the vimrc file
-nmap <silent> <leader>v :<C-R>=(expand('%')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
+nmap <silent> <leader>v :<C-R>=(expand('%:p')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
 
 nmap 0y "0y
 vmap 0y "0y
