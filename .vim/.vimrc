@@ -441,7 +441,7 @@ else
   nnoremap <C-p> :Mru<CR>
   nnoremap <C-b> :Buffers<CR>
   nnoremap <leader>g :GitFilesOrCwd<CR>
-  nnoremap <leader>s :FilesGitRootOrCwd<CR>
+  nnoremap <leader>a :FilesGitRootOrCwd<CR>
 
 endif
 
@@ -700,6 +700,16 @@ set showcmd
 
 set lazyredraw
 
+if (&termencoding ==# 'utf-8' || &encoding ==# 'utf-8') && version >= 700
+  let &listchars = "tab:>\ ,trail:\u2022"
+else
+  set listchars=tab:>\ ,trail:-,extends:>,precedes:<
+endif
+set list
+
+set wildmenu
+set wildmode=longest:full,full
+
 " some options have to be set only at init
 if !exists("g:vimrc_init")
   let g:vimrc_init = 1
@@ -734,8 +744,9 @@ if !exists("g:vimrc_init")
   set tabstop=2
   set smarttab
 
-  " display line numbers
-  " set number
+  " line numbers
+  set nonumber
+  silent! set norelativenumber
 
   " set folding method
   set foldmethod=marker
@@ -756,11 +767,6 @@ if !exists("g:vimrc_init")
   set sidescroll=1
 
   set foldcolumn=0
-  " if &foldenable
-  "   silent! set foldcolumn=1
-  " else
-  "   silent! set foldcolumn=0
-  " endif
 
   set nowrap
 endif " exists("g:vimrc_init")
@@ -790,8 +796,8 @@ silent! set shortmess+=c
 
 highlight ExtraWhitespace ctermbg=137 guibg=#cc4411
 
-hi! VertSplit guibg=#252525
-hi! MatchParen guifg=#5F5F87 guibg=#1d1f21
+" hi! VertSplit guibg=#252525
+" hi! MatchParen guifg=#5F5F87 guibg=#1d1f21
 hi! clear TabLine
 hi! clear TabLineFill
 hi! TabLine guifg=#d5d8d6 guibg=#3c3c3c
@@ -845,6 +851,14 @@ map <leader>q :q<CR>
 " disable search highlighting
 map <silent> <leader>n :noh<CR>
 
+nmap <leader><tab> :b#<CR>
+
+" save current file
+map <leader>w :w<CR>
+
+" quickly edit/reload the vimrc file
+nmap <silent> <leader>v :<C-R>=(expand('%:p')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
+
 " resizing splits more easily
 nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
 nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
@@ -867,29 +881,13 @@ inoremap <C-U> <C-G>u<C-U>
 
 autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
 
-nmap <leader><tab> :b#<CR>
-
-silent! set norelativenumber
-
 nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
 
-" save current file
-map <leader>w :w<CR>
-
-" quickly edit/reload the vimrc file
-nmap <silent> <leader>v :<C-R>=(expand('%:p')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
-
-nmap 0y "0y
-vmap 0y "0y
 nmap 0p "0p
 vmap 0p "0p
-nmap 0Y "0Y
-vmap 0Y "0Y
 nmap 0P "0P
 vmap 0P "0P
 nmap <silent> <leader>t :checktime<CR>
-
-vmap K k
 
 " refresh <nowait> ESC mappings
 runtime after/plugin/ESCNoWaitMappings.vim
@@ -968,21 +966,15 @@ function! SourceRange() range
 endfunction
 command! -range Source <line1>,<line2>call SourceRange()
 
-" --------------- VIM MAPPINGS END -------------- }}}
-
-if filereadable(expand("~/.vimrc.local"))
-  source ~/.vimrc.local
-endif
-
-set listchars=trail:-
-set list
-
-set wildmenu
-set wildmode=longest:full,full
-
 cnoremap <C-p> <up>
 cnoremap <C-n> <down>
 
 cnoremap <C-a> <C-b>
 cnoremap b <C-Left>
 cnoremap f <C-Right>
+
+" --------------- VIM MAPPINGS END -------------- }}}
+
+if filereadable(expand("~/.vimrc.local"))
+  source ~/.vimrc.local
+endif
