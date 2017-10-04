@@ -25,6 +25,7 @@ if v:version >= 703
   let g:NERDTreeMapJumpPrevSibling = 'K'
   let g:NERDMenuMode = 3
   let g:NERDTreeCascadeSingleChildDir = 0
+  let g:NERDTreeRespectWildIgnore = 1
 
   augroup my_nerdtree_maps
     au!
@@ -32,6 +33,8 @@ if v:version >= 703
     autocmd FileType nerdtree nmap <buffer> <C-x> i
     autocmd FileType nerdtree nmap <buffer> . I
     autocmd FileType nerdtree nmap <buffer> <leader><tab> q
+    autocmd BufEnter NERD_tree_* let b:NERDTree._previousBuf = bufname('#')
+    autocmd BufUnload NERD_tree_* unlet t:netrwNERDTree
   augroup END
 
   function! NERDTreeEnableOrToggle()
@@ -44,9 +47,7 @@ if v:version >= 703
 
   function! NERDTreeNewOrReuse()
     if exists('t:netrwNERDTree')
-      let nr = bufnr('%')
       exec "b " . t:netrwNERDTree
-      let b:NERDTree._previousBuf = nr
     else
       e .
       let t:netrwNERDTree = bufname('%')
@@ -701,7 +702,7 @@ set showcmd
 set lazyredraw
 
 if (&termencoding ==# 'utf-8' || &encoding ==# 'utf-8') && version >= 700
-  let &listchars = "tab:>\ ,trail:\u2022"
+  let &listchars = "tab:»\ ,trail:\u2022"
 else
   set listchars=tab:>\ ,trail:-,extends:>,precedes:<
 endif
@@ -978,3 +979,5 @@ cnoremap f <C-Right>
 if filereadable(expand("~/.vimrc.local"))
   source ~/.vimrc.local
 endif
+
+nmap <leader><leader>r :redraw!<CR>
