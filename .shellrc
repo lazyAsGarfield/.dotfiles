@@ -30,6 +30,8 @@ alias j='jump'
 
 alias ssh='TERM=screen-256color ssh'
 
+export LESS=-iFRM~gj4#2
+
 alias_if_needed()
 {
   gcmd="g$1"
