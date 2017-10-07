@@ -1,6 +1,6 @@
 [ -z "$PROFILE" ] && . "$HOME/.profile"
 
-alias ls='gls --color=auto'
+alias ls='$_ls --color=auto'
 alias grep='grep --color=auto'
 alias ll='ls -lFh'
 alias lla='ls -alFh'
@@ -38,14 +38,14 @@ alias_if_needed()
   path_to="$(which $gcmd 2>/dev/null)"
   if [[ ! -x "$path_to" ]]; then
     export _$1=$1
-    alias $gcmd=$1
+    # alias $gcmd=$1
   else
     export _$1=$gcmd
   fi
 }
 
 alias_if_needed ls
-alias_if_needed "awk"
+alias_if_needed awk
 alias_if_needed sed
 alias_if_needed timeout
 alias_if_needed wc
@@ -72,8 +72,8 @@ jump()
   [[ -n $1 ]] && { cd -P "$MARKPATH/$1" 2>/dev/null \
     || echo "No such mark: $1"; } \
     || { echo && \
-    for f in $(gls -A "$MARKPATH"); do echo "$f" '->' $(greadlink -f "$MARKPATH/$f") ; done \
-    | gawk -F ' -> ' '{if ($0 != "") printf "    %-10s -> %s\n", $1, $2; else print}' \
+    for f in $($_ls -A "$MARKPATH"); do echo "$f" '->' $($_readlink -f "$MARKPATH/$f") ; done \
+    | $_awk -F ' -> ' '{if ($0 != "") printf "    %-10s -> %s\n", $1, $2; else print}' \
     && echo; }
 }
 
@@ -108,8 +108,8 @@ export FZF_DEFAULT_OPTS="--color fg:187,bg:233,hl:103,fg+:222,bg+:234,hl+:104 \
   --color info:183,prompt:110,spinner:107,pointer:167,marker:215 \
   --bind \"ctrl-u:page-up,ctrl-d:page-down,ctrl-j:accept,ctrl-k:ignore,alt-a:select-all,alt-d:deselect-all,alt-t:toggle-all\""
 
-export FZF_ALT_C_COMMAND='find -L . -type d 2>/dev/null | grep -v ".git" | gsed 1d | cut -b3-'
-export FZF_CTRL_T_COMMAND='find -L . -type d -o -type f -o -type l 2>/dev/null | grep -v ".git/" | gsed 1d | cut -b3-'
+export FZF_ALT_C_COMMAND='find -L . -type d 2>/dev/null | grep -v ".git" | $_sed 1d | cut -b3-'
+export FZF_CTRL_T_COMMAND='find -L . -type d -o -type f -o -type l 2>/dev/null | grep -v ".git/" | $_sed 1d | cut -b3-'
 export FZF_DEFAULT_COMMAND='ag -g "" -U --hidden --ignore .git/ 2>/dev/null'
 
 if [ -x /usr/bin/dircolors ]; then
@@ -117,10 +117,10 @@ if [ -x /usr/bin/dircolors ]; then
     eval "$(dircolors $DOTFILES_DIR/dircolors -b)"
   elif [[ $TERM =~ ^tmux ]]; then
     fname=/tmp/__dir_colors$RANDOM
-    gsed -ne '/^TERM/q; p' /etc/DIR_COLORS > $fname
+    $_sed -ne '/^TERM/q; p' /etc/DIR_COLORS > $fname
     echo "TERM tmux" >> $fname
     echo "TERM tmux-256color" >> $fname
-    gsed -ne '/^TERM/,$p' /etc/DIR_COLORS >> $fname
+    $_sed -ne '/^TERM/,$p' /etc/DIR_COLORS >> $fname
     eval "$(dircolors -b $fname)"
     rm -f $fname
   fi
@@ -145,13 +145,13 @@ __get_git_branch()
         git_info="$git_info "
       else
         local ahead_behind
-        ahead_behind="$(gtimeout 0.1s $SHELL -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
+        ahead_behind="$($_timeout 0.1s $SHELL -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
         ret=$?
         if [[ $ret -eq 124 || $ret -eq 137 ]]; then
           killed=1
         else
-          local ahead="$(gsed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
-          local behind="$(gsed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
+          local ahead="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
+          local behind="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
           if [[ $behind -gt 0 ]]; then
             more_info="$more_info${__styles[BLUE]}\u25BC$behind"
           fi
@@ -163,7 +163,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local untracked
-          untracked="$(gtimeout 0.1s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | $_wc -l")"
+          untracked="$($_timeout 0.1s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1
@@ -176,7 +176,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local unstaged
-          unstaged="$(gtimeout 0.1s $SHELL -c "git diff --numstat 2>/dev/null | $_wc -l")"
+          unstaged="$($_timeout 0.1s $SHELL -c "git diff --numstat 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1
@@ -189,7 +189,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local staged
-          staged="$(gtimeout 0.1s $SHELL -c "git diff --cached --numstat 2>/dev/null | $_wc -l")"
+          staged="$($_timeout 0.1s $SHELL -c "git diff --cached --numstat 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1

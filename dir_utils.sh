@@ -47,9 +47,9 @@ function saved()
           dir="${__cd_history__[$num]}"
         fi
       elif [[ $dir == "-" ]]; then
-        dir="$(greadlink -f -- "$OLDPWD")"
+        dir="$($_readlink -f -- "$OLDPWD")"
       else
-        dir="$(greadlink -f -- "$dir")"
+        dir="$($_readlink -f -- "$dir")"
       fi
       if [[ -d $dir ]]; then
         for saved_dir in "${__saved_dirs__[@]}"; do
@@ -154,8 +154,8 @@ function local_cd_hist()
     fi
     if [[ -z $dir ]]; then
       pat="$@"
-      pat="$(gsed 's/\./\\./g' <<< "$pat")"
-      pat="$(gsed 's/\ /.*/g' <<< "$pat")"
+      pat="$($_sed 's/\./\\./g' <<< "$pat")"
+      pat="$($_sed 's/\ /.*/g' <<< "$pat")"
       dir=$(printf "%s\n" "${__cd_history__[@]}" | grep $pat | tail -n1)
     fi
     [[ -z $dir ]] && return
