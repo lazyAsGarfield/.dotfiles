@@ -554,6 +554,39 @@ map g# <Plug>(incsearch-nohl-g#)
 
 " }}}
 
+" ----------- clojure ---------- {{{
+
+Plug 'guns/vim-sexp'
+Plug 'tpope/vim-sexp-mappings-for-regular-people'
+Plug 'tpope/vim-fireplace'
+Plug 'junegunn/rainbow_parentheses.vim'
+
+let g:sexp_mappings = {
+      \ 'sexp_round_head_wrap_element':   '<LocalLeader>s',
+      \ 'sexp_round_tail_wrap_element':   '<LocalLeader>S'
+      \ }
+
+augroup my_rainbow_au
+  au!
+  au FileType clojure RainbowParentheses
+augroup END
+
+let g:rainbow#colors = {
+      \ 'dark': [
+      \   ['brown', 'SaddleBrown'],
+      \   ['blue', 'CornflowerBlue'],
+      \   ['white', 'aquamarine2'],
+      \   ['red', 'firebrick3'],
+      \   ['yellow', 'goldenrod1'],
+      \   ['magenta', 'DarkOrchid3'],
+      \   ['red', 'PaleVioletRed2'],
+      \ ]
+      \ }
+
+let g:rainbow#pairs = [['(', ')'], ['[', ']'], ['{', '}']]
+
+" }}}
+
 " ------------ latex ----------- {{{
 
 if !empty($__VIM_LATEX__)
