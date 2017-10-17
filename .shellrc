@@ -30,7 +30,8 @@ alias j='jump'
 
 alias ssh='TERM=screen-256color ssh'
 
-export LESS=-iFRM~gj4#2
+export LESS=-iRM~gj4#2
+[[ $(uname -s) =~ Darwin ]] || export LESS=${LESS}F
 
 alias_if_needed()
 {
