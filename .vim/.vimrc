@@ -35,7 +35,7 @@ if v:version >= 703
     autocmd FileType nerdtree nmap <buffer> <leader><tab> q
     autocmd BufEnter NERD_tree_* let b:NERDTree._previousBuf = bufname('#')
     autocmd BufUnload NERD_tree_* unlet t:netrwNERDTree
-    autocmd BufLeave NERD_tree_* let @# = b:NERDTree._previousBuf
+    autocmd BufLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = b:NERDTree._previousBuf | endif
     autocmd BufEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = b:_prev_buffer | endif
     autocmd BufEnter * let b:_prev_buffer = bufname('#')
   augroup END
@@ -1017,3 +1017,5 @@ if filereadable(expand("~/.vimrc.local"))
 endif
 
 nmap <leader><leader>r :redraw!<CR>
+
+set formatoptions+=rjl
