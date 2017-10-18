@@ -37,7 +37,7 @@ if v:version >= 703
     autocmd BufUnload NERD_tree_* unlet t:netrwNERDTree
     autocmd BufLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = b:NERDTree._previousBuf | endif
     autocmd BufEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = b:_prev_buffer | endif
-    autocmd BufEnter * let b:_prev_buffer = bufname('#')
+    autocmd BufEnter * if bufexists('#') | let b:_prev_buffer = bufname('#') | endif
   augroup END
 
   function! NERDTreeEnableOrToggle()
