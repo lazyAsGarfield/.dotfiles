@@ -3,6 +3,9 @@
 line_num=$(cut -f2 -d: <<< $1)
 
 lines=27
+if [[ -n $2 ]]; then
+  lines=$2
+fi
 lines_2=$((lines/2))
 
 true_beg=$((line_num - lines_2))

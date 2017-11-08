@@ -392,6 +392,10 @@ else
           \ })
   endfunction
 
+  function! s:ag_preview_height(bang)
+    return (a:bang ? &lines : (&lines * 40 / 100)) - 2
+  endfunction
+
   function! s:ag_in(bang, ...)
     let tokens  = a:000
     let ag_opts = join(filter(copy(tokens), 'v:val =~ "^-"'))
@@ -408,7 +412,7 @@ else
     endtry
     call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --ignore .git/', {
           \ 'dir': dir,
-          \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
+          \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {} ' . s:ag_preview_height(a:bang) . '" --prompt "' . dir . ' (Ag)> "'
           \ }, a:bang ? 1 : 0)
   endfunction
 
@@ -419,7 +423,7 @@ else
     let dir = s:git_root_or_cwd()
     call fzf#vim#ag(query, ag_opts . ' --ignore .git/', {
           \ 'dir': dir,
-          \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {}" --prompt "' . dir . ' (Ag)> "'
+          \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {} ' . s:ag_preview_height(a:bang) . '" --prompt "' . dir . ' (Ag)> "'
           \ }, a:bang ? 1 : 0)
   endfunction
 
@@ -1017,5 +1021,7 @@ if filereadable(expand("~/.vimrc.local"))
 endif
 
 nmap <leader><leader>r :redraw!<CR>
+
+nmap <leader>z <C-w>z<CR>
 
 set formatoptions+=rjl
