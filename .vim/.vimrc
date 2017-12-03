@@ -207,8 +207,9 @@ endif
 
 Plug 'lazyAsGarfield/delimitMate'
 
-let delimitMate_expand_cr=2
+let delimitMate_expand_cr=1
 let delimitMate_expand_space=1
+let delimitMate_jump_expansion = 1
 let delimitMate_balance_matchpairs=1
 let delimitMate_matchpairs = "(:),[:],{:}"
 let delimitMate_smart_matchpairs = '^\%(\w\|[£$]\|[^[:space:][:punct:]]\)'
@@ -1024,4 +1025,6 @@ nmap <leader><leader>r :redraw!<CR>
 
 nmap <leader>z <C-w>z<CR>
 
-set formatoptions+=rjl
+set formatoptions+=jl
+
+abbrev flase false
