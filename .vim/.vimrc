@@ -97,7 +97,7 @@ if v:version >= 703
   Plug 'easymotion/vim-easymotion'
 
   if version >= 703
-    nmap <leader>f <Plug>(easymotion-s2)
+    nmap <leader>f <Plug>(easymotion-sn)
 
     let g:EasyMotion_off_screen_search = 0
     let g:EasyMotion_inc_highlight = 1
