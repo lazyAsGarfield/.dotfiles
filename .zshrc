@@ -140,6 +140,8 @@ alias grm='git reset --mixed HEAD^'
 alias gdp='git diff HEAD^'
 alias gdcap='git diff --cached HEAD^'
 alias gapp='git apply'
+alias gignore='git update-index --skip-worktree'
+alias gunignore='git update-index --no-skip-worktree'
 
 function _completemarks {
   reply=($(ls $MARKPATH))
