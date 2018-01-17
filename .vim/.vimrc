@@ -535,8 +535,8 @@ autocmd FileType c,cpp setlocal commentstring=//\ %s
 
 Plug 'junegunn/vim-easy-align'
 
-xmap ga <Plug>(EasyAlign)
-nmap ga <Plug>(EasyAlign)
+xmap ga <Plug>(LiveEasyAlign)
+nmap ga <Plug>(LiveEasyAlign)
 
 " }}}
 
