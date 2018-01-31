@@ -1037,3 +1037,5 @@ function! YcmOnDeleteChar()
   endif
   return ""
 endfunction
+
+nmap <silent> & :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
