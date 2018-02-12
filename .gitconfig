@@ -35,10 +35,10 @@
   default = rebase
 
 [include]
-	path = .gitconfig.local
+  path = .gitconfig.local
 
 [core]
-	ignore = ~/.cvsignore
+  ignore = ~/.cvsignore
 
 [init]
-	templatedir = ~/.git_template
+  templatedir = ~/.git_template

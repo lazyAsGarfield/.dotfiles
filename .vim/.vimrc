@@ -8,6 +8,18 @@ let path='~/.vim/plugged'
 
 call plug#begin(path)
 
+let s:plugin_initializers = []
+
+function! s:add_plugin_initializer(init)
+  call add(s:plugin_initializers, a:init)
+endfunction
+
+function! s:init_plugins()
+  for Init in s:plugin_initializers
+    call Init()
+  endfor
+endfunction
+
 " change leader key
 let mapleader=" "
 let maplocalleader=" "
@@ -473,13 +485,7 @@ nmap ]h <Plug>GitGutterNextHunk
 
 cnoreabbrev GG GitGutter
 
-if !exists('g:vimrc_init')
-  augroup my_enter
-    autocmd VimEnter * GitGutterSignsDisable
-    autocmd VimEnter * au! my_enter
-  augroup END
-endif
-
+call s:add_plugin_initializer(function('gitgutter#signs_disable'))
 
 " }}}
 
@@ -619,6 +625,12 @@ endif
 " }}}
 
 call plug#end()
+
+if v:vim_did_enter
+  call s:init_plugins()
+else
+  au VimEnter * call s:init_plugins()
+endif
 
 filetype plugin indent on
 
@@ -1038,4 +1050,4 @@ function! YcmOnDeleteChar()
   return ""
 endfunction
 
-nmap <silent> & :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
+nmap <silent>  :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
