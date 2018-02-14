@@ -235,6 +235,29 @@ imap <C-j> <C-k><CR>
 
 " }}}
 
+" --------- text objects ------- {{{
+
+Plug 'kana/vim-textobj-user'
+
+function! s:textobj_init()
+  try
+    " after/plugin/funcCallTextObj.vim
+    call textobj#user#plugin('func', {
+    \   'call': {
+    \     'select-i-function': 'ArgTextObjI',
+    \     'select-i': 'ia',
+    \     'select-a-function': 'ArgTextObjA',
+    \     'select-a': 'aa',
+    \   }
+    \ })
+  catch
+  endtry
+endfunction
+
+call s:add_delayed_initializer(function('s:textobj_init'))
+
+" }}}
+
 " ---------- fzf/ctrlp --------- {{{
 
 Plug 'junegunn/fzf', { 'do': './install --all' }
@@ -1070,3 +1093,22 @@ function! YcmOnDeleteChar()
 endfunction
 
 nmap <silent>  :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
+
+function! ArgPaste(char)
+  let off = a:char == 'p' ? 0 : -1
+  if matchstr(getline('.'), '\%' . (col('.') + off) . 'c.') == '('
+    let end = matchend(@", '^,\s*')
+    if end != -1
+      let @" = @"[end:] . ', '
+    endif
+  else
+    let end = match(@", ',\s*$')
+    if end != -1
+      let @" = ', ' . @"[:end-1]
+    endif
+  endif
+  exec 'norm! ' . a:char
+endfunction
+
+nmap gap :call ArgPaste('p')<CR>
+nmap gaP :call ArgPaste('P')<CR>
