@@ -8,14 +8,14 @@ let path='~/.vim/plugged'
 
 call plug#begin(path)
 
-let s:plugin_initializers = []
+let s:delayed_initializers = []
 
-function! s:add_plugin_initializer(init)
-  call add(s:plugin_initializers, a:init)
+function! s:add_delayed_initializer(init)
+  call add(s:delayed_initializers, a:init)
 endfunction
 
-function! s:init_plugins()
-  for Init in s:plugin_initializers
+function! s:delayed_init()
+  for Init in s:delayed_initializers
     call Init()
   endfor
 endfunction
@@ -191,8 +191,8 @@ if v:version >= 703
   let g:jedi#completions_command = ""
   let g:jedi#rename_command = ""
 
-
   autocmd FileType python nmap <buffer> <C-]> g<C-]>
+  autocmd FileType python silent! vunmap <buffer> yjr
 endif
 
 " }}}
@@ -464,6 +464,12 @@ else
   nnoremap <leader>g :GitFilesOrCwd<CR>
   nnoremap <leader>a :FilesGitRootOrCwd<CR>
 
+  function! s:fzf_init()
+    command! -nargs=* -bang Ag AgGitRootOrCwd<bang> <args>
+    command! -nargs=? -complete=dir Files FilesBetterPrompt<bang> <args>
+  endfunction
+
+  call s:add_delayed_initializer(function('s:fzf_init'))
 endif
 
 " }}}
@@ -485,7 +491,7 @@ nmap ]h <Plug>GitGutterNextHunk
 
 cnoreabbrev GG GitGutter
 
-call s:add_plugin_initializer(function('gitgutter#signs_disable'))
+call s:add_delayed_initializer(function('gitgutter#signs_disable'))
 
 " }}}
 
@@ -626,10 +632,23 @@ endif
 
 call plug#end()
 
+function! s:init_esc_mappings()
+  " it has to be done after any other esc/alt bindings
+  " alt + key send's esc sequence + key, so vim waits for key after esc when
+  " something is mapped to alt + key, don't want it
+  nnoremap <nowait> <esc> <esc>
+  vnoremap <nowait> <esc> <esc>
+  inoremap <nowait> <esc> <esc>
+  cnoremap <nowait> <esc> <C-c>
+  snoremap <nowait> <esc> <esc>
+endfunction
+
+call s:add_delayed_initializer(function('s:init_esc_mappings'))
+
 if v:vim_did_enter
-  call s:init_plugins()
+  call s:delayed_init()
 else
-  au VimEnter * call s:init_plugins()
+  au VimEnter * call s:delayed_init()
 endif
 
 filetype plugin indent on

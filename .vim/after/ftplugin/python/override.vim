@@ -1,1 +1,0 @@
-silent! vunmap <buffer> yjr
