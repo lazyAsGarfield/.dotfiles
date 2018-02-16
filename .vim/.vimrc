@@ -43,13 +43,15 @@ if v:version >= 703
     au!
     autocmd FileType nerdtree nmap <buffer> <C-v> s
     autocmd FileType nerdtree nmap <buffer> <C-x> i
+    autocmd FileType nerdtree nmap <buffer> <C-p> k
+    autocmd FileType nerdtree nmap <buffer> <C-n> j
     autocmd FileType nerdtree nmap <buffer> . I
     autocmd FileType nerdtree nmap <buffer> <leader><tab> q
-    autocmd BufEnter NERD_tree_* let b:NERDTree._previousBuf = bufname('#')
+    autocmd BufWinEnter NERD_tree_* let b:NERDTree._previousBuf = bufname('#')
     autocmd BufUnload NERD_tree_* unlet t:netrwNERDTree
-    autocmd BufLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = b:NERDTree._previousBuf | endif
-    autocmd BufEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = b:_prev_buffer | endif
-    autocmd BufEnter * if bufexists(bufnr('#')) | let b:_prev_buffer = bufname('#') | endif
+    autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = b:NERDTree._previousBuf | endif
+    autocmd BufWinEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = b:_prev_buffer | endif
+    autocmd BufWinEnter * if bufexists(bufnr('#')) | let b:_prev_buffer = bufname('#') | endif
   augroup END
 
   function! NERDTreeEnableOrToggle()
@@ -650,6 +652,12 @@ if !empty($__VIM_LATEX__)
   endfunction
 
 endif
+
+" }}}
+
+" ------------ vader ----------- {{{
+
+Plug 'junegunn/vader.vim'
 
 " }}}
 

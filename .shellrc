@@ -74,10 +74,11 @@ jump()
 {
   [[ -n $1 ]] && { cd -P "$MARKPATH/$1" 2>/dev/null \
     || echo "No such mark: $1"; } \
-    || { echo && \
-    for f in $($_ls -A "$MARKPATH"); do echo "$f" '->' $($_readlink -f "$MARKPATH/$f") ; done \
-    | $_awk -F ' -> ' '{if ($0 != "") printf "    %-10s -> %s\n", $1, $2; else print}' \
-    && echo; }
+    || { echo;
+    for f in $($_ls -A "$MARKPATH"); do
+      echo "$f" '->' $($_readlink -f "$MARKPATH/$f" || echo -en '\e[3m<invalid>\e[0m'); done \
+    | $_awk -F ' -> ' '{if ($0 != "") printf "    %-10s ->  %s\n", $1, $2; else print}';
+    echo; }
 }
 
 mark()
@@ -88,11 +89,6 @@ mark()
 unmark()
 {
   rm -i "$MARKPATH/$1"
-}
-
-detach()
-{
-  (nohup "$@" >/dev/null 2>&1 &)
 }
 
 command -v vim >/dev/null 2>&1 &&
