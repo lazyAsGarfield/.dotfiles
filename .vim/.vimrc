@@ -516,7 +516,18 @@ nmap ]h <Plug>GitGutterNextHunk
 
 cnoreabbrev GG GitGutter
 
-call s:add_delayed_initializer(function('gitgutter#signs_disable'))
+function s:disable_signs()
+  try
+    call gitgutter#sign#disable()
+  catch
+    try
+      call gitgutter#signs_disable()
+    catch
+    endtry
+  endtry
+endfunction
+
+call s:add_delayed_initializer(function('s:disable_signs'))
 
 " }}}
 
