@@ -49,6 +49,7 @@ _z() {
 
         # maintain the data file
         local tempfile="$datafile.$RANDOM"
+        trap "rm -f $tempfile" EXIT
         while read line; do
             # only count directories
             [ -d "${line%%\|*}" ] && echo $line
@@ -228,7 +229,7 @@ _z() {
         [ $? -gt 0 ] && return
         [ "$cd" ] || return
         echo "$cd"
-        ${echo:-cd} "$cd"
+        [ "$echo" ] || cd "$cd"
     fi
 }
 
