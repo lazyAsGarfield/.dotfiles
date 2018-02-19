@@ -44,7 +44,6 @@ if v:version >= 703
     autocmd FileType nerdtree nmap <buffer> <C-v> s
     autocmd FileType nerdtree nmap <buffer> <C-x> i
     autocmd FileType nerdtree nmap <buffer> <C-p> k
-    autocmd FileType nerdtree nmap <buffer> <C-n> j
     autocmd FileType nerdtree nmap <buffer> . I
     autocmd FileType nerdtree nmap <buffer> <leader><tab> q
     autocmd BufWinEnter NERD_tree_* let b:NERDTree._previousBuf = bufname('#')
