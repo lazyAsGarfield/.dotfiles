@@ -502,6 +502,7 @@ endif
 
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
+Plug 'junegunn/gv.vim'
 
 let g:gitgutter_override_sign_column_highlight = 0
 
@@ -515,7 +516,7 @@ nmap ]h <Plug>GitGutterNextHunk
 
 cnoreabbrev GG GitGutter
 
-function s:disable_signs()
+function! s:disable_signs()
   try
     call gitgutter#sign#disable()
   catch
@@ -838,8 +839,7 @@ if !exists("g:vimrc_init")
     let &t_8b = "[48;2;%lu;%lu;%lum"
   endif
 
-  set guioptions-=r
-  set guioptions-=L
+  set guioptions=Pci
 
   " when editing a file, always jump to the last known cursor position.
   autocmd BufReadPost *

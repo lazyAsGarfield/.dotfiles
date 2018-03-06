@@ -1,6 +1,7 @@
 [Configuration]
 ScrollingLines=10000
 FontName=Liberation Mono 9
+MiscHighlightUrls=FALSE
 ColorCursor=#cccccccccccc
 ColorForeground=#dddddddddddd
 ColorBackground=#272727272727
