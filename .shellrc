@@ -247,7 +247,7 @@ function ssh()
 {
   if [ -n "$TMUX" ]; then
     target=${*##*\ }
-    printf '\033]2;%s\033\\' "${target##*\@}"
+    tmux setenv "__pane_title_$TMUX_PANE" "$target"
     command ssh "$@"
   else
     command ssh "$@"
