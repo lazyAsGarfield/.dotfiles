@@ -1,5 +1,10 @@
 if exists('g:loaded_nerd_tree')
 
+  if exists('s:done_once')
+    finish
+  endif
+  let s:done_once = 1
+
   function! NERDTree_dir_h(dir)
     let dir = a:dir
     if dir.isRoot()

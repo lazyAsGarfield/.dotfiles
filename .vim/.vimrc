@@ -86,6 +86,16 @@ if v:version >= 703
 
   nmap n :<C-r>=expand('%') =~ 'NERD_tree' ? 'normal q' : 'call NERDTreeFindCurrentBuffer()'<CR><CR>
 
+  function! s:runtime_nerdtree_mappings()
+    try
+      " seems that not on all versions it loads automatically
+      runtime after/plugin/NERDTreeMappings.vim
+    catch
+    endtry
+  endfunction
+
+  call s:add_delayed_initializer(function('s:runtime_nerdtree_mappings'))
+
 endif
 
 " }}}
@@ -242,7 +252,8 @@ Plug 'kana/vim-textobj-user'
 
 function! s:textobj_init()
   try
-    " after/plugin/funcCallTextObj.vim
+    " seems that not on all versions it loads automatically
+    runtime after/plugin/funcCallTextObj.vim
     call textobj#user#plugin('func', {
     \   'call': {
     \     'select-i-function': 'ArgTextObjI',
@@ -893,6 +904,8 @@ if !exists("g:vimrc_init")
   set foldcolumn=0
 
   set nowrap
+
+  set wildignore+=*.pyc,*.pyo
 endif " exists("g:vimrc_init")
 
 " Cstyle indentation settings
