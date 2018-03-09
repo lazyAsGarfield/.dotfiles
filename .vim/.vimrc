@@ -687,7 +687,15 @@ endfunction
 
 call s:add_delayed_initializer(function('s:init_esc_mappings'))
 
-if v:vim_did_enter
+function! s:did_vim_enter()
+  if version >= 704 && has('patch1658')
+    return v:vim_did_enter
+  else
+    return exists('g:vimrc_init')
+  endif
+endfunction
+
+if s:did_vim_enter()
   call s:delayed_init()
 else
   au VimEnter * call s:delayed_init()
@@ -774,7 +782,9 @@ set swapfile
 set completeopt=menuone
 
 set novisualbell
-set belloff=all
+if exists('+belloff')
+  set belloff=all
+endif
 
 " Automatically read a file that has changed on disk
 set autoread
