@@ -1087,6 +1087,12 @@ cnoremap <C-a> <C-b>
 cnoremap b <C-Left>
 cnoremap f <C-Right>
 
+nnoremap <C-ScrollWheelUp> <ScrollWheelUp>
+nnoremap <C-ScrollWheelDown> <ScrollWheelDown>
+let s:wheel_mult = 5
+exec 'nnoremap <M-ScrollWheelUp> ' . repeat('<ScrollWheelUp>', s:wheel_mult)
+exec 'nnoremap <M-ScrollWheelDown> ' . repeat('<ScrollWheelDown>', s:wheel_mult)
+
 " --------------- VIM MAPPINGS END -------------- }}}
 
 if filereadable(expand("~/.vimrc.local"))

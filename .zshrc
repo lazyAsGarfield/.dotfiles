@@ -192,15 +192,6 @@ autoload -Uz add-zsh-hook
 
 . $DOTFILES_DIR/fzf-utils.sh
 
-if [[ -n $TMUX ]]; then
-  fzf()
-  {
-    tmux set-environment pass_ctrl 1
-    command fzf "$@"
-    tmux set-environment pass_ctrl 0
-  }
-fi
-
 # }}}
 
 # completion settings {{{
