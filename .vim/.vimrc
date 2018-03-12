@@ -53,7 +53,7 @@ if v:version >= 703
     autocmd BufWinEnter NERD_tree_* let b:NERDTree._previousBuf = bufname('#')
     autocmd BufUnload NERD_tree_* unlet t:netrwNERDTree
     if s:has_patch(704, 605)
-      autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = bufname('#') | endif
+      autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = b:NERDTree._previousBuf | endif
       autocmd BufWinEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = b:_prev_buffer | endif
     else
       autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | exec 'b ' . b:NERDTree._previousBuf | b# | endif
