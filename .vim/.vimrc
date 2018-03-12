@@ -24,6 +24,10 @@ endfunction
 let mapleader=" "
 let maplocalleader=" "
 
+function! s:has_patch(version, patch)
+  return version > a:version || (version == a:version && has('patch' . a:patch))
+endfunction
+
 " ---------- nerdtree ---------- {{{
 
 if v:version >= 703
@@ -48,8 +52,14 @@ if v:version >= 703
     autocmd FileType nerdtree nmap <buffer> <leader><tab> q
     autocmd BufWinEnter NERD_tree_* let b:NERDTree._previousBuf = bufname('#')
     autocmd BufUnload NERD_tree_* unlet t:netrwNERDTree
-    autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = b:NERDTree._previousBuf | endif
-    autocmd BufWinEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = b:_prev_buffer | endif
+    if s:has_patch(704, 605)
+      autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = bufname('#') | endif
+      autocmd BufWinEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = b:_prev_buffer | endif
+    else
+      autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | exec 'b ' . b:NERDTree._previousBuf | b# | endif
+      autocmd BufWinEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | exec 'b ' . b:_prev_buffer | b# | call setpos('.', b:_prev_pos) | endif
+      autocmd BufWinLeave * let b:_prev_pos = getpos('.')
+    endif
     autocmd BufWinEnter * if bufexists(bufnr('#')) | let b:_prev_buffer = bufname('#') | endif
   augroup END
 
@@ -699,7 +709,7 @@ endfunction
 call s:add_delayed_initializer(function('s:init_esc_mappings'))
 
 function! s:did_vim_enter()
-  if version >= 704 && has('patch1658')
+  if s:has_patch(704, 1658)
     return v:vim_did_enter
   else
     return exists('g:vimrc_init')
@@ -994,7 +1004,12 @@ nmap <leader><tab> :b#<CR>
 map <leader>w :w<CR>
 
 " quickly edit/reload the vimrc file
-nmap <silent> <leader>v :<C-R>=(expand('%:p')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
+if $MYVIMRC == ""
+  let g:myvimrc = $HOME . '/.vimrc'
+else
+  let g:myvimrc = $MYVIMRC
+endif
+nmap <silent> <leader>v :<C-R>=(expand('%:p')==g:myvimrc)? 'so' : 'e'<CR> <C-R>=g:myvimrc<CR><CR>
 
 " resizing splits more easily
 nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
