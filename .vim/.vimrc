@@ -584,6 +584,12 @@ autocmd FileType c,cpp setlocal commentstring=//\ %s
 
 " }}}
 
+" --------- golden-ratio ------- {{{
+
+Plug 'roman/golden-ratio'
+
+" }}}
+
 " ---------- easy-align -------- {{{
 
 Plug 'junegunn/vim-easy-align'
