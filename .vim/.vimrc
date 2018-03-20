@@ -152,28 +152,10 @@ if v:version >= 703
     endif
 
     " let g:loaded_youcompleteme = 1
-    let g:ycm_complete_in_comments = 1
     let g:ycm_seed_identifiers_with_syntax = 1
     " let g:ycm_add_preview_to_completeopt = 1
     " let g:ycm_autoclose_preview_window_after_insertion = 0
     let g:ycm_always_populate_location_list = 1
-    let g:ycm_semantic_triggers =  {
-          \   'c' : ['->', '.'],
-          \   'objc' : ['->', '.', 're!\[[_a-zA-Z]+\w*\s', 're!^\s*[^\W\d]\w*\s',
-          \             're!\[.*\]\s'],
-          \   'ocaml' : ['.', '#'],
-          \   'cpp,objcpp' : ['->', '.', '::'],
-          \   'perl' : ['->'],
-          \   'php' : ['->', '::'],
-          \   'cs,java,javascript,typescript,d,perl6,scala,vb,elixir,go' : ['.'],
-          \   'python' : ['.'],
-          \   'ruby' : ['.', '::'],
-          \   'lua' : ['.', ':'],
-          \   'erlang' : [':'],
-          \ }
-
-          " \   'cpp,objcpp' : ['re!\w+', '->', '.', '::'],
-
     let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")
     let g:ycm_warning_symbol = '>'
     let g:ycm_error_symbol = '>>'
@@ -555,6 +537,8 @@ call s:add_delayed_initializer(function('s:disable_signs'))
 " ------- better-whitespace ---- {{{
 
 Plug 'ntpeters/vim-better-whitespace'
+
+let g:better_whitespace_operator = ""
 
 " }}}
 
@@ -1005,11 +989,9 @@ map <leader>w :w<CR>
 
 " quickly edit/reload the vimrc file
 if $MYVIMRC == ""
-  let g:myvimrc = $HOME . '/.vimrc'
-else
-  let g:myvimrc = $MYVIMRC
+  let $MYVIMRC = $HOME . '/.vimrc'
 endif
-nmap <silent> <leader>v :<C-R>=(expand('%:p')==g:myvimrc)? 'so' : 'e'<CR> <C-R>=g:myvimrc<CR><CR>
+nmap <silent> <leader>v :<C-R>=(expand('%:p')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
 
 " resizing splits more easily
 nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
@@ -1145,14 +1127,14 @@ set formatoptions+=jl
 
 abbrev flase false
 
-imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR><Plug>delimitMateBS
+" imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR><Plug>delimitMateBS
 
-function! YcmOnDeleteChar()
-  if pumvisible()
-    return "\<C-y>"
-  endif
-  return ""
-endfunction
+" function! YcmOnDeleteChar()
+"   if pumvisible()
+"     return "\<C-y>"
+"   endif
+"   return ""
+" endfunction
 
 nmap <silent>  :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
 
