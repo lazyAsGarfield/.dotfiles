@@ -1015,6 +1015,14 @@ vmap cp "+p
 nmap cP "+P
 vmap cP "+P
 
+nmap 0p "0p
+vmap 0p "0p
+nmap 0P "0P
+vmap 0P "0P
+
+nmap <leader>r "
+vmap <leader>r "
+
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
@@ -1023,10 +1031,6 @@ autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
 
 nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
 
-nmap 0p "0p
-vmap 0p "0p
-nmap 0P "0P
-vmap 0P "0P
 nmap <silent> <leader>t :checktime<CR>
 
 " refresh <nowait> ESC mappings
