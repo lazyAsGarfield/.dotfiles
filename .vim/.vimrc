@@ -452,7 +452,7 @@ else
     endtry
     call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --ignore .git/', {
           \ 'dir': dir,
-          \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {} ' . s:ag_preview_height(a:bang) . '" --prompt "' . dir . ' (Ag)> "'
+          \ 'options': '--nth=4.. -d: --preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {} ' . s:ag_preview_height(a:bang) . '" --prompt "' . dir . ' (Ag)> "'
           \ }, a:bang ? 1 : 0)
   endfunction
 
@@ -463,7 +463,7 @@ else
     let dir = s:git_root_or_cwd()
     call fzf#vim#ag(query, ag_opts . ' --ignore .git/', {
           \ 'dir': dir,
-          \ 'options': '--preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {} ' . s:ag_preview_height(a:bang) . '" --prompt "' . dir . ' (Ag)> "'
+          \ 'options': '--nth=4.. -d: --preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {} ' . s:ag_preview_height(a:bang) . '" --prompt "' . dir . ' (Ag)> "'
           \ }, a:bang ? 1 : 0)
   endfunction
 
