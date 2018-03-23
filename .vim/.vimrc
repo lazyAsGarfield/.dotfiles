@@ -240,25 +240,12 @@ imap <C-j> <C-k><CR>
 
 " --------- text objects ------- {{{
 
-Plug 'kana/vim-textobj-user'
+Plug 'machakann/vim-swap'
 
-function! s:textobj_init()
-  try
-    " seems that not on all versions it loads automatically
-    runtime after/plugin/funcCallTextObj.vim
-    call textobj#user#plugin('func', {
-    \   'call': {
-    \     'select-i-function': 'ArgTextObjI',
-    \     'select-i': 'ia',
-    \     'select-a-function': 'ArgTextObjA',
-    \     'select-a': 'aa',
-    \   }
-    \ })
-  catch
-  endtry
-endfunction
-
-call s:add_delayed_initializer(function('s:textobj_init'))
+omap i, <Plug>(swap-textobject-i)
+xmap i, <Plug>(swap-textobject-i)
+omap a, <Plug>(swap-textobject-a)
+xmap a, <Plug>(swap-textobject-a)
 
 " }}}
 
