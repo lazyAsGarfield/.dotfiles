@@ -241,6 +241,58 @@ imap <C-j> <C-k><CR>
 " --------- text objects ------- {{{
 
 Plug 'machakann/vim-swap'
+Plug 'machakann/vim-sandwich'
+
+let g:textobj_sandwich_no_default_key_mappings = 1
+
+function! s:init_vim_sandwich()
+  runtime macros/sandwich/keymap/surround.vim
+
+  omap if <Plug>(textobj-sandwich-auto-i)
+  xmap if <Plug>(textobj-sandwich-auto-i)
+  omap af <Plug>(textobj-sandwich-auto-a)
+  xmap af <Plug>(textobj-sandwich-auto-a)
+
+  let g:sandwich#recipes += [
+    \   {
+    \     'buns': ['(', ')'],
+    \     'cursor': 'head',
+    \     'command': ['startinsert'],
+    \     'kind': ['add', 'replace'],
+    \     'action': ['add'],
+    \     'input': ['F']
+    \   },
+    \ ]
+
+  let g:sandwich_function_patterns = {}
+  let g:sandwich_function_patterns['_'] = [
+        \   {
+        \     'header' : '\<\h\k*',
+        \     'bra'    : '(',
+        \     'ket'    : ')',
+        \     'footer' : '',
+        \   },
+        \ ]
+  let g:sandwich_function_patterns['vim'] = [
+        \   {
+        \     'header' : '\C\<\%(\h\|[sa]:\h\|g:[A-Z]\)\k*',
+        \     'bra'    : '(',
+        \     'ket'    : ')',
+        \     'footer' : '',
+        \   },
+        \ ]
+  let g:sandwich_function_patterns['python'] = [
+        \   {
+        \     'header' : '\<\h\(\.\|\k\)*',
+        \     'bra'    : '(',
+        \     'ket'    : ')',
+        \     'footer' : '',
+        \   },
+        \ ]
+
+endfunction
+
+call s:add_delayed_initializer(function('s:init_vim_sandwich'))
 
 omap i, <Plug>(swap-textobject-i)
 xmap i, <Plug>(swap-textobject-i)
@@ -549,7 +601,7 @@ let g:cpp_concepts_highlight = 1
 
 " ------------ tpope ----------- {{{
 
-Plug 'tpope/vim-surround'
+" Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-unimpaired'
