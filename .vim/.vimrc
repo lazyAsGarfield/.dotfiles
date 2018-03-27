@@ -243,15 +243,26 @@ imap <C-j> <C-k><CR>
 Plug 'machakann/vim-swap'
 Plug 'machakann/vim-sandwich'
 
+let g:sandwich_no_default_key_mappings = 1
+let g:operator_sandwich_no_default_key_mappings = 1
 let g:textobj_sandwich_no_default_key_mappings = 1
 
 function! s:init_vim_sandwich()
   runtime macros/sandwich/keymap/surround.vim
 
-  omap if <Plug>(textobj-sandwich-auto-i)
-  xmap if <Plug>(textobj-sandwich-auto-i)
-  omap af <Plug>(textobj-sandwich-auto-a)
-  xmap af <Plug>(textobj-sandwich-auto-a)
+  omap ic <Plug>(textobj-sandwich-auto-i)
+  xmap ic <Plug>(textobj-sandwich-auto-i)
+  omap ac <Plug>(textobj-sandwich-auto-a)
+  xmap ac <Plug>(textobj-sandwich-auto-a)
+
+  omap ia <Plug>(textobj-sandwich-function-ip)
+  xmap ia <Plug>(textobj-sandwich-function-ip)
+  omap aa <Plug>(textobj-sandwich-function-ap)
+  xmap aa <Plug>(textobj-sandwich-function-ap)
+  omap if <Plug>(textobj-sandwich-function-i)
+  xmap if <Plug>(textobj-sandwich-function-i)
+  omap af <Plug>(textobj-sandwich-function-a)
+  xmap af <Plug>(textobj-sandwich-function-a)
 
   let g:sandwich#recipes += [
     \   {
