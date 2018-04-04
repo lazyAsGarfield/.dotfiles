@@ -163,6 +163,7 @@ if v:version >= 703
 
     nnoremap ycg :YcmCompleter GoTo<CR>
     nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
+    nnoremap ycf :YcmCompleter FixIt<CR>
 
   endif
 endif
@@ -295,6 +296,14 @@ function! s:init_vim_sandwich()
   let g:sandwich_function_patterns['python'] = [
         \   {
         \     'header' : '\<\h\(\.\|\k\)*',
+        \     'bra'    : '(',
+        \     'ket'    : ')',
+        \     'footer' : '',
+        \   },
+        \ ]
+  let g:sandwich_function_patterns['cpp'] = [
+        \   {
+        \     'header' : '\<\h\([.>:]\|\k\)*',
         \     'bra'    : '(',
         \     'ket'    : ')',
         \     'footer' : '',
@@ -811,9 +820,6 @@ if has('mouse_sgr')
   set ttymouse=sgr
 endif
 
-" enable syntax highlighting
-syntax on
-
 " timeout for key codes (delayed ESC is annoying)
 set ttimeoutlen=0
 
@@ -899,6 +905,9 @@ set wildmode=longest:full,full
 " some options have to be set only at init
 if !exists("g:vimrc_init")
   let g:vimrc_init = 1
+
+  " enable syntax highlighting
+  syntax on
 
   set background=dark
   " silent! colorscheme hybrid
@@ -1216,3 +1225,91 @@ endfunction
 
 nmap gap :call ArgPaste('p')<CR>
 nmap gaP :call ArgPaste('P')<CR>
+
+function! SID(fname)
+  redir => l:scriptnames
+  sil exe 'scriptnames'
+  redir END
+  for script in split(l:scriptnames, "\n")
+    if l:script =~ a:fname
+      return str2nr(split(l:script, ":")[0])
+    endif
+  endfor
+  return -1
+endfunction
+
+let s:swap_sid = SID('vim-swap/autoload/swap/textobj.vim')
+if s:swap_sid == -1
+  try
+    let l:dummy = swap#textobj#dummy
+  catch
+  endtry
+  let s:swap_sid = SID('vim-swap/autoload/swap/textobj.vim')
+endif
+
+let s:sandwich_sid = SID('vim-sandwich/autoload/sandwich/magicchar/f.vim')
+if s:sandwich_sid == -1
+  try
+    let l:dummy = sandwich#magicchar#f#dummy
+  catch
+  endtry
+  let s:sandwich_sid = SID('vim-sandwich/autoload/sandwich/magicchar/f.vim')
+endif
+
+function! AddArgument(where)
+  let l:count = v:count1
+
+  if index(['<', '>'], a:where) >= 0
+
+    let TEXTOBJ = !!1
+    let swap = swap#swap#new('n', [])
+    let [buffer, rule] = swap.scan('char', TEXTOBJ)
+    if empty(buffer) || empty(buffer.items)
+      return
+    endif
+    let [start, end] = eval('<SNR>' . s:swap_sid . '_get_target_i(buffer, l:count)')
+    if a:where ==# '>'
+      let pos = end.region.tail
+    elseif a:where ==# '<'
+      let pos = start.region.head
+    endif
+
+  elseif index(['<<', '>>'], a:where) >= 0
+
+    let opt = {}
+    let opt.searchlines = eval('<SNR>' . s:sandwich_sid . '_get("textobj_sandwich_function_searchlines" , 30)')
+    let pattern_list = eval('<SNR>' . s:sandwich_sid . '_resolve_patterns()')
+    let view = winsaveview()
+    try
+      let candidates = eval('<SNR>' . s:sandwich_sid . '_gather_candidates("ap", l:count, pattern_list, opt)')
+      let [start, end] = eval('<SNR>' . s:sandwich_sid . '_get_range("ap", l:count, candidates)')
+      if start == [0, 0] || end == [0, 0]
+        return
+      endif
+    finally
+      call winrestview(view)
+    endtry
+    if a:where ==# '>>'
+      let [line, col] = end
+      let col += 1
+    elseif a:where ==# '<<'
+      let [line, col] = start
+    endif
+    let pos = [0, line, col, 0]
+
+  endif
+
+  call setpos('.', pos)
+  if a:where[0] ==# '>'
+    execute "normal! i, \<esc>l"
+  elseif a:where[0] ==# '<'
+    execute "normal! i, \<esc>h"
+  endif
+  startinsert
+
+endfunction
+
+nnoremap <silent> g,i :call AddArgument('<')<CR>
+nnoremap <silent> g,a :call AddArgument('>')<CR>
+nnoremap <silent> g,I :call AddArgument('<<')<CR>
+nnoremap <silent> g,A :call AddArgument('>>')<CR>
