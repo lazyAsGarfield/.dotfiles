@@ -10,7 +10,7 @@ lines_2=$((lines/2))
 
 true_beg=$((line_num - lines_2))
 beg=$((true_beg > 0 ? true_beg : 1))
-end=$((true_beg + lines))
+end=$((beg + lines))
 head=$((end - beg + 1))
 
 rel_line_num=$((true_beg + lines_2 - beg + 1))

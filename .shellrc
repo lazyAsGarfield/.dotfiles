@@ -34,7 +34,7 @@ alias t='tmux attach -t 1 2>/dev/null || tmux new -s 1'
 
 alias ssh='TERM=xterm-256color ssh'
 
-export LESS=-iSRM~gj4#2
+export LESS=-iSRM~j4#2
 [[ $(uname -s) =~ Darwin ]] || export LESS=${LESS}F
 
 alias_if_needed()

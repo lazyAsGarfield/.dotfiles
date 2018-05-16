@@ -243,6 +243,7 @@ imap <C-j> <C-k><CR>
 
 Plug 'machakann/vim-swap'
 Plug 'machakann/vim-sandwich'
+Plug 'machakann/vim-textobj-delimited'
 
 let g:sandwich_no_default_key_mappings = 1
 let g:operator_sandwich_no_default_key_mappings = 1
@@ -909,6 +910,8 @@ if !exists("g:vimrc_init")
   " enable syntax highlighting
   syntax on
 
+  set updatetime=100
+
   set background=dark
   " silent! colorscheme hybrid
   silent! colorscheme jellybeans
@@ -1196,35 +1199,16 @@ set formatoptions+=jl
 
 abbrev flase false
 
-" imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR><Plug>delimitMateBS
+imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR>
 
-" function! YcmOnDeleteChar()
-"   if pumvisible()
-"     return "\<C-y>"
-"   endif
-"   return ""
-" endfunction
-
-nmap <silent>  :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
-
-function! ArgPaste(char)
-  let off = a:char == 'p' ? 0 : -1
-  if matchstr(getline('.'), '\%' . (col('.') + off) . 'c.') == '('
-    let end = matchend(@", '^,\s*')
-    if end != -1
-      let @" = @"[end:] . ', '
-    endif
-  else
-    let end = match(@", ',\s*$')
-    if end != -1
-      let @" = ', ' . @"[:end-1]
-    endif
+function! YcmOnDeleteChar()
+  if pumvisible()
+    return "\<C-y>" . delimitMate#BS()
   endif
-  exec 'norm! ' . a:char
+  return "" . delimitMate#BS()
 endfunction
 
-nmap gap :call ArgPaste('p')<CR>
-nmap gaP :call ArgPaste('P')<CR>
+nmap <silent>  :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
 
 function! SID(fname)
   redir => l:scriptnames
