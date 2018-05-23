@@ -53,8 +53,8 @@ if v:version >= 703
     autocmd BufWinEnter NERD_tree_* let b:NERDTree._previousBuf = bufname('#')
     autocmd BufUnload NERD_tree_* unlet t:netrwNERDTree
     if s:has_patch(704, 605)
-      autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = b:NERDTree._previousBuf | endif
-      autocmd BufWinEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = b:_prev_buffer | endif
+      autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | let @# = bufnr(b:NERDTree._previousBuf) | endif
+      autocmd BufWinEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | let @# = bufnr(b:_prev_buffer) | endif
     else
       autocmd BufWinLeave NERD_tree_* if bufexists(b:NERDTree._previousBuf) | exec 'b ' . b:NERDTree._previousBuf | b# | endif
       autocmd BufWinEnter * if bufname('#') == bufname('%') && exists('b:_prev_buffer') | exec 'b ' . b:_prev_buffer | b# | call setpos('.', b:_prev_pos) | endif
@@ -733,13 +733,8 @@ if !empty($__VIM_LATEX__)
     let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
   endfunction
 
+
 endif
-
-" }}}
-
-" ------------ vader ----------- {{{
-
-Plug 'junegunn/vader.vim'
 
 " }}}
 
@@ -931,7 +926,7 @@ if !exists("g:vimrc_init")
         \ endif
 
   " 80/120 columns marker
-  silent! let &colorcolumn="120"
+  silent! let &colorcolumn="121"
 
   " indentation options
   set autoindent

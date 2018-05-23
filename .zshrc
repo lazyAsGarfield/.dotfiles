@@ -98,6 +98,8 @@ setopt nolistambiguous
 setopt histreduceblanks
 setopt histexpiredupsfirst
 
+export WORDCHARS=${WORDCHARS:s#/#}
+
 zmodload zsh/complist
 
 zplugs=()
