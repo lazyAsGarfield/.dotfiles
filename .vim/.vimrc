@@ -28,6 +28,16 @@ function! s:has_patch(version, patch)
   return version > a:version || (version == a:version && has('patch' . a:patch))
 endfunction
 
+if empty($__VIM_LATEX__)
+  let $__VIM_LATEX__ = 0
+endif
+if empty($__VIM_YCM__)
+  let $__VIM_YCM__ = 0
+endif
+if empty($__VIM_YCM_COMPL__)
+  let $__VIM_YCM_COMPL__ = 0
+endif
+
 " ---------- nerdtree ---------- {{{
 
 if v:version >= 703
@@ -143,9 +153,9 @@ endif
 " ------------- YCM ------------ {{{
 
 if v:version >= 703
-  if !empty($__VIM_YCM__)
+  if $__VIM_YCM__ != "0"
 
-    if !empty($__VIM_COMPL__)
+    if $__VIM_YCM_COMPL__ != "0"
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
     else
       Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
@@ -176,7 +186,7 @@ Plug 'hynek/vim-python-pep8-indent'
 
 if v:version >= 703
 
-  if !empty($__VIM_YCM__)
+  if $__VIM_YCM__ != "0"
     Plug 'davidhalter/jedi-vim'
   endif
 
@@ -713,7 +723,7 @@ let g:rainbow#pairs = [['(', ')'], ['[', ']'], ['{', '}']]
 
 " ------------ latex ----------- {{{
 
-if !empty($__VIM_LATEX__)
+if $__VIM_LATEX__ != "0"
 
   Plug 'lervag/vimtex'
 

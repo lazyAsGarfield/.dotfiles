@@ -60,9 +60,7 @@ alias_if_needed sort
 
 
 if tmux_path=$(type -p tmuxifier 2>/dev/null) && [ -n "$tmux_path" ] &&
-  tmuxifier_path=$(type -p tmuxifier 2>/dev/null) && [ -n "$tmuxifier_path" ] &&
-  [ -z "$TMUXIFIER_LAYOUT_PATH" ]; then
-
+  tmuxifier_path=$(type -p tmuxifier 2>/dev/null) && [ -n "$tmuxifier_path" ]; then
   alias mux=tmuxifier
   export TMUXIFIER_LAYOUT_PATH="$HOME/.tmux-layouts"
   mkdir -p "$TMUXIFIER_LAYOUT_PATH"
@@ -131,7 +129,14 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 
 . $DOTFILES_DIR/z.sh
 
-__get_git_branch()
+if [[ -z ${__GIT_CMD_PROMPT_TIMEOUT__+x} ]]; then
+  __GIT_CMD_PROMPT_TIMEOUT__="0.1"
+fi
+if [[ -z ${__GIT_DETAILED_PROMP_INFO__+x} ]]; then
+  __GIT_DETAILED_PROMP_INFO__=1
+fi
+
+__git_info()
 {
   local git_info
   if [[ $(git rev-parse --is-bare-repository 2>/dev/null) =~ true ]]; then
@@ -144,9 +149,11 @@ __get_git_branch()
       git_info="${__styles[YELLOW]}$git_info"
       if [[ -z $ZSH_VERSION ]]; then
         git_info="$git_info "
+      elif [[ $__GIT_DETAILED_PROMP_INFO__ == 0 ]]; then
+        git_info="$git_info ${__styles[GREEN]}*** "
       else
         local ahead_behind
-        ahead_behind="$($_timeout 0.1s $SHELL -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
+        ahead_behind="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
         ret=$?
         if [[ $ret -eq 124 || $ret -eq 137 ]]; then
           killed=1
@@ -164,7 +171,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local untracked
-          untracked="$($_timeout 0.1s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | $_wc -l")"
+          untracked="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1
@@ -177,7 +184,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local unstaged
-          unstaged="$($_timeout 0.1s $SHELL -c "git diff --numstat 2>/dev/null | $_wc -l")"
+          unstaged="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git diff --numstat 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1
@@ -190,7 +197,7 @@ __get_git_branch()
 
         if ! (( $killed )); then
           local staged
-          staged="$($_timeout 0.1s $SHELL -c "git diff --cached --numstat 2>/dev/null | $_wc -l")"
+          staged="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git diff --cached --numstat 2>/dev/null | $_wc -l")"
           ret=$?
           if [[ $ret -eq 124 || $ret -eq 137 ]]; then
             killed=1

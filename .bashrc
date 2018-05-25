@@ -34,7 +34,7 @@ prompt_command()
 
   df -T $PWD | grep sshfs >/dev/null 2>&1
   if [[ $? -ne 0 ]]; then
-    local git_branch="$(__get_git_branch)"
+    local git_branch="$(__git_info)"
     local prompt_char="$(__prompt_char)"
   fi
 
