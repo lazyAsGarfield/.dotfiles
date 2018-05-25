@@ -103,6 +103,9 @@ setopt histreduceblanks
 setopt histexpiredupsfirst
 
 export WORDCHARS=${WORDCHARS:s#/#}
+if [[ ! $WORDCHARS =~ "\|" ]]; then
+  export WORDCHARS="${WORDCHARS}|"
+fi
 
 zmodload zsh/complist
 
