@@ -5,10 +5,13 @@ import subprocess
 GOLDEN_RATIO = 1.618
 
 def tmux_cmd(*args):
-    if len(args) == 1 and isinstance(args[0], list):
-        return subprocess.check_output(['tmux'] + args[0])
-    else:
-        return subprocess.check_output(['tmux'] + args[0].split())
+    try:
+        if len(args) == 1 and isinstance(args[0], list):
+            return subprocess.check_output(['tmux'] + args[0])
+        else:
+            return subprocess.check_output(['tmux'] + args[0].split())
+    except Exception:
+        return ''
 
 window = {}
 window['width'], window['height'] = [float(val) for val in tmux_cmd(['display-message', '-p', '#{window_width} #{window_height}']).split()]
@@ -29,9 +32,9 @@ window['width'], window['height'] = [float(val) for val in tmux_cmd(['display-me
 #     if pane['active']:
 #         active_pane = pane
 #     panes[int(id)] = pane
-enabled = True
+enabled = False
 try:
-    enabled = (tmux_cmd('show-env -g GR').split('=')[1].strip() != '0')
+    enabled = (tmux_cmd('show-env -g GR').split('=')[1].strip() == '1')
 except Exception:
     pass
 
