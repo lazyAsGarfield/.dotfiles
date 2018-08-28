@@ -1096,8 +1096,6 @@ inoremap <C-U> <C-G>u<C-U>
 
 autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
 
-nnoremap cop :set <C-R>=&paste ? 'nopaste' : 'paste'<CR><CR>
-
 nmap <silent> <leader>t :checktime<CR>
 
 " refresh <nowait> ESC mappings
