@@ -90,21 +90,30 @@ if v:version >= 703
     endif
   endfunction
 
-  map <C-n> :<C-r>=expand('%') =~ 'NERD_tree' ? 'normal q' : 'call NERDTreeNewOrReuse()'<CR><CR>
+  map <C-n> :<C-r>=&ft == 'nerdtree' ? 'normal q' : 'call NERDTreeNewOrReuse()'<CR><CR>
 
   function! NERDTreeFindCurrentBuffer()
     let path = expand("%:p")
     call NERDTreeNewOrReuse()
-    let p = g:NERDTreePath.New(path)
-    if !p.isUnder(b:NERDTree.root.path)
-      call b:NERDTree.changeRoot(g:NERDTreeDirNode.New(p.getParent(), b:NERDTree))
-    endif
-    let node = b:NERDTree.root.reveal(p)
+    try
+      let p = g:NERDTreePath.New(path)
+      if !p.isUnder(b:NERDTree.root.path)
+        call b:NERDTree.changeRoot(g:NERDTreeDirNode.New(p.getParent(), b:NERDTree))
+      endif
+      let node = b:NERDTree.root.reveal(p)
+      call node.putCursorHere(1,0)
+    catch NERDTree.InvalidArgumentsError
+      let path = fnamemodify(path, ':h')
+      let p = g:NERDTreePath.New(path)
+      let dir = g:NERDTreeDirNode.New(p, b:NERDTree)
+      if !p.isUnder(b:NERDTree.root.path)
+        call b:NERDTree.changeRoot(dir)
+      endif
+    endtry
     call b:NERDTree.render()
-    call node.putCursorHere(1,0)
   endfunction
 
-  nmap n :<C-r>=expand('%') =~ 'NERD_tree' ? 'normal q' : 'call NERDTreeFindCurrentBuffer()'<CR><CR>
+  nmap n :<C-r>=&ft == 'nerdtree' ? 'normal q' : 'call NERDTreeFindCurrentBuffer()'<CR><CR>
 
   function! s:runtime_nerdtree_mappings()
     try
@@ -573,7 +582,7 @@ endif
 
 " ------------- git ------------ {{{
 
-Plug 'airblade/vim-gitgutter'
+" Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
 
@@ -625,6 +634,8 @@ Plug 'vim-airline/vim-airline-themes'
 let g:airline_left_sep=''
 let g:airline_right_sep=''
 
+let g:airline#extensions#whitespace#enabled = 0
+
 let g:cpp_experimental_template_highlight = 1
 let g:cpp_concepts_highlight = 1
 
@@ -649,6 +660,8 @@ nnoremap <F9> :Dispatch<CR>
 nnoremap <C-F9> :Dispatch!<CR>
 nnoremap <F10> :Start<CR>
 nnoremap <C-F10> :Start!<CR>
+
+let g:nremap = {"m": ""}
 
 autocmd FileType c,cpp setlocal commentstring=//\ %s
 
@@ -825,6 +838,9 @@ endif
 if has('mouse_sgr')
   set ttymouse=sgr
 endif
+
+set clipboard-=autoselect
+set clipboard+=autoselectplus
 
 " timeout for key codes (delayed ESC is annoying)
 set ttimeoutlen=0
