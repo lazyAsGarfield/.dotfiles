@@ -688,16 +688,53 @@ Plug 'haya14busa/incsearch.vim'
 
 let g:incsearch#auto_nohlsearch = 1
 
-map /  <Plug>(incsearch-forward)
-map ?  <Plug>(incsearch-backward)
-map g/ <Plug>(incsearch-stay)
+if !exists('g:__incsearch_enabled')
+  let g:__incsearch_enabled = 0
+endif
 
-map n  <Plug>(incsearch-nohl-n)
-map N  <Plug>(incsearch-nohl-N)
-map *  <Plug>(incsearch-nohl-*)
-map #  <Plug>(incsearch-nohl-#)
-map g* <Plug>(incsearch-nohl-g*)
-map g# <Plug>(incsearch-nohl-g#)
+function! s:__enable_incsearch()
+  map /  <Plug>(incsearch-forward)
+  map ?  <Plug>(incsearch-backward)
+  map g/ <Plug>(incsearch-stay)
+
+  map n  <Plug>(incsearch-nohl-n)
+  map N  <Plug>(incsearch-nohl-N)
+  map *  <Plug>(incsearch-nohl-*)
+  map #  <Plug>(incsearch-nohl-#)
+  map g* <Plug>(incsearch-nohl-g*)
+  map g# <Plug>(incsearch-nohl-g#)
+endfunction
+
+function! s:endisable_incsearch()
+  if g:__incsearch_enabled == 0
+    let g:__incsearch_enabled = 1
+    call s:__enable_incsearch()
+    set hlsearch
+    set incsearch
+    noh
+    echo 'Better incsearch enabled'
+  else
+    let g:__incsearch_enabled = 0
+    unmap /
+    unmap ?
+    unmap g/
+    unmap n
+    unmap N
+    unmap *
+    unmap #
+    unmap g*
+    unmap g#
+
+    set nohlsearch
+    set noincsearch
+
+    echo 'Better incsearch disabled'
+  endif
+endfunction
+
+call s:__enable_incsearch()
+
+nmap <silent> yo/ :call <SID>endisable_incsearch()<CR>
 
 " }}}
 
