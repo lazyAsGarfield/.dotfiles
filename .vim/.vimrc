@@ -28,6 +28,10 @@ function! s:has_patch(version, patch)
   return version > a:version || (version == a:version && has('patch' . a:patch))
 endfunction
 
+function! s:plugin_installed(plugin)
+  return has_key(g:plugs, a:plugin) && !isdirectory(g:plugs[a:plugin].dir)
+endfunction
+
 if empty($__VIM_LATEX__)
   let $__VIM_LATEX__ = 0
 endif
@@ -264,80 +268,84 @@ Plug 'machakann/vim-swap'
 Plug 'machakann/vim-sandwich'
 Plug 'machakann/vim-textobj-delimited'
 
-let g:sandwich_no_default_key_mappings = 1
-let g:operator_sandwich_no_default_key_mappings = 1
-let g:textobj_sandwich_no_default_key_mappings = 1
+if s:plugin_installed('vim-sandwich')
 
-function! s:init_vim_sandwich()
-  runtime macros/sandwich/keymap/surround.vim
+  let g:sandwich_no_default_key_mappings = 1
+  let g:operator_sandwich_no_default_key_mappings = 1
+  let g:textobj_sandwich_no_default_key_mappings = 1
 
-  omap ic <Plug>(textobj-sandwich-auto-i)
-  xmap ic <Plug>(textobj-sandwich-auto-i)
-  omap ac <Plug>(textobj-sandwich-auto-a)
-  xmap ac <Plug>(textobj-sandwich-auto-a)
+  function! s:init_vim_sandwich()
+    runtime macros/sandwich/keymap/surround.vim
 
-  omap ia <Plug>(textobj-sandwich-function-ip)
-  xmap ia <Plug>(textobj-sandwich-function-ip)
-  omap aa <Plug>(textobj-sandwich-function-ap)
-  xmap aa <Plug>(textobj-sandwich-function-ap)
-  omap if <Plug>(textobj-sandwich-function-i)
-  xmap if <Plug>(textobj-sandwich-function-i)
-  omap af <Plug>(textobj-sandwich-function-a)
-  xmap af <Plug>(textobj-sandwich-function-a)
+    omap ic <Plug>(textobj-sandwich-auto-i)
+    xmap ic <Plug>(textobj-sandwich-auto-i)
+    omap ac <Plug>(textobj-sandwich-auto-a)
+    xmap ac <Plug>(textobj-sandwich-auto-a)
 
-  let g:sandwich#recipes += [
-    \   {
-    \     'buns': ['(', ')'],
-    \     'cursor': 'head',
-    \     'command': ['startinsert'],
-    \     'kind': ['add', 'replace'],
-    \     'action': ['add'],
-    \     'input': ['F']
-    \   },
-    \ ]
+    omap ia <Plug>(textobj-sandwich-function-ip)
+    xmap ia <Plug>(textobj-sandwich-function-ip)
+    omap aa <Plug>(textobj-sandwich-function-ap)
+    xmap aa <Plug>(textobj-sandwich-function-ap)
+    omap if <Plug>(textobj-sandwich-function-i)
+    xmap if <Plug>(textobj-sandwich-function-i)
+    omap af <Plug>(textobj-sandwich-function-a)
+    xmap af <Plug>(textobj-sandwich-function-a)
 
-  let g:sandwich_function_patterns = {}
-  let g:sandwich_function_patterns['_'] = [
-        \   {
-        \     'header' : '\<\h\k*',
-        \     'bra'    : '(',
-        \     'ket'    : ')',
-        \     'footer' : '',
-        \   },
-        \ ]
-  let g:sandwich_function_patterns['vim'] = [
-        \   {
-        \     'header' : '\C\<\%(\h\|[sa]:\h\|g:[A-Z]\)\k*',
-        \     'bra'    : '(',
-        \     'ket'    : ')',
-        \     'footer' : '',
-        \   },
-        \ ]
-  let g:sandwich_function_patterns['python'] = [
-        \   {
-        \     'header' : '\<\h\(\.\|\k\)*',
-        \     'bra'    : '(',
-        \     'ket'    : ')',
-        \     'footer' : '',
-        \   },
-        \ ]
-  let g:sandwich_function_patterns['cpp'] = [
-        \   {
-        \     'header' : '\<\h\([.>:]\|\k\)*',
-        \     'bra'    : '(',
-        \     'ket'    : ')',
-        \     'footer' : '',
-        \   },
-        \ ]
+    let g:sandwich#recipes += [
+      \   {
+      \     'buns': ['(', ')'],
+      \     'cursor': 'head',
+      \     'command': ['startinsert'],
+      \     'kind': ['add', 'replace'],
+      \     'action': ['add'],
+      \     'input': ['F']
+      \   },
+      \ ]
 
-endfunction
+    let g:sandwich_function_patterns = {}
+    let g:sandwich_function_patterns['_'] = [
+          \   {
+          \     'header' : '\<\h\k*',
+          \     'bra'    : '(',
+          \     'ket'    : ')',
+          \     'footer' : '',
+          \   },
+          \ ]
+    let g:sandwich_function_patterns['vim'] = [
+          \   {
+          \     'header' : '\C\<\%(\h\|[sa]:\h\|g:[A-Z]\)\k*',
+          \     'bra'    : '(',
+          \     'ket'    : ')',
+          \     'footer' : '',
+          \   },
+          \ ]
+    let g:sandwich_function_patterns['python'] = [
+          \   {
+          \     'header' : '\<\h\(\.\|\k\)*',
+          \     'bra'    : '(',
+          \     'ket'    : ')',
+          \     'footer' : '',
+          \   },
+          \ ]
+    let g:sandwich_function_patterns['cpp'] = [
+          \   {
+          \     'header' : '\<\h\([.>:]\|\k\)*',
+          \     'bra'    : '(',
+          \     'ket'    : ')',
+          \     'footer' : '',
+          \   },
+          \ ]
 
-call s:add_delayed_initializer(function('s:init_vim_sandwich'))
+  endfunction
 
-omap i, <Plug>(swap-textobject-i)
-xmap i, <Plug>(swap-textobject-i)
-omap a, <Plug>(swap-textobject-a)
-xmap a, <Plug>(swap-textobject-a)
+  call s:add_delayed_initializer(function('s:init_vim_sandwich'))
+
+  omap i, <Plug>(swap-textobject-i)
+  xmap i, <Plug>(swap-textobject-i)
+  omap a, <Plug>(swap-textobject-a)
+  xmap a, <Plug>(swap-textobject-a)
+
+endif
 
 " }}}
 
@@ -671,6 +679,8 @@ autocmd FileType c,cpp setlocal commentstring=//\ %s
 
 Plug 'roman/golden-ratio'
 
+let g:golden_ratio_exclude_nonmodifiable = 1
+
 " }}}
 
 " ---------- easy-align -------- {{{
@@ -686,55 +696,58 @@ nmap ga <Plug>(LiveEasyAlign)
 
 Plug 'haya14busa/incsearch.vim'
 
-let g:incsearch#auto_nohlsearch = 1
+if s:plugin_installed('incsearch.vim')
 
-if !exists('g:__incsearch_enabled')
-  let g:__incsearch_enabled = 0
-endif
+  let g:incsearch#auto_nohlsearch = 1
 
-function! s:__enable_incsearch()
-  map /  <Plug>(incsearch-forward)
-  map ?  <Plug>(incsearch-backward)
-  map g/ <Plug>(incsearch-stay)
+  function! s:__enable_incsearch()
+    map /  <Plug>(incsearch-forward)
+    map ?  <Plug>(incsearch-backward)
+    map g/ <Plug>(incsearch-stay)
 
-  map n  <Plug>(incsearch-nohl-n)
-  map N  <Plug>(incsearch-nohl-N)
-  map *  <Plug>(incsearch-nohl-*)
-  map #  <Plug>(incsearch-nohl-#)
-  map g* <Plug>(incsearch-nohl-g*)
-  map g# <Plug>(incsearch-nohl-g#)
-endfunction
+    map n  <Plug>(incsearch-nohl-n)
+    map N  <Plug>(incsearch-nohl-N)
+    map *  <Plug>(incsearch-nohl-*)
+    map #  <Plug>(incsearch-nohl-#)
+    map g* <Plug>(incsearch-nohl-g*)
+    map g# <Plug>(incsearch-nohl-g#)
+  endfunction
 
-function! s:endisable_incsearch()
-  if g:__incsearch_enabled == 0
+  function! s:endisable_incsearch()
+    if g:__incsearch_enabled == 0
+      let g:__incsearch_enabled = 1
+      call s:__enable_incsearch()
+      set hlsearch
+      set incsearch
+      noh
+      echo 'Better incsearch enabled'
+    else
+      let g:__incsearch_enabled = 0
+      unmap /
+      unmap ?
+      unmap g/
+      unmap n
+      unmap N
+      unmap *
+      unmap #
+      unmap g*
+      unmap g#
+
+      set nohlsearch
+      set noincsearch
+
+      echo 'Better incsearch disabled'
+    endif
+  endfunction
+
+  call s:__enable_incsearch()
+  if !exists('g:__incsearch_enabled')
     let g:__incsearch_enabled = 1
-    call s:__enable_incsearch()
-    set hlsearch
-    set incsearch
-    noh
-    echo 'Better incsearch enabled'
-  else
-    let g:__incsearch_enabled = 0
-    unmap /
-    unmap ?
-    unmap g/
-    unmap n
-    unmap N
-    unmap *
-    unmap #
-    unmap g*
-    unmap g#
-
-    set nohlsearch
-    set noincsearch
-
-    echo 'Better incsearch disabled'
   endif
-endfunction
 
-call s:__enable_incsearch()
+  nmap <silent> yo/ :call <SID>endisable_incsearch()<CR>
 
-nmap <silent> yo/ :call <SID>endisable_incsearch()<CR>
+endif
 
 " }}}
 
