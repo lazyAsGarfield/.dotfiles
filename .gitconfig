@@ -38,7 +38,7 @@
   path = .gitconfig.local
 
 [core]
-  ignore = ~/.cvsignore
+  excludesfile = ~/.cvsignore
 
 [init]
   templatedir = ~/.git_template

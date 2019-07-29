@@ -1,15 +1,5 @@
 [ -z "$PROFILE" ] && . "$HOME/.profile"
 
-alias ls='$_ls --color=auto'
-alias grep='grep --color=auto'
-alias ll='ls -lFh'
-alias lla='ls -alFh'
-alias llt='ls -alFh --sort=time'
-alias llat='ls -alFh --sort=time --time=access'
-alias lls='ls -alFh --sort=size'
-alias la='ls -A --color=auto'
-alias l='ls -CF'
-
 alias tmux='tmux -2'
 
 alias rm='rm -i'
@@ -56,6 +46,18 @@ alias_if_needed timeout
 alias_if_needed wc
 alias_if_needed readlink
 alias_if_needed sort
+
+if [[ ! $(uname -s) =~ Darwin || $_ls == "gls" ]]; then
+  alias ls='$_ls --color=auto'
+fi
+alias grep='grep --color=auto'
+alias ll='ls -lFh'
+alias lla='ls -alFh'
+alias llt='ls -alFh --sort=time'
+alias llat='ls -alFh --sort=time --time=access'
+alias lls='ls -alFh --sort=size'
+alias la='ls -A --color=auto'
+alias l='ls -CF'
 
 # http://jeroenjanssens.com/2013/08/16/quickly-navigate-your-filesystem-from-the-command-line.html
 export MARKPATH=$HOME/.marks

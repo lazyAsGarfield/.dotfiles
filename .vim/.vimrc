@@ -29,7 +29,7 @@ function! s:has_patch(version, patch)
 endfunction
 
 function! s:plugin_installed(plugin)
-  return has_key(g:plugs, a:plugin) && !isdirectory(g:plugs[a:plugin].dir)
+  return has_key(g:plugs, a:plugin) && isdirectory(g:plugs[a:plugin].dir)
 endfunction
 
 if empty($__VIM_LATEX__)
@@ -1268,7 +1268,9 @@ set formatoptions+=jl
 
 abbrev flase false
 
-imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR>
+if s:plugin_installed('YouCompleteMe')
+  imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR>
+endif
 
 function! YcmOnDeleteChar()
   if pumvisible()
