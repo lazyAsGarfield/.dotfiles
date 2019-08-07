@@ -890,7 +890,7 @@ if has('mouse_sgr')
 endif
 
 set clipboard-=autoselect
-set clipboard+=autoselectplus
+set clipboard+=unnamed
 
 " timeout for key codes (delayed ESC is annoying)
 set ttimeoutlen=0

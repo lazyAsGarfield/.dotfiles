@@ -1,5 +1,25 @@
 [ -z "$PROFILE" ] && . "$HOME/.profile"
 
+# Defaults
+
+[[ -z ${__GIT_INFO__+x} ]] && __GIT_INFO__=1
+
+[[ -z ${__GIT_CMD_PROMPT_TIMEOUT__+x} ]] && __GIT_CMD_PROMPT_TIMEOUT__="0.1"
+
+[[ -z ${__GIT_DETAILED_PROMP_INFO__+x} ]] && __GIT_DETAILED_PROMP_INFO__=1
+
+# zsh only
+[[ -z ${__MULTI_LINE_PROMPT__+x} ]] && __MULTI_LINE_PROMPT__=0
+
+# vim
+[[ -z ${__VIM_LATEX__+x} ]] && __VIM_LATEX__=0
+
+[[ -z ${__VIM_YCM__+x} ]] && __VIM_YCM__=0
+
+[[ -z ${__VIM_YCM_COMPL__+x} ]] && __VIM_YCM_COMPL__=0
+
+#####
+
 alias tmux='tmux -2'
 
 alias rm='rm -i'
@@ -121,15 +141,11 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 
 . $DOTFILES_DIR/z.sh
 
-if [[ -z ${__GIT_CMD_PROMPT_TIMEOUT__+x} ]]; then
-  __GIT_CMD_PROMPT_TIMEOUT__="0.1"
-fi
-if [[ -z ${__GIT_DETAILED_PROMP_INFO__+x} ]]; then
-  __GIT_DETAILED_PROMP_INFO__=1
-fi
-
 __git_info()
 {
+  if [[ $__GIT_INFO__ == 0 ]]; then
+    return
+  fi
   local git_info
   if [[ $(git rev-parse --is-bare-repository 2>/dev/null) =~ true ]]; then
     git_info="/bare repo/"
