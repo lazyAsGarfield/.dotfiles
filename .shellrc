@@ -6,7 +6,7 @@
 
 [[ -z ${__GIT_CMD_PROMPT_TIMEOUT__+x} ]] && __GIT_CMD_PROMPT_TIMEOUT__="0.1"
 
-[[ -z ${__GIT_DETAILED_PROMP_INFO__+x} ]] && __GIT_DETAILED_PROMP_INFO__=1
+[[ -z ${__GIT_DETAILED_PROMPT_INFO__+x} ]] && __GIT_DETAILED_PROMPT_INFO__=1
 
 # zsh only
 [[ -z ${__MULTI_LINE_PROMPT__+x} ]] && __MULTI_LINE_PROMPT__=0
@@ -164,18 +164,20 @@ __git_info()
       else
         local ahead="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
         local behind="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
+        ahead_behind=""
         if [[ $behind -gt 0 ]]; then
-          git_info="$git_info${__styles[BLUE]}\u2193$behind"
+          ahead_behind="$ahead_behind${__styles[BLUE]}\u21E3$behind"
         fi
         if [[ $ahead -gt 0 ]]; then
-          git_info="$git_info${__styles[BLUE]}\u2191$ahead"
+          ahead_behind="$ahead_behind${__styles[BLUE]}\u21E1$ahead"
         fi
+        [[ -n $ahead_behind ]] && git_info="$git_info $ahead_behind"
       fi
       git_info="$git_info "
 
       if [[ -z $ZSH_VERSION ]]; then
         git_info="$git_info "
-      elif [[ $__GIT_DETAILED_PROMP_INFO__ != 0 ]]; then
+      elif [[ $__GIT_DETAILED_PROMPT_INFO__ != 0 ]]; then
         if ! (( $killed )); then
           local untracked
           untracked="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | $_wc -l")"
@@ -184,7 +186,7 @@ __git_info()
             killed=1
           else
             if [[ $untracked -gt 0 ]]; then
-              more_info="$more_info${__styles[YELLOW]}$untracked\u25A1 "
+              more_info="$more_info${__styles[YELLOW]}\u2026$untracked "
             fi
           fi
         fi
@@ -197,7 +199,7 @@ __git_info()
             killed=1
           else
             if [[ $unstaged -gt 0 ]]; then
-              more_info="$more_info${__styles[YELLOW]}$unstaged\u25EA "
+              more_info="$more_info${__styles[YELLOW]}\u25CB$unstaged "
             fi
           fi
         fi
@@ -210,7 +212,7 @@ __git_info()
             killed=1
           else
             if [[ $staged -gt 0 ]]; then
-              more_info="$more_info${__styles[YELLOW]}$staged\u25A0 "
+              more_info="$more_info${__styles[YELLOW]}\u25CF$staged "
             fi
           fi
         fi
