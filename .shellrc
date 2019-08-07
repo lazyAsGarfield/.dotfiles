@@ -155,28 +155,27 @@ __git_info()
     git_info="$(git branch 2> /dev/null | grep '* ' | cut -c3-)"
     if [[ -n $git_info ]]; then
       git_info="${__styles[YELLOW]}$git_info"
+
+      local ahead_behind
+      ahead_behind="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
+      ret=$?
+      if [[ $ret -eq 124 || $ret -eq 137 ]]; then
+        killed=1
+      else
+        local ahead="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
+        local behind="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
+        if [[ $behind -gt 0 ]]; then
+          git_info="$git_info${__styles[BLUE]}\u2193$behind"
+        fi
+        if [[ $ahead -gt 0 ]]; then
+          git_info="$git_info${__styles[BLUE]}\u2191$ahead"
+        fi
+      fi
+      git_info="$git_info "
+
       if [[ -z $ZSH_VERSION ]]; then
         git_info="$git_info "
-      elif [[ $__GIT_DETAILED_PROMP_INFO__ == 0 ]]; then
-        git_info="$git_info ${__styles[GREEN]}*** "
-      else
-        local ahead_behind
-        ahead_behind="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
-        ret=$?
-        if [[ $ret -eq 124 || $ret -eq 137 ]]; then
-          killed=1
-        else
-          local ahead="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
-          local behind="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
-          if [[ $behind -gt 0 ]]; then
-            more_info="$more_info${__styles[BLUE]}\u25BC$behind"
-          fi
-          if [[ $ahead -gt 0 ]]; then
-            more_info="$more_info${__styles[BLUE]}\u25B2$ahead"
-          fi
-        fi
-        more_info="$more_info "
-
+      elif [[ $__GIT_DETAILED_PROMP_INFO__ != 0 ]]; then
         if ! (( $killed )); then
           local untracked
           untracked="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | $_wc -l")"
@@ -231,7 +230,7 @@ __get_virtual_env()
   virtual_env=""
   if [[ -z $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
     if [[ -n $VIRTUAL_ENV ]]; then
-      virtual_env="($(basename $VIRTUAL_ENV)) "
+      virtual_env="$(basename $VIRTUAL_ENV)"
     fi
   fi
   echo $virtual_env

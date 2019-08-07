@@ -39,6 +39,8 @@ __prompt_command()
   local prompt_char="$"
   local virtual_env="$(__get_virtual_env)"
 
+  [[ ! -z "$virtual_env" ]] && virtual_env="($virtual_env) "
+
   df -T $PWD | grep sshfs >/dev/null 2>&1
   if [[ $? -ne 0 ]]; then
     local git_branch="$(__git_info)"
