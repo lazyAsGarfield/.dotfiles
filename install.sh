@@ -30,7 +30,7 @@ _install "$target_dir/.shellrc"
 _install "$target_dir/.zshrc"
 _install "$target_dir/.bashrc"
 
-# _install "$target_dir/.tmux.conf"
+_install "$target_dir/.tmux.conf"
 
 _install "$target_dir/.vim"
 _install "$target_dir/.vim/.vimrc"
