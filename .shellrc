@@ -45,7 +45,7 @@ alias t='tmux attach -t 1 2>/dev/null || tmux new -s 1'
 alias ssh='TERM=xterm-256color ssh'
 
 export LESS=-iSRM~j4#2
-[[ $(uname -s) =~ Darwin ]] || export LESS=${LESS}F
+[[ $(less -V | head -n1 | cut -f2 -d' ') -ge 530 ]] && export LESS=${LESS}F
 
 alias_if_needed()
 {
@@ -233,6 +233,9 @@ __get_virtual_env()
   if [[ -z $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
     if [[ -n $VIRTUAL_ENV ]]; then
       virtual_env="$(basename $VIRTUAL_ENV)"
+    fi
+    if [[ -n $CONDA_DEFAULT_ENV ]]; then
+      virtual_env="$CONDA_DEFAULT_ENV"
     fi
   fi
   echo $virtual_env

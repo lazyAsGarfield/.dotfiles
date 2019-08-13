@@ -68,8 +68,6 @@ __prompt_command()
 
 precmd()
 {
-  # in vi mode, prompt will be set other way
-  PROMPT=""
   __dir_history
 }
 
