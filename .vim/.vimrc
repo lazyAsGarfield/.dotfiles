@@ -35,12 +35,6 @@ endfunction
 if empty($__VIM_LATEX__)
   let $__VIM_LATEX__ = 0
 endif
-if empty($__VIM_YCM__)
-  let $__VIM_YCM__ = 0
-endif
-if empty($__VIM_YCM_COMPL__)
-  let $__VIM_YCM_COMPL__ = 0
-endif
 
 " ---------- nerdtree ---------- {{{
 
@@ -163,32 +157,34 @@ endif
 
 " }}}
 
-" ------------- YCM ------------ {{{
+" ---------- completion -------- {{{
 
-if v:version >= 703
-  if $__VIM_YCM__ != "0"
+if v:version >= 800
 
-    if $__VIM_YCM_COMPL__ != "0"
-      Plug 'Valloric/YouCompleteMe', { 'do': './install.py --clang-completer' }
-    else
-      Plug 'Valloric/YouCompleteMe', { 'do': './install.py' }
-    endif
+  Plug 'neoclide/coc.nvim', {'branch': 'release'}
 
-    " let g:loaded_youcompleteme = 1
-    let g:ycm_seed_identifiers_with_syntax = 1
-    " let g:ycm_add_preview_to_completeopt = 1
-    " let g:ycm_autoclose_preview_window_after_insertion = 0
-    let g:ycm_always_populate_location_list = 1
-    let g:ycm_global_ycm_extra_conf = expand("$HOME/.vim/ycm/.ycm_extra_conf.py")
-    let g:ycm_warning_symbol = '>'
-    let g:ycm_error_symbol = '>>'
-    let g:ycm_collect_identifiers_from_tags_files = 1
+  if s:plugin_installed('coc.nvim') && executable('node')
+    " use <tab> for trigger completion and navigate to the next complete item
+    function! s:check_back_space() abort
+      let col = col('.') - 1
+      return !col || getline('.')[col - 1]  =~ '\s'
+    endfunction
 
-    nnoremap ycg :YcmCompleter GoTo<CR>
-    nnoremap ycc :YcmForceCompileAndDiagnostics<CR>
-    nnoremap ycf :YcmCompleter FixIt<CR>
+    inoremap <silent><expr> <Tab>
+          \ pumvisible() ? "\<C-n>" :
+          \ <SID>check_back_space() ? "\<Tab>" :
+          \ coc#refresh()
+
+    inoremap <silent><expr> <S-Tab>
+          \ pumvisible() ? "\<C-p>" :
+          \ coc#refresh()
+
+    inoremap <silent><expr> <c-@> coc#refresh()
+
+    autocmd FileType python nmap <buffer> <C-]> <Plug>(coc-definition)
 
   endif
+
 endif
 
 " }}}
@@ -196,31 +192,6 @@ endif
 " ------------ python ---------- {{{
 
 Plug 'hynek/vim-python-pep8-indent'
-
-if v:version >= 703
-
-  if $__VIM_YCM__ != "0"
-    Plug 'davidhalter/jedi-vim'
-  endif
-
-  " disable completions from jedi-vim, using YCM instead
-  let g:jedi#completions_enabled = 0
-
-  " two below fix showing argument list when using YCM
-  let g:jedi#show_call_signatures_delay = 0
-  let g:jedi#show_call_signatures = "0"
-
-  let g:jedi#goto_command = "yjg"
-  let g:jedi#documentation_command = "K"
-  let g:jedi#usages_command = "yju"
-
-  let g:jedi#goto_assignments_command = ""
-  let g:jedi#completions_command = ""
-  let g:jedi#rename_command = ""
-
-  autocmd FileType python nmap <buffer> <C-]> g<C-]>
-  autocmd FileType python silent! vunmap <buffer> yjr
-endif
 
 " }}}
 
@@ -1267,17 +1238,6 @@ nmap <leader>z <C-w>z<CR>
 set formatoptions+=jl
 
 abbrev flase false
-
-if s:plugin_installed('YouCompleteMe')
-  imap <silent> <BS> <C-R>=YcmOnDeleteChar()<CR>
-endif
-
-function! YcmOnDeleteChar()
-  if pumvisible()
-    return "\<C-y>" . delimitMate#BS()
-  endif
-  return "" . delimitMate#BS()
-endfunction
 
 nmap <silent>  :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
 

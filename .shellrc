@@ -14,10 +14,6 @@
 # vim
 [[ -z ${__VIM_LATEX__+x} ]] && __VIM_LATEX__=0
 
-[[ -z ${__VIM_YCM__+x} ]] && __VIM_YCM__=0
-
-[[ -z ${__VIM_YCM_COMPL__+x} ]] && __VIM_YCM_COMPL__=0
-
 #####
 
 alias tmux='tmux -2'
