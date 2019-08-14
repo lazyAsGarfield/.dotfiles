@@ -20,7 +20,6 @@ _install "$target_dir/.gdbinit"
 
 _install "$target_dir/.gitconfig"
 _install "$target_dir/.git_template"
-_install "$target_dir/.cvsignore"
 
 _install "$target_dir/.profile"
 _install "$target_dir/.zprofile"
