@@ -1,20 +1,8 @@
 [ -z "$PROFILE" ] && . "$HOME/.profile"
 
-# Defaults
-
-[[ -z ${__GIT_INFO__+x} ]] && __GIT_INFO__=1
-
-[[ -z ${__GIT_CMD_PROMPT_TIMEOUT__+x} ]] && __GIT_CMD_PROMPT_TIMEOUT__="0.1"
-
-[[ -z ${__GIT_DETAILED_PROMPT_INFO__+x} ]] && __GIT_DETAILED_PROMPT_INFO__=1
-
-# zsh only
-[[ -z ${__MULTI_LINE_PROMPT__+x} ]] && __MULTI_LINE_PROMPT__=0
-
-# vim
+[[ -z ${PROMPT_GIT_INFO+x} ]] && PROMPT_GIT_INFO=1
+[[ -z ${MULTI_LINE_PROMPT+x} ]] && MULTI_LINE_PROMPT=0
 [[ -z ${__VIM_LATEX__+x} ]] && __VIM_LATEX__=0
-
-#####
 
 alias tmux='tmux -2'
 
@@ -27,16 +15,10 @@ alias cd-='cd -'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
-alias .....='cd ../../../..'
-alias ......='cd ../../../../..'
 
-alias s='saved'
 alias c='local_cd_hist'
 alias c-='c -'
-
 alias j='jump'
-
-alias t='tmux attach -t 1 2>/dev/null || tmux new -s 1'
 
 alias ssh='TERM=xterm-256color ssh'
 
@@ -49,7 +31,6 @@ alias_if_needed()
   path_to="$(which $gcmd 2>/dev/null)"
   if [[ ! -x "$path_to" ]]; then
     export _$1=$1
-    # alias $gcmd=$1
   else
     export _$1=$gcmd
   fi
@@ -80,13 +61,9 @@ export MARKPATH=$HOME/.marks
 
 jump()
 {
-  [[ -n $1 ]] && { cd -P "$MARKPATH/$1" 2>/dev/null \
-    || echo "No such mark: $1"; } \
-    || { echo;
-    for f in $($_ls -A "$MARKPATH"); do
-      echo "$f" '->' $($_readlink -f "$MARKPATH/$f" || echo -en '\e[3m<invalid>\e[0m'); done \
-    | $_awk -F ' -> ' '{if ($0 != "") printf "    %-10s ->  %s\n", $1, $2; else print}';
-    echo; }
+  [[ -z $1 ]] \
+    && ls -l "$MARKPATH" | tr -s ' ' | cut -d' ' -f9- | awk NF | awk -F ' -> ' '{printf "    %-10s -> %s\n", $1, $2}' \
+    || cd -P "$MARKPATH/$1" 2>/dev/null || echo "No such mark: $1"
 }
 
 mark()
@@ -104,7 +81,6 @@ command -v vim >/dev/null 2>&1 &&
 command -v vimx >/dev/null 2>&1 &&
   export EDITOR=vimx
 
-# in order to keep aliases in one place
 if [[ -n $ZSH_VERSION ]]; then
   alias sr=". $HOME/.zshrc"
 else
@@ -139,108 +115,72 @@ export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quo
 
 __git_info()
 {
-  if [[ $__GIT_INFO__ == 0 ]]; then
+  [[ $PROMPT_GIT_INFO == 0 ]] && return
+  [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) != true ]] && return
+
+  if [[ $(git rev-parse --is-bare-repository 2>/dev/null) == true ]]; then
+    echo "${1}${__c[YELLOW]}/bare repo/${2}"
     return
   fi
-  local git_info
-  if [[ $(git rev-parse --is-bare-repository 2>/dev/null) =~ true ]]; then
-    git_info="/bare repo/"
-  else
-    local killed=0
-    local more_info=""
-    git_info="$(git branch 2> /dev/null | grep '* ' | cut -c3-)"
-    if [[ -n $git_info ]]; then
-      git_info="${__styles[YELLOW]}$git_info"
 
-      local ahead_behind
-      ahead_behind="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git rev-list --left-right --count HEAD...@{u} 2>/dev/null")"
-      ret=$?
-      if [[ $ret -eq 124 || $ret -eq 137 ]]; then
-        killed=1
-      else
-        local ahead="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
-        local behind="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
-        ahead_behind=""
-        if [[ $behind -gt 0 ]]; then
-          ahead_behind="$ahead_behind${__styles[BLUE]}\u21E3$behind"
-        fi
-        if [[ $ahead -gt 0 ]]; then
-          ahead_behind="$ahead_behind${__styles[BLUE]}\u21E1$ahead"
-        fi
-        [[ -n $ahead_behind ]] && git_info="$git_info $ahead_behind"
-      fi
-      git_info="$git_info "
+  local branch="$(git branch 2> /dev/null | grep '* ' | cut -c3-)"
 
-      if [[ -z $ZSH_VERSION ]]; then
-        git_info="$git_info "
-      elif [[ $__GIT_DETAILED_PROMPT_INFO__ != 0 ]]; then
-        if ! (( $killed )); then
-          local untracked
-          untracked="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git ls-files \"$(git rev-parse --show-toplevel 2>/dev/null)\" --exclude-standard --others 2>/dev/null | $_wc -l")"
-          ret=$?
-          if [[ $ret -eq 124 || $ret -eq 137 ]]; then
-            killed=1
-          else
-            if [[ $untracked -gt 0 ]]; then
-              more_info="$more_info${__styles[YELLOW]}\u2026$untracked "
-            fi
-          fi
-        fi
+  local ahead_behind="$(git rev-list --left-right --count HEAD...@{u} 2>/dev/null)"
+  local behind="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\2/p' <<< "$ahead_behind")"
+  local ahead="$($_sed -nre 's/^([0-9]+)\s+([0-9]+)$/\1/p' <<< "$ahead_behind")"
 
-        if ! (( $killed )); then
-          local unstaged
-          unstaged="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git diff --numstat 2>/dev/null | $_wc -l")"
-          ret=$?
-          if [[ $ret -eq 124 || $ret -eq 137 ]]; then
-            killed=1
-          else
-            if [[ $unstaged -gt 0 ]]; then
-              more_info="$more_info${__styles[YELLOW]}\u25CB$unstaged "
-            fi
-          fi
-        fi
+  local git_status="$(git status --porcelain --ignore-submodules -unormal 2>/dev/null)"
+  local untracked="$(<<<"$git_status" grep -c '^?? ')"
+  local unstaged="$(<<<"$git_status" grep -c '^[ MADRC][MADRC] ')"
+  local staged="$(<<<"$git_status" grep -c '^[MADRC][ MADRC] ')"
 
-        if ! (( $killed )); then
-          local staged
-          staged="$($_timeout ${__GIT_CMD_PROMPT_TIMEOUT__}s $SHELL -c "git diff --cached --numstat 2>/dev/null | $_wc -l")"
-          ret=$?
-          if [[ $ret -eq 124 || $ret -eq 137 ]]; then
-            killed=1
-          else
-            if [[ $staged -gt 0 ]]; then
-              more_info="$more_info${__styles[YELLOW]}\u25CF$staged "
-            fi
-          fi
-        fi
-        if (( $killed )); then
-          git_info="$git_info ${__styles[RED]}? "
-        else
-          git_info="$git_info$more_info"
-        fi
-      fi
-    fi
-  fi
-  echo -e "$git_info"
+  local ret="${__c[YELLOW]}${branch}"
+  ( [[ $behind -gt 0 || $ahead -gt 0 ]] ) && ret+=" "
+  [[ $behind -gt 0 ]] && ret+="${__c[BLUE]}"$'\u21e3'$behind
+  [[ $ahead -gt 0 ]] && ret+="${__c[BLUE]}"$'\u21E1'$ahead
+  [[ $untracked -gt 0 ]] && ret+=" ${__c[YELLOW]}"$'\u2026'$untracked
+  [[ $unstaged -gt 0 ]] && ret+=" ${__c[YELLOW]}"$'\u25CB'$unstaged
+  [[ $staged -gt 0 ]] && ret+=" ${__c[YELLOW]}"$'\u25CF'$staged
+
+  [[ -n $ret ]] && echo "${1}${ret}${2}"
 }
 
-__get_virtual_env()
+__virtual_env_info()
 {
-  virtual_env=""
-  if [[ -z $VIRTUAL_ENV_DISABLE_PROMPT ]]; then
-    if [[ -n $VIRTUAL_ENV ]]; then
-      virtual_env="$(basename $VIRTUAL_ENV)"
-    fi
-    if [[ -n $CONDA_DEFAULT_ENV ]]; then
-      virtual_env="$CONDA_DEFAULT_ENV"
-    fi
-  fi
-  echo $virtual_env
+  local ret=""
+  [[ -n $VIRTUAL_ENV ]] && ret="$(basename $VIRTUAL_ENV)"
+  [[ -n $CONDA_DEFAULT_ENV ]] && ret="$CONDA_DEFAULT_ENV"
+  [[ -n $ret ]] && echo "${1}${ret}${2}"
 }
 
 __prompt_char()
 {
-  git branch >/dev/null 2>/dev/null && echo "±" && return
-  echo '$'
+  local prompt_char='$'
+  [[ $(git rev-parse --is-inside-work-tree 2>/dev/null) == true ]] && prompt_char='±'
+  echo "${1}${prompt_char}${2}"
+}
+
+__get_prompt()
+{
+  local sep="${__c[BOLD]} | "
+  local virtual_env="$(__virtual_env_info "${__c[BLUE]}" "$sep")"
+  local git_branch="$(__git_info "$sep")"
+
+  local user="${__c[CYAN]}$1"
+  if [[ -n $SSH_CLIENT ]]; then
+    user+="${__c[YELLOW]}@${__c[BLUE]}$2"
+  fi
+  local cwd="${__c[BOLD]}$3"
+
+  local whitespace=" "
+  if [[ $MULTI_LINE_PROMPT != 0 ]]; then
+    whitespace=$'\n'
+  fi
+
+  local last_exit_code="$4"
+  local prompt_char="$(__prompt_char "${__c[NORMAL]}" " ${__c[NORMAL]}")"
+
+  echo "${virtual_env}${user}${sep}${cwd}${git_branch}${whitespace}${last_exit_code}${prompt_char}"
 }
 
 __add_to_hist()
@@ -258,29 +198,8 @@ __dir_history()
   fi
 }
 
-function ssh()
-{
-  if [ -n "$TMUX" ]; then
-    target=${*##*\ }
-    tmux setenv "__pane_title_$TMUX_PANE" "$target"
-    command ssh "$@"
-  else
-    command ssh "$@"
-  fi
-}
-
 . "$DOTFILES_DIR/dir_utils.sh"
 
 [ -r "$HOME/.shellrc.local" ] && . "$HOME/.shellrc.local"
-
-if tmux_path=$(type -p tmuxifier 2>/dev/null) && [ -n "$tmux_path" ] &&
-  tmuxifier_path=$(type -p tmuxifier 2>/dev/null) && [ -n "$tmuxifier_path" ]; then
-  alias mux=tmuxifier
-  if [[ -z "$TMUXIFIER_LAYOUT_PATH" ]]; then
-    export TMUXIFIER_LAYOUT_PATH="$HOME/.tmux-layouts"
-  fi
-  mkdir -p "$TMUXIFIER_LAYOUT_PATH"
-  eval "$(tmuxifier init -)"
-fi
 
 # vim: ft=zsh

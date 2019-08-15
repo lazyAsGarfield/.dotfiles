@@ -4,68 +4,6 @@
 
 autoload -U colors && colors
 
-typeset -A __styles
-__styles=(
-NORMAL "%{%f%b%}"
-WHITE "%{$fg[white]%}"
-BOLD "%{%b$fg_bold[white]%}"
-
-RED "%{%b$fg[red]%}"
-LIGHT_RED "%{%b$fg_bold[red]%}"
-
-GREEN "%{%b$fg[green]%}"
-LIGHT_GREEN "%{%b$fg_bold[green]%}"
-
-YELLOW "%{%b$fg[yellow]%}"
-LIGHT_YELLOW "%{%b$fg_bold[yellow]%}"
-
-BLUE "%{%b$fg[blue]%}"
-LIGHT_BLUE "%{%b$fg_bold[blue]%}"
-
-MAGENTA "%{%b$fg[magenta]%}"
-LIGHT_MAGENTA "%{%b$fg_bold[magenta]%}"
-
-CYAN "%{%b$fg[cyan]%}"
-LIGHT_CYAN "%{%b$fg_bold[cyan]%}"
-)
-
-if [[ -z ${__MULTI_LINE_PROMPT__+x} ]]; then
-  __MULTI_LINE_PROMPT__=0
-fi
-
-__prompt_command()
-{
-  local git_branch=""
-  local prompt_char="$"
-  local virtual_env="$(__get_virtual_env)"
-
-  df -T $PWD | grep sshfs >/dev/null 2>&1
-  if [[ $? -ne 0 ]]; then
-    local git_branch="$(__git_info)"
-    local prompt_char="$(__prompt_char)"
-  fi
-
-  local short_path="${__styles[BOLD]}%(4~|.../%2~|%~)"
-  local last_exit_code="%(?||${__styles[LIGHT_RED]}/%?/ )"
-
-  local host=""
-  if [[ -n $SSH_CLIENT ]]; then
-    local host="${__styles[YELLOW]}@${__styles[BLUE]}%m"
-  fi
-
-  local newline=""
-  if [[ $__MULTI_LINE_PROMPT__ != 0 ]]; then
-    newline=$'\n'
-  fi
-
-  [[ ! -z "$virtual_env" ]] && virtual_env="$virtual_env${__styles[BOLD]} | "
-  [[ ! -z "$git_branch" ]] && git_branch="${__styles[BOLD]}| $git_branch"
-
-  PROMPT="${__styles[BLUE]}${virtual_env}${__styles[CYAN]}${__styles[CYAN]}%n$host${__styles[BOLD]} | $short_path${__styles[CYAN]} ${git_branch}"$newline"$last_exit_code${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
-
-  zle && zle reset-prompt
-}
-
 precmd()
 {
   __dir_history
@@ -73,7 +11,8 @@ precmd()
 
 zle-line-init zle-keymap-select()
 {
-  __prompt_command
+  PROMPT="$(__get_prompt "%n" "%m" "%(4~|.../%2~|%~)" "%(?||${__c[LIGHT_RED]}/%?/ )")"
+  zle && zle reset-prompt
 }
 
 zle -N zle-line-init
@@ -146,12 +85,30 @@ alias gapp='git apply'
 alias gignore='git update-index --skip-worktree'
 alias gunignore='git update-index --no-skip-worktree'
 
-function _completemarks {
-  reply=($(ls $MARKPATH))
-}
+typeset -A __c
+__c=(
+NORMAL "%{%f%b%}"
+WHITE "%{$fg[white]%}"
+BOLD "%{%b$fg_bold[white]%}"
 
-compctl -K _completemarks jump
-compctl -K _completemarks unmark
+RED "%{%b$fg[red]%}"
+LIGHT_RED "%{%b$fg_bold[red]%}"
+
+GREEN "%{%b$fg[green]%}"
+LIGHT_GREEN "%{%b$fg_bold[green]%}"
+
+YELLOW "%{%b$fg[yellow]%}"
+LIGHT_YELLOW "%{%b$fg_bold[yellow]%}"
+
+BLUE "%{%b$fg[blue]%}"
+LIGHT_BLUE "%{%b$fg_bold[blue]%}"
+
+MAGENTA "%{%b$fg[magenta]%}"
+LIGHT_MAGENTA "%{%b$fg_bold[magenta]%}"
+
+CYAN "%{%b$fg[cyan]%}"
+LIGHT_CYAN "%{%b$fg_bold[cyan]%}"
+)
 
 # }}}
 
@@ -175,10 +132,8 @@ bindkey "^[3;5~"             delete-char
 bindkey '^[[Z'               reverse-menu-complete
 if $(whence -w fzf-completion >/dev/null) ; then
   bindkey '^I'               fzf-completion
-else
-  # bindkey -M viins '^I'               menu-complete
 fi
-bindkey '^X^X'               edit-command-line
+bindkey '^[e'               edit-command-line
 
 bindkey '^ '                 autosuggest-accept
 
@@ -221,9 +176,27 @@ zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p
 autoload -Uz compinit
 compinit
 
-compdef _precommand detach
-compdef _dir_list saved
 compdef _gnu_generic firewall-cmd
+
+function _complete_marks {
+  reply=($(ls $MARKPATH))
+}
+
+compctl -K _complete_marks jump
+compctl -K _complete_marks unmark
+
+function _complete_dir_hist {
+  local hist_size="${#__cd_history__[@]}"
+  local min="$(( $hist_size - 15 + 1 ))"
+  min="$(( $min < 1 ? 1 : $min ))"
+  dirs=()
+  for (( i = $min ; i <= $hist_size ; ++i )); do
+    dirs+=("$(($i - $hist_size - 1)):${__cd_history__[$i]}")
+  done
+  _describe "dir" dirs
+}
+
+compdef _complete_dir_hist local_cd_hist
 
 ZLE_REMOVE_SUFFIX_CHARS=" "
 # }}}
@@ -240,65 +213,6 @@ ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(
 ZSH_AUTOSUGGEST_HIGHLIGHT_STYLE='fg=245,underline'
 # }}}
 
-# Expand @s... or @c... to saved dir/history entry in executed command {{{
-
-setopt bash_rematch
-
-my-accept-line()
-{
-  while [[ "$BUFFER" =~ '( |^)@(c(-?)|s)([0-9]+)( |$)' ]]; do
-    if [[ ${BASH_REMATCH[3][1]} == "c" ]]; then
-      cmd="local_cd_hist"
-    else
-      cmd="saved"
-    fi
-    arg=${BASH_REMATCH[4]}${BASH_REMATCH[5]}
-    output="$($cmd -g$arg)"
-    [[ -z $output ]] && break
-    output="${output//\//\\/}"
-    BUFFER=$($_sed -Ee "s/( |^)@(c-?|s)[0-9]+( |$)/\1$output\3/" <<< "$BUFFER")
-  done
-  zle .accept-line
-}
-
-zle -N accept-line my-accept-line
-
-dc_completion()
-{
-  if [[ $PREFIX =~ '( |^)@(c|s|m)$' ]]; then
-    local unsorted
-    if [[ ${BASH_REMATCH[3]} == "c" ]]; then
-      IFS=$'\n' unsorted=( $(local_cd_hist | tr -s ' ' | cut -d' ' -f4-) )
-      unsorted=( "${(Oa)unsorted[@]}" )
-    elif [[ ${BASH_REMATCH[3]} == "s" ]]; then
-      IFS=$'\n' unsorted=( $(saved | tr -s ' ' | cut -d' ' -f3-) )
-    else
-      IFS=$'\n' unsorted=( $(ls -1 "$HOME/.marks" | xargs -L1 -I{} $_readlink -f "$MARKPATH/{}") )
-    fi
-    compadd -S/ -q -U1V unsorted -a unsorted
-    _compskip=all
-  fi
-}
-
-completer_selector()
-{
-  if [[ ${BUFFER:0:$CURSOR} =~ '( |^)@(c|s|m)$' ]]; then
-    zle menu-complete
-  else
-    zle expand-or-complete
-  fi
-}
-
-zle -N dc_completion
-compdef dc_completion -first-
-
-zle -N completer_selector
-bindkey '^I' completer_selector
-
-# }}}
-
 [ -r ~/.fzf.zsh ] && . ~/.fzf.zsh
-
-bindkey '^T' transpose-chars
 
 [ -r "$HOME/.zshrc.local" ] && . "$HOME/.zshrc.local"

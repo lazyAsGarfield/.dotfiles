@@ -2,8 +2,24 @@
 
 [ -r ~/.fzf.bash ] && . ~/.fzf.bash
 
-declare -A __styles
-__styles=(
+prompt_command()
+{
+  PS1="$(__get_prompt "\u" "\h" "\W")"
+}
+
+[[ ! $PROMPT_COMMAND =~ "history -a" ]] && PROMPT_COMMAND="$PROMPT_COMMAND history -a; prompt_command; __dir_history"
+
+_completemarks() {
+  local curw=${COMP_WORDS[COMP_CWORD]}
+  local wordlist=$(find $MARKPATH -type l -exec basename {} \;)
+  COMPREPLY=($(compgen -W '${wordlist[@]}' -- "$curw"))
+  return 0
+}
+
+complete -F _completemarks jump unmark j
+
+declare -A __c
+__c=(
   [NORMAL]="\[\e[0m\]"
   [BOLD]="\[\e[0;1;39m\]"
 
@@ -25,39 +41,5 @@ __styles=(
   [CYAN]="\[\e[0;36m\]"
   [LIGHT_CYAN]="\[\e[0;1;36m\]"
 )
-
-prompt_command()
-{
-  local git_branch=""
-  local prompt_char="$"
-  local virtual_env="$(__get_virtual_env)"
-
-  df -T $PWD | grep sshfs >/dev/null 2>&1
-  if [[ $? -ne 0 ]]; then
-    local git_branch="$(__git_info)"
-    local prompt_char="$(__prompt_char)"
-  fi
-
-  local host=""
-  if [[ -n $SSH_CLIENT ]]; then
-    local host="${__styles[YELLOW]}@${__styles[BLUE]}\h"
-  fi
-
-  PS1="${__styles[BLUE]}$virtual_env${__styles[CYAN]}[${__styles[CYAN]}\u${__styles[YELLOW]}:${__styles[BOLD]}\W${__styles[CYAN]}] $git_branch${__styles[NORMAL]}$prompt_char ${__styles[NORMAL]}"
-}
-
-if [[ -z ${__prompt_cmd_set+x} ]]; then
-  __prompt_cmd_set=1
-  PROMPT_COMMAND="$PROMPT_COMMAND history -a; prompt_command; __dir_history"
-fi
-
-_completemarks() {
-  local curw=${COMP_WORDS[COMP_CWORD]}
-  local wordlist=$(find $MARKPATH -type l -printf "%f\n")
-  COMPREPLY=($(compgen -W '${wordlist[@]}' -- "$curw"))
-  return 0
-}
-
-complete -F _completemarks jump unmark j
 
 [ -r "$HOME/.bashrc.local" ] && . "$HOME/.bashrc.local"
