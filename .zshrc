@@ -6,17 +6,10 @@ autoload -U colors && colors
 
 precmd()
 {
-  __dir_history
-}
-
-zle-line-init zle-keymap-select()
-{
   PROMPT="$(__get_prompt "%n" "%m" "%(4~|.../%2~|%~)" "%(?||${__c[LIGHT_RED]}/%?/ )")"
   zle && zle reset-prompt
+  __dir_history
 }
-
-zle -N zle-line-init
-zle -N zle-keymap-select
 
 HISTFILE=~/.histfile
 HISTSIZE=100000
