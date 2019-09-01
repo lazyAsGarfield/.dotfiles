@@ -1,7 +1,7 @@
 [ -z "$PROFILE" ] && . "$HOME/.profile"
 
 [[ -z ${PROMPT_GIT_INFO+x} ]] && PROMPT_GIT_INFO=1
-[[ -z ${MULTI_LINE_PROMPT+x} ]] && MULTI_LINE_PROMPT=0
+[[ -z ${PROMPT_MULTILINE+x} ]] && PROMPT_MULTILINE=0
 [[ -z ${__VIM_LATEX__+x} ]] && __VIM_LATEX__=0
 
 alias tmux='tmux -2'
@@ -173,7 +173,7 @@ __get_prompt()
   local cwd="${__c[BOLD]}$3"
 
   local whitespace=" "
-  if [[ $MULTI_LINE_PROMPT != 0 ]]; then
+  if [[ $PROMPT_MULTILINE != 0 ]]; then
     whitespace=$'\n'
   fi
 
