@@ -166,6 +166,8 @@ zstyle ':completion:*' menu select=0
 zstyle ':completion:*' original true
 zstyle ':completion:*' select-prompt %SScrolling active: current selection at %p%s
 
+ZLE_REMOVE_SUFFIX_CHARS=" "
+
 autoload -Uz compinit
 compinit
 
@@ -183,15 +185,16 @@ function _complete_dir_hist {
   local min="$(( $hist_size - 15 + 1 ))"
   min="$(( $min < 1 ? 1 : $min ))"
   dirs=()
-  for (( i = $min ; i <= $hist_size ; ++i )); do
+  for (( i = $hist_size ; i >= $min ; --i )); do
     dirs+=("$(($i - $hist_size - 1)):${__cd_history__[$i]}")
   done
-  _describe "dir" dirs
+  _describe -V "dir" dirs
 }
 
 compdef _complete_dir_hist local_cd_hist
 
-ZLE_REMOVE_SUFFIX_CHARS=" "
+zstyle ':completion:*:*:local_cd_hist:*' list-grouped false
+
 # }}}
 
 # autosuggestions {{{
