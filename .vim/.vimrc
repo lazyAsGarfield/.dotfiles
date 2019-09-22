@@ -215,7 +215,7 @@ endif
 
 " --------- delimitMate -------- {{{
 
-Plug 'lazyAsGarfield/delimitMate'
+Plug 'Raimondi/delimitMate'
 
 let delimitMate_expand_cr=1
 let delimitMate_expand_space=1
@@ -561,34 +561,8 @@ endif
 
 " ------------- git ------------ {{{
 
-" Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-fugitive'
 Plug 'junegunn/gv.vim'
-
-let g:gitgutter_override_sign_column_highlight = 0
-
-" those are better visible
-let g:gitgutter_sign_modified = '#'
-let g:gitgutter_sign_removed = 'v'
-let g:gitgutter_sign_modified_removed = '#v'
-
-nmap [h <Plug>GitGutterPrevHunk
-nmap ]h <Plug>GitGutterNextHunk
-
-cnoreabbrev GG GitGutter
-
-function! s:disable_signs()
-  try
-    call gitgutter#sign#disable()
-  catch
-    try
-      call gitgutter#signs_disable()
-    catch
-    endtry
-  endtry
-endfunction
-
-call s:add_delayed_initializer(function('s:disable_signs'))
 
 " }}}
 
@@ -649,8 +623,6 @@ autocmd FileType c,cpp setlocal commentstring=//\ %s
 " --------- golden-ratio ------- {{{
 
 Plug 'roman/golden-ratio'
-
-let g:golden_ratio_exclude_nonmodifiable = 1
 
 " }}}
 
