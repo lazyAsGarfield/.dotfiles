@@ -2,7 +2,8 @@
 
 [[ -z ${PROMPT_GIT_INFO+x} ]] && PROMPT_GIT_INFO=1
 [[ -z ${PROMPT_MULTILINE+x} ]] && PROMPT_MULTILINE=0
-[[ -z ${__VIM_LATEX__+x} ]] && __VIM_LATEX__=0
+[[ -z ${PROMPT_PREFIX+x} ]] && PROMPT_PREFIX=""
+[[ -z ${VIM_LATEX+x} ]] && VIM_LATEX=0
 
 alias tmux='tmux -2'
 
@@ -180,7 +181,12 @@ __get_prompt()
   local last_exit_code="$4"
   local prompt_char="$(__prompt_char "${__c[NORMAL]}" " ${__c[NORMAL]}")"
 
-  echo "${virtual_env}${user}${sep}${cwd}${git_branch}${whitespace}${last_exit_code}${prompt_char}"
+  local prefix=""
+  if [[ -n $PROMPT_PREFIX ]]; then
+    prefix="${__c[YELLOW]}${PROMPT_PREFIX}${sep}"
+  fi
+
+  echo "${prefix}${virtual_env}${user}${sep}${cwd}${git_branch}${whitespace}${last_exit_code}${prompt_char}"
 }
 
 __add_to_hist()

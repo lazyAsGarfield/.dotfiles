@@ -32,10 +32,6 @@ function! s:plugin_installed(plugin)
   return has_key(g:plugs, a:plugin) && isdirectory(g:plugs[a:plugin].dir)
 endfunction
 
-if empty($__VIM_LATEX__)
-  let $__VIM_LATEX__ = 0
-endif
-
 " ---------- nerdtree ---------- {{{
 
 if v:version >= 703
@@ -596,7 +592,6 @@ let g:cpp_concepts_highlight = 1
 
 " ------------ tpope ----------- {{{
 
-" Plug 'tpope/vim-surround'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-unimpaired'
@@ -729,7 +724,8 @@ let g:rainbow#pairs = [['(', ')'], ['[', ']'], ['{', '}']]
 
 " ------------ latex ----------- {{{
 
-if $__VIM_LATEX__ != "0"
+
+if !empty($VIM_LATEX) && $VIM_LATEX != "0"
 
   Plug 'lervag/vimtex'
 
