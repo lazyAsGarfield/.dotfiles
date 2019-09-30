@@ -613,6 +613,18 @@ let g:nremap = {"m": ""}
 
 autocmd FileType c,cpp setlocal commentstring=//\ %s
 
+function! s:python_setlocal()
+  augroup python_setlocal
+    autocmd!
+    autocmd FileType python setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=8
+  augroup END
+  if &ft == 'python'
+  setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=8
+  endif
+endfunction
+
+call s:add_delayed_initializer(function('s:python_setlocal'))
+
 " }}}
 
 " --------- golden-ratio ------- {{{
