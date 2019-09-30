@@ -318,8 +318,10 @@ endif
 
 " ---------- fzf/ctrlp --------- {{{
 
-Plug 'junegunn/fzf', { 'do': './install --all' }
-Plug 'junegunn/fzf.vim'
+if !empty($VIM_FZF) && $VIM_FZF != "0"
+  Plug 'junegunn/fzf', { 'do': './install --all' }
+  Plug 'junegunn/fzf.vim'
+endif
 Plug 'kien/ctrlp.vim'
 
 let g:ctrlp_cmd = 'CtrlPMRU'
@@ -327,7 +329,7 @@ let g:ctrlp_working_path_mode = 'ra'
 
 nmap <leader>b <C-b>
 
-if !executable('fzf')
+if !executable('fzf') || empty($VIM_FZF) || $VIM_FZF == "0"
 
   nnoremap <silent> <C-b> :CtrlPBuffer<CR>
   nnoremap <silent> <C-f> :CtrlP<CR>

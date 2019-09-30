@@ -4,6 +4,7 @@
 [[ -z ${PROMPT_MULTILINE+x} ]] && PROMPT_MULTILINE=0
 [[ -z ${PROMPT_PREFIX+x} ]] && PROMPT_PREFIX=""
 [[ -z ${VIM_LATEX+x} ]] && VIM_LATEX=0
+[[ -z ${VIM_FZF+x} ]] && VIM_FZF=0
 
 alias tmux='tmux -2'
 
