@@ -6,6 +6,9 @@ abbr -a gdcap       git diff --cached HEAD^
 abbr -a gapp        git apply
 abbr -a gignore     git update-index --skip-worktree
 abbr -a gunignore   git update-index --no-skip-worktree
+abbr -a gloga       git log --oneline --decorate --color --graph --all
+abbr -a gpsup       git push --set-upstream origin (git rev-parse --abbrev-ref HEAD)
+abbr -a gpsup!      git push --set-upstream --force-with-lease origin (git rev-parse --abbrev-ref HEAD)
 
 abbr -a cd.         cd ..
 abbr -a cd..        cd ..

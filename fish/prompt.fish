@@ -9,7 +9,8 @@ function fish_prompt
   (__user) \
   (__rc $rc) \
   (set_color --bold white) \
-  (__prompt_pwd) "> "
+  (__prompt_pwd) "> " \
+  (set_color normal)
 end
 
 function __sep
