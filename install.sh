@@ -25,7 +25,6 @@ _install "$target_dir/.profile"
 _install "$target_dir/.zprofile"
 _install "$target_dir/.bash_profile"
 
-_install "$target_dir/.shellrc"
 _install "$target_dir/.zshrc"
 _install "$target_dir/.bashrc"
 
@@ -37,6 +36,11 @@ _install "$target_dir/.vim/.vimrc"
 _install "$target_dir/.docker"
 
 _install "$target_dir/.terminfo"
+
+mkdir -p $HOME/.config/fish/
+cd $HOME/.config/fish/
+
+_install "$target_dir/config.fish"
 
 if [ ! -f "$target_dir/.vim/vim-plug/autoload/plug.vim" ]; then
   echo "Downloading plug.vim"

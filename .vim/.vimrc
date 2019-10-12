@@ -764,6 +764,8 @@ endif
 
 " }}}
 
+Plug 'dag/vim-fish'
+
 call plug#end()
 
 function! s:init_esc_mappings()

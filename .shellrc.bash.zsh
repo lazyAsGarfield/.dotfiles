@@ -1,31 +1,4 @@
-[ -z "$PROFILE" ] && . "$HOME/.profile"
-
-[[ -z ${PROMPT_GIT_INFO+x} ]] && PROMPT_GIT_INFO=1
-[[ -z ${PROMPT_MULTILINE+x} ]] && PROMPT_MULTILINE=0
-[[ -z ${PROMPT_PREFIX+x} ]] && PROMPT_PREFIX=""
-[[ -z ${VIM_LATEX+x} ]] && VIM_LATEX=0
-[[ -z ${VIM_FZF+x} ]] && VIM_FZF=0
-
-alias tmux='tmux -2'
-
-alias rm='rm -i'
-alias cp='cp -i'
-
-alias cd.='cd ..'
-alias cd..='cd ..'
-alias cd-='cd -'
-alias ..='cd ..'
-alias ...='cd ../..'
-alias ....='cd ../../..'
-
-alias c='local_cd_hist'
-alias c-='c -'
-alias j='jump'
-
-alias ssh='TERM=xterm-256color ssh'
-
-export LESS=-iSRM~j4#2
-[[ $(less -V | head -n1 | cut -f2 -d' ') -ge 530 ]] && export LESS=${LESS}F
+[ -z $PROFILE ] && . "$HOME/.profile"
 
 alias_if_needed()
 {
@@ -38,28 +11,28 @@ alias_if_needed()
   fi
 }
 
-alias_if_needed ls
-alias_if_needed awk
-alias_if_needed sed
-alias_if_needed timeout
-alias_if_needed wc
-alias_if_needed readlink
-alias_if_needed sort
+. "$DOTFILES_DIR/.shellrc.common"
+
+[ $(less -V | head -n1 | cut -f2 -d' ') -ge 530 ] && export LESS=${LESS}F
 
 if [[ ! $(uname -s) =~ Darwin || $_ls == "gls" ]]; then
   alias ls='$_ls --color=auto'
 fi
-alias grep='grep --color=auto'
-alias ll='ls -lFh'
-alias lla='ls -alFh'
-alias llt='ls -alFh --sort=time'
-alias llat='ls -alFh --sort=time --time=access'
-alias lls='ls -alFh --sort=size'
-alias la='ls -A --color=auto'
-alias l='ls -CF'
+
+alias c='local_cd_hist'
+
+alias cd.='cd ..'
+alias cd..='cd ..'
+alias cd-='cd -'
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+alias c-='c -'
+alias j='jump'
 
 # http://jeroenjanssens.com/2013/08/16/quickly-navigate-your-filesystem-from-the-command-line.html
-export MARKPATH=$HOME/.marks
+export MARKPATH="$HOME/.marks"
 
 jump()
 {
@@ -78,11 +51,6 @@ unmark()
   rm -i "$MARKPATH/$1"
 }
 
-command -v vim >/dev/null 2>&1 &&
-  export EDITOR=vim
-command -v vimx >/dev/null 2>&1 &&
-  export EDITOR=vimx
-
 if [[ -n $ZSH_VERSION ]]; then
   alias sr=". $HOME/.zshrc"
 else
@@ -97,7 +65,7 @@ export FZF_ALT_C_COMMAND='find -L . -type d 2>/dev/null | grep -v ".git" | $_sed
 export FZF_CTRL_T_COMMAND='find -L . -type d -o -type f -o -type l 2>/dev/null | grep -v ".git/" | $_sed 1d | cut -b3-'
 export FZF_DEFAULT_COMMAND='ag -g "" -U --hidden --ignore .git/ 2>/dev/null'
 
-if [ -x /usr/bin/dircolors ]; then
+if [[ -x /usr/bin/dircolors ]]; then
   if [[ -f $DOTFILES_DIR/dircolors ]]; then
     eval "$(dircolors $DOTFILES_DIR/dircolors -b)"
   elif [[ $TERM =~ ^tmux ]]; then
@@ -110,8 +78,6 @@ if [ -x /usr/bin/dircolors ]; then
     rm -f $fname
   fi
 fi
-
-export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
 
 . $DOTFILES_DIR/z.sh
 
@@ -190,23 +156,6 @@ __get_prompt()
   echo "${prefix}${virtual_env}${user}${sep}${cwd}${git_branch}${whitespace}${last_exit_code}${prompt_char}"
 }
 
-__add_to_hist()
-{
-  local hist_size="${#__cd_history__[@]}"
-  if [[ ${__cd_history__[$hist_size]} != $1 && ! -z $1 ]]; then
-    __cd_history__[$(( $hist_size + 1 ))]="$1"
-  fi
-}
-
-__dir_history()
-{
-  if [[ $PWD != $OLDPWD ]]; then
-    __add_to_hist $OLDPWD
-  fi
-}
-
 . "$DOTFILES_DIR/dir_utils.sh"
-
-[ -r "$HOME/.shellrc.local" ] && . "$HOME/.shellrc.local"
 
 # vim: ft=zsh

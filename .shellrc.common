@@ -1,0 +1,50 @@
+[ -z $PROMPT_GIT_INFO ] && export PROMPT_GIT_INFO=1
+[ -z $PROMPT_MULTILINE ] && export PROMPT_MULTILINE=0
+[ -z $PROMPT_PREFIX ] && export PROMPT_PREFIX=""
+[ -z $VIM_LATEX ] && export VIM_LATEX=0
+[ -z $VIM_FZF ] && export VIM_FZF=0
+
+alias tmux='tmux -2'
+
+alias rm='rm -i'
+alias cp='cp -i'
+
+alias ssh='TERM=xterm-256color ssh'
+
+export LESS=-iSRM~j4#2
+
+alias_if_needed ls
+alias_if_needed awk
+alias_if_needed sed
+alias_if_needed timeout
+alias_if_needed wc
+alias_if_needed readlink
+alias_if_needed sort
+
+alias grep='grep --color=auto'
+alias ll='ls -lFh'
+alias lla='ls -alFh'
+alias llt='ls -alFh --sort=time'
+alias llat='ls -alFh --sort=time --time=access'
+alias lls='ls -alFh --sort=size'
+alias la='ls -A'
+alias l='ls -CF'
+
+command -v vim >/dev/null 2>&1 &&
+  export EDITOR=vim
+command -v vimx >/dev/null 2>&1 &&
+  export EDITOR=vimx
+
+export FZF_DEFAULT_OPTS="--color fg:187,bg:233,hl:103,fg+:222,bg+:234,hl+:104 \
+  --color info:183,prompt:110,spinner:107,pointer:167,marker:215 \
+  --bind \"ctrl-u:page-up,ctrl-d:page-down,ctrl-j:accept,ctrl-k:ignore,alt-a:select-all,alt-d:deselect-all,alt-t:toggle-all\""
+
+export FZF_ALT_C_COMMAND='find -L . -type d 2>/dev/null | grep -v ".git" | $_sed 1d | cut -b3-'
+export FZF_CTRL_T_COMMAND='find -L . -type d -o -type f -o -type l 2>/dev/null | grep -v ".git/" | $_sed 1d | cut -b3-'
+export FZF_DEFAULT_COMMAND='ag -g "" -U --hidden --ignore .git/ 2>/dev/null'
+
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
+[ -r "$HOME/.shellrc.local" ] && . "$HOME/.shellrc.local"
+
+# vim: ft=zsh

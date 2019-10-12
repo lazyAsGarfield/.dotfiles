@@ -2,6 +2,21 @@
 
 declare -a __cd_history__
 
+__add_to_hist()
+{
+  local hist_size="${#__cd_history__[@]}"
+  if [[ ${__cd_history__[$hist_size]} != $1 && ! -z $1 ]]; then
+    __cd_history__[$(( $hist_size + 1 ))]="$1"
+  fi
+}
+
+__dir_history()
+{
+  if [[ $PWD != $OLDPWD ]]; then
+    __add_to_hist $OLDPWD
+  fi
+}
+
 function _list_cd_local_hist()
 {
   [[ $# -gt 0 && ! $1 =~ ^[1-9][0-9]*$ ]] &&
@@ -30,11 +45,6 @@ function local_cd_hist()
       limit=15
     fi
     _list_cd_local_hist $limit
-  elif [[ $1 =~ "-g-?[0-9]+" ]]; then
-    echo ${__cd_history__[${1:2}]}
-  elif [[ $1 == "-c" ]]; then
-    unset __cd_history__
-    declare -a __cd_history__
   else
     local pat
     if [[ $1 =~ ^-?[0-9]+$ ]]; then

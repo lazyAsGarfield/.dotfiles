@@ -1,4 +1,4 @@
-. "$HOME/.shellrc"
+. "$DOTFILES_DIR/.shellrc.bash.zsh"
 
 # misc shell stuff {{{
 
