@@ -7,8 +7,14 @@ abbr -a gapp        git apply
 abbr -a gignore     git update-index --skip-worktree
 abbr -a gunignore   git update-index --no-skip-worktree
 abbr -a gloga       git log --oneline --decorate --color --graph --all
-abbr -a gpsup       git push --set-upstream origin (git rev-parse --abbrev-ref HEAD)
-abbr -a gpsup!      git push --set-upstream --force-with-lease origin (git rev-parse --abbrev-ref HEAD)
+abbr -a gpsup       git push --set-upstream origin "(git_current_branch)"
+abbr -a gpsup!      git push --set-upstream --force-with-lease origin "(git_current_branch)"
+abbr -a gcl         git clone --recurse-submodules
+abbr -a gcls        git clone --recurse-submodules --depth 1 --shallow-submodules
+
+function git_current_branch
+  git rev-parse --abbrev-ref HEAD 2>/dev/null
+end
 
 abbr -a cd.         cd ..
 abbr -a cd..        cd ..
