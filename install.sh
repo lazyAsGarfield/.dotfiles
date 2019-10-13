@@ -40,7 +40,7 @@ _install "$target_dir/.terminfo"
 mkdir -p $HOME/.config/fish/
 cd $HOME/.config/fish/
 
-_install "$target_dir/config.fish"
+_install "$target_dir/fish/config.fish"
 
 if [ ! -f "$target_dir/.vim/vim-plug/autoload/plug.vim" ]; then
   echo "Downloading plug.vim"
