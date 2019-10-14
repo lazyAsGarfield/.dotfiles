@@ -9,8 +9,6 @@ alias tmux='tmux -2'
 alias rm='rm -i'
 alias cp='cp -i'
 
-alias ssh='TERM=xterm-256color ssh'
-
 export LESS=-iSRM~j4#2
 
 alias_if_needed ls

@@ -31,6 +31,8 @@ alias ....='cd ../../..'
 alias c-='c -'
 alias j='jump'
 
+alias ssh='TERM=xterm-256color ssh'
+
 # http://jeroenjanssens.com/2013/08/16/quickly-navigate-your-filesystem-from-the-command-line.html
 export MARKPATH="$HOME/.marks"
 
