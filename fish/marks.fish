@@ -11,6 +11,9 @@ function jump
   end
 end
 
+complete -e -c jump
+complete -x -c jump -a '(ls -l "$MARKPATH" | tr -s " " | cut -d" " -f9,11- | awk NF | sed "s/ /"\t"/")'
+
 function mark
   mkdir -p "$MARKPATH"; ln -s "(pwd)" "$MARKPATH/$argv[1]"
 end

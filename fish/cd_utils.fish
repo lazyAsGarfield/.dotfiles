@@ -42,6 +42,15 @@ function list_cd_hist
   end
 end
 
+function __complete_cd_hist
+  for ind in (seq (count $_cd_history) 1)
+    printf "%d\t%s\n" $ind $_cd_history[$ind]
+  end
+end
+
+complete -e -c cd_hist
+complete -x -c cd_hist -k -a '(__complete_cd_hist)'
+
 function cd
   if begin [ -n "$argv[1]" ]; and [ -d "$argv[1]" ]; end
     builtin cd (realpath $argv[1]) $argv[2..-1]
