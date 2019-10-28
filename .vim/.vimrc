@@ -566,7 +566,7 @@ Plug 'junegunn/gv.vim'
 
 " ------- better-whitespace ---- {{{
 
-Plug 'ntpeters/vim-better-whitespace'
+" Plug 'ntpeters/vim-better-whitespace'
 
 let g:better_whitespace_operator = ""
 
@@ -631,7 +631,11 @@ call s:add_delayed_initializer(function('s:python_setlocal'))
 
 " --------- golden-ratio ------- {{{
 
-Plug 'roman/golden-ratio'
+if !has('gui_macvim')
+
+  Plug 'roman/golden-ratio'
+
+endif
 
 " }}}
 
@@ -1126,11 +1130,11 @@ inoremap jj <esc>
 
 function! MoveToPrevTab(...)
   let l:line = line('.')
-  "there is only one window
+  " there is only one window
   if tabpagenr('$') == 1 && winnr('$') == 1
     return
   endif
-  "preparing new window
+  " preparing new window
   let l:last = tabpagenr() == tabpagenr('$')
   let l:only = winnr('$') == 1
   let l:cur_buf = bufnr('%')
@@ -1144,18 +1148,18 @@ function! MoveToPrevTab(...)
     close!
     exe tabpagenr() - 1 . "tabnew"
   endif
-  "opening current buffer in new window
+  " opening current buffer in new window
   exe "b".l:cur_buf
   exe l:line
 endfunc
 
 function! MoveToNextTab(...)
   let l:line = line('.')
-  "there is only one window
+  " there is only one window
   if tabpagenr('$') == 1 && winnr('$') == 1
     return
   endif
-  "preparing new window
+  " preparing new window
   let l:tab_nr = tabpagenr('$')
   let l:cur_buf = bufnr('%')
   if tabpagenr() < tab_nr && a:0 == 0
@@ -1168,7 +1172,7 @@ function! MoveToNextTab(...)
     close!
     tabnew
   endif
-  "opening current buffer in new window
+  " opening current buffer in new window
   exe "b".l:cur_buf
   exe l:line
 endfunc
