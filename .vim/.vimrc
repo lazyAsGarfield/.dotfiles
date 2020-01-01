@@ -153,38 +153,6 @@ endif
 
 " }}}
 
-" ---------- completion -------- {{{
-
-if v:version >= 800
-
-  Plug 'neoclide/coc.nvim', {'branch': 'release'}
-
-  if s:plugin_installed('coc.nvim') && executable('node')
-    " use <tab> for trigger completion and navigate to the next complete item
-    function! s:check_back_space() abort
-      let col = col('.') - 1
-      return !col || getline('.')[col - 1]  =~ '\s'
-    endfunction
-
-    inoremap <silent><expr> <Tab>
-          \ pumvisible() ? "\<C-n>" :
-          \ <SID>check_back_space() ? "\<Tab>" :
-          \ coc#refresh()
-
-    inoremap <silent><expr> <S-Tab>
-          \ pumvisible() ? "\<C-p>" :
-          \ coc#refresh()
-
-    inoremap <silent><expr> <c-@> coc#refresh()
-
-    autocmd FileType python nmap <buffer> <C-]> <Plug>(coc-definition)
-
-  endif
-
-endif
-
-" }}}
-
 " ------------ python ---------- {{{
 
 Plug 'hynek/vim-python-pep8-indent'
@@ -508,7 +476,7 @@ else
     endtry
     call fzf#vim#ag(join(query[1:], ' '), ag_opts . ' --ignore .git/', {
           \ 'dir': dir,
-          \ 'options': '--nth=4.. -d: --preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {} ' . s:ag_preview_height(a:bang) . '" --prompt "' . dir . ' (Ag)> "'
+          \ 'options': '--nth=4.. -d: --prompt "' . dir . ' (Ag)> "'
           \ }, a:bang ? 1 : 0)
   endfunction
 
@@ -519,7 +487,7 @@ else
     let dir = s:git_root_or_cwd()
     call fzf#vim#ag(query, ag_opts . ' --ignore .git/', {
           \ 'dir': dir,
-          \ 'options': '--nth=4.. -d: --preview "$DOTFILES_DIR/ag_fzf_preview_helper.sh {} ' . s:ag_preview_height(a:bang) . '" --prompt "' . dir . ' (Ag)> "'
+          \ 'options': '--nth=4.. -d: --prompt "' . dir . ' (Ag)> "'
           \ }, a:bang ? 1 : 0)
   endfunction
 
@@ -557,25 +525,7 @@ endif
 
 " }}}
 
-" ------------- git ------------ {{{
-
-Plug 'tpope/vim-fugitive'
-Plug 'junegunn/gv.vim'
-
-" }}}
-
-" ------- better-whitespace ---- {{{
-
-" Plug 'ntpeters/vim-better-whitespace'
-
-let g:better_whitespace_operator = ""
-
-" }}}
-
 " --------- colors/themes ------ {{{
-
-Plug 'sjl/badwolf'
-Plug 'w0ng/vim-hybrid'
 
 Plug 'octol/vim-cpp-enhanced-highlight'
 
@@ -598,18 +548,9 @@ Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-sleuth'
 Plug 'tpope/vim-unimpaired'
 Plug 'tpope/vim-endwise'
-Plug 'tpope/vim-dispatch'
 Plug 'tpope/vim-rsi'
 Plug 'tpope/vim-eunuch'
-Plug 'tpope/vim-scriptease'
 Plug 'tpope/vim-commentary'
-
-nnoremap <F8> :Make<CR>
-nnoremap <C-F8> :Make!<CR>
-nnoremap <F9> :Dispatch<CR>
-nnoremap <C-F9> :Dispatch!<CR>
-nnoremap <F10> :Start<CR>
-nnoremap <C-F10> :Start!<CR>
 
 let g:nremap = {"m": ""}
 
@@ -702,67 +643,6 @@ if s:plugin_installed('incsearch.vim')
   endif
 
   nmap <silent> yo/ :call <SID>endisable_incsearch()<CR>
-
-endif
-
-" }}}
-
-" ----------- clojure ---------- {{{
-
-Plug 'guns/vim-sexp'
-Plug 'tpope/vim-sexp-mappings-for-regular-people'
-Plug 'tpope/vim-fireplace'
-Plug 'junegunn/rainbow_parentheses.vim'
-
-let g:sexp_mappings = {
-      \ 'sexp_round_head_wrap_element':   '<LocalLeader>s',
-      \ 'sexp_round_tail_wrap_element':   '<LocalLeader>S'
-      \ }
-
-augroup my_rainbow_au
-  au!
-  au FileType clojure RainbowParentheses
-augroup END
-
-let g:rainbow#colors = {
-      \ 'dark': [
-      \   ['brown', 'SaddleBrown'],
-      \   ['blue', 'CornflowerBlue'],
-      \   ['white', 'aquamarine2'],
-      \   ['red', 'firebrick3'],
-      \   ['yellow', 'goldenrod1'],
-      \   ['magenta', 'DarkOrchid3'],
-      \   ['red', 'PaleVioletRed2'],
-      \ ]
-      \ }
-
-let g:rainbow#pairs = [['(', ')'], ['[', ']'], ['{', '}']]
-
-" }}}
-
-" ------------ latex ----------- {{{
-
-
-if !empty($VIM_LATEX) && $VIM_LATEX != "0"
-
-  Plug 'lervag/vimtex'
-
-  let g:tex_flavor = "latex"
-
-  au FileType tex let b:delimitMate_quotes = "\" '"
-  au FileType tex set textwidth=120
-
-  augroup latexSurround
-    autocmd!
-    autocmd FileType tex call s:latexSurround()
-  augroup END
-
-  function! s:latexSurround()
-    let b:surround_{char2nr("e")}
-          \ = "\\begin{\1environment: \1}\n\t\r\n\\end{\1\1}"
-    let b:surround_{char2nr("c")} = "\\\1command: \1{\r}"
-  endfunction
-
 
 endif
 
@@ -943,7 +823,6 @@ if !exists("g:vimrc_init")
   set updatetime=100
 
   set background=dark
-  " silent! colorscheme hybrid
   silent! colorscheme jellybeans
 
   if has('termguicolors')
@@ -1048,28 +927,6 @@ cabbrev WQ wq
 cabbrev Wq wq
 cabbrev W w
 
-function! s:toggleWindow(name)
-  for i in range(1, winnr('$'))
-    let bnum = winbufnr(i)
-    if getbufvar(bnum, '&buftype') == 'quickfix'
-      let dict = getwininfo(win_getid(i))
-      if len(dict) > 0 && get(dict[0], 'quickfix', 0) && !get(dict[0], 'loclist', 0)
-        cclose
-      elseif len(dict) > 0 && get(dict[0], 'quickfix', 0) && get(dict[0], 'loclist', 0)
-        lclose
-      endif
-      return
-    endif
-  endfor
-
-  exec 'bot ' . a:name . 'open'
-endfunction
-
-" open/close quickfix/location-list window
-noremap <silent> \q :call <SID>toggleWindow('c')<CR>
-noremap <silent> \l :call <SID>toggleWindow('l')<CR>
-noremap <silent> \c :call <SID>toggleWindow('C')<CR>
-
 " moving around wrapped lines more naturally
 noremap j gj
 noremap k gk
@@ -1091,12 +948,6 @@ if $MYVIMRC == ""
 endif
 nmap <silent> <leader>v :<C-R>=(expand('%:p')==$MYVIMRC)? 'so' : 'e'<CR> $MYVIMRC<CR>
 
-" resizing splits more easily
-nmap _ :exe "vertical resize " . ((winwidth(0) + 1) * 3/2)<CR>
-nmap - :exe "vertical resize " . (winwidth(0) * 2/3)<CR>
-nmap _ :exe "resize " . ((winheight(0) + 1) * 3/2)<CR>
-nmap - :exe "resize " . (winheight(0) * 2/3)<CR>
-
 nmap cy "+y
 vmap cy "+y
 nmap cY "+Y
@@ -1112,19 +963,11 @@ vmap 0p "0p
 nmap 0P "0P
 vmap 0P "0P
 
-nmap <leader>r "
-vmap <leader>r "
-
 " CTRL-U in insert mode deletes a lot.  Use CTRL-G u to first break undo,
 " so that you can undo CTRL-U after inserting a line break.
 inoremap <C-U> <C-G>u<C-U>
 
 autocmd FileType help nnoremap <nowait> <buffer> q :quit<CR>
-
-nmap <silent> <leader>t :checktime<CR>
-
-" refresh <nowait> ESC mappings
-runtime after/plugin/ESCNoWaitMappings.vim
 
 inoremap jj <esc>
 
@@ -1192,14 +1035,6 @@ nnoremap <silent> H :tabm-1<CR>
 nnoremap l gt
 nnoremap <silent> L :tabm+1<CR>
 
-function! SourceRange() range
-  let tmpsofile = tempname()
-  call writefile(getline(a:firstline, a:lastline), l:tmpsofile)
-  execute "source " . l:tmpsofile
-  call delete(l:tmpsofile)
-endfunction
-command! -range Source <line1>,<line2>call SourceRange()
-
 cnoremap <C-p> <up>
 cnoremap <C-n> <down>
 
@@ -1221,98 +1056,8 @@ endif
 
 nmap <leader><leader>r :redraw!<CR>
 
-nmap <leader>z <C-w>z<CR>
-
 set formatoptions+=jl
 
 abbrev flase false
 
 nmap <silent>  :let @/=expand('<cword>') \| echo expand('<cword>')<CR>
-
-function! SID(fname)
-  redir => l:scriptnames
-  sil exe 'scriptnames'
-  redir END
-  for script in split(l:scriptnames, "\n")
-    if l:script =~ a:fname
-      return str2nr(split(l:script, ":")[0])
-    endif
-  endfor
-  return -1
-endfunction
-
-let s:swap_sid = SID('vim-swap/autoload/swap/textobj.vim')
-if s:swap_sid == -1
-  try
-    let l:dummy = swap#textobj#dummy
-  catch
-  endtry
-  let s:swap_sid = SID('vim-swap/autoload/swap/textobj.vim')
-endif
-
-let s:sandwich_sid = SID('vim-sandwich/autoload/sandwich/magicchar/f.vim')
-if s:sandwich_sid == -1
-  try
-    let l:dummy = sandwich#magicchar#f#dummy
-  catch
-  endtry
-  let s:sandwich_sid = SID('vim-sandwich/autoload/sandwich/magicchar/f.vim')
-endif
-
-function! AddArgument(where)
-  let l:count = v:count1
-
-  if index(['<', '>'], a:where) >= 0
-
-    let TEXTOBJ = !!1
-    let swap = swap#swap#new('n', [])
-    let [buffer, rule] = swap.scan('char', TEXTOBJ)
-    if empty(buffer) || empty(buffer.items)
-      return
-    endif
-    let [start, end] = eval('<SNR>' . s:swap_sid . '_get_target_i(buffer, l:count)')
-    if a:where ==# '>'
-      let pos = end.region.tail
-    elseif a:where ==# '<'
-      let pos = start.region.head
-    endif
-
-  elseif index(['<<', '>>'], a:where) >= 0
-
-    let opt = {}
-    let opt.searchlines = eval('<SNR>' . s:sandwich_sid . '_get("textobj_sandwich_function_searchlines" , 30)')
-    let pattern_list = eval('<SNR>' . s:sandwich_sid . '_resolve_patterns()')
-    let view = winsaveview()
-    try
-      let candidates = eval('<SNR>' . s:sandwich_sid . '_gather_candidates("ap", l:count, pattern_list, opt)')
-      let [start, end] = eval('<SNR>' . s:sandwich_sid . '_get_range("ap", l:count, candidates)')
-      if start == [0, 0] || end == [0, 0]
-        return
-      endif
-    finally
-      call winrestview(view)
-    endtry
-    if a:where ==# '>>'
-      let [line, col] = end
-      let col += 1
-    elseif a:where ==# '<<'
-      let [line, col] = start
-    endif
-    let pos = [0, line, col, 0]
-
-  endif
-
-  call setpos('.', pos)
-  if a:where[0] ==# '>'
-    execute "normal! i, \<esc>l"
-  elseif a:where[0] ==# '<'
-    execute "normal! i, \<esc>h"
-  endif
-  startinsert
-
-endfunction
-
-nnoremap <silent> g,i :call AddArgument('<')<CR>
-nnoremap <silent> g,a :call AddArgument('>')<CR>
-nnoremap <silent> g,I :call AddArgument('<<')<CR>
-nnoremap <silent> g,A :call AddArgument('>>')<CR>

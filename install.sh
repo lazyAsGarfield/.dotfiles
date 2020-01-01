@@ -33,8 +33,6 @@ _install "$target_dir/.tmux.conf"
 _install "$target_dir/.vim"
 _install "$target_dir/.vim/.vimrc"
 
-_install "$target_dir/.docker"
-
 _install "$target_dir/.terminfo"
 
 mkdir -p $HOME/.config/fish/
