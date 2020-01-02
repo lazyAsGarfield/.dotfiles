@@ -1,5 +1,10 @@
 #!/bin/bash
 
+if ! command -v git >/dev/null 2>&1; then
+  echo "ERROR: git is needed to install dotfiles" >&2
+  exit 1
+fi
+
 target_dir="$HOME/.dotfiles"
 
 if [ ! -d $target_dir/.git ]; then
@@ -16,14 +21,7 @@ _install()
 
 cd
 
-_install "$target_dir/.gdbinit"
-
 _install "$target_dir/.gitconfig"
-_install "$target_dir/.git_template"
-
-_install "$target_dir/.profile"
-_install "$target_dir/.zprofile"
-_install "$target_dir/.bash_profile"
 
 _install "$target_dir/.zshrc"
 _install "$target_dir/.bashrc"
@@ -38,7 +36,7 @@ _install "$target_dir/.terminfo"
 mkdir -p $HOME/.config/fish/
 cd $HOME/.config/fish/
 
-_install "$target_dir/fish/config.fish"
+_install "$target_dir/config.fish"
 
 if [ ! -f "$target_dir/.vim/vim-plug/autoload/plug.vim" ]; then
   echo "Downloading plug.vim"

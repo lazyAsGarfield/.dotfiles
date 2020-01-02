@@ -1,7 +1,6 @@
 [ -z $PROMPT_GIT_INFO ] && export PROMPT_GIT_INFO=1
 [ -z $PROMPT_MULTILINE ] && export PROMPT_MULTILINE=0
 [ -z $PROMPT_PREFIX ] && export PROMPT_PREFIX=""
-[ -z $VIM_LATEX ] && export VIM_LATEX=0
 [ -z $VIM_FZF ] && export VIM_FZF=0
 
 alias tmux='tmux -2'
@@ -20,8 +19,7 @@ alias_if_needed readlink
 alias_if_needed sort
 
 alias grep='grep --color=auto'
-alias ll='ls -lFh'
-alias lla='ls -alFh'
+alias ll='ls -alFh'
 alias llt='ls -alFh --sort=time'
 alias llat='ls -alFh --sort=time --time=access'
 alias lls='ls -alFh --sort=size'
