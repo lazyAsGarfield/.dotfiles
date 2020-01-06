@@ -27,8 +27,6 @@ end
 
 . "$DOTFILES_DIR/.shellrc.common"
 
-alias sed gsed
-
 [ (less -V | head -n1 | cut -f2 -d' ') -ge 530 ] && export LESS={$LESS}F
 
 alias sr=". $HOME/.config/fish/config.fish"
