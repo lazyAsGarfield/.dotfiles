@@ -648,7 +648,7 @@ endif
 
 " }}}
 
-Plug 'dag/vim-fish'
+Plug 'aliva/vim-fish'
 
 call plug#end()
 

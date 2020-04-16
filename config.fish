@@ -27,7 +27,7 @@ end
 
 . "$DOTFILES_DIR/.shellrc.common"
 
-[ (less -V | head -n1 | cut -f2 -d' ') -ge 530 ] && export LESS={$LESS}F
+# [ (less -V | head -n1 | cut -f2 -d' ') -ge 530 ] && export LESS={$LESS}F
 
 alias sr=". $HOME/.config/fish/config.fish"
 
