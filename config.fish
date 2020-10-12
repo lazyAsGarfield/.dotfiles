@@ -260,8 +260,14 @@ abbr -a gapp        git apply
 abbr -a gbd         git branch -d
 abbr -a gbd!        git branch -D
 
+abbr -a gbcon        git branch --contains
+
 function gbda --description "remove all local git branches already merged to current one"
-  git branch --no-color --merged | command grep -vE '^(\+|\*|\s*(master|develop|dev)\s*$)' | command xargs -n 1 git branch -d
+  if [ "$argv[1]" = "-n" ]
+    git branch --no-color --merged | command grep -vE '^(\+|\*|\s*(master|develop|dev)\s*$)' | command xargs -n 1 echo
+  else
+    git branch --no-color --merged | command grep -vE '^(\+|\*|\s*(master|develop|dev)\s*$)' | command xargs -n 1 git branch -d
+  end
 end
 
 abbr -a gcl         git clone --recurse-submodules
