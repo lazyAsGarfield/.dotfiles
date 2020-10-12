@@ -280,6 +280,37 @@ if s:plugin_installed('vim-sandwich')
   omap a, <Plug>(swap-textobject-a)
   xmap a, <Plug>(swap-textobject-a)
 
+  function! AddArgument(where)
+    if index(['<<', '>>'], a:where) >= 0
+      call sandwich#magicchar#f#ap()
+    elseif index(['<', '>'], a:where) >= 0
+      call swap#textobj#select('i')
+    endif
+
+    if mode() != 'v'
+      return
+    endif
+
+    exe "normal! \<esc>"
+
+    if a:where[0] ==# '>'
+      let pos = getpos("'>")
+      let pos[2] += 1
+      call setpos('.', pos)
+      execute "normal! i, \<esc>l"
+    elseif a:where[0] ==# '<'
+      let pos = getpos("'<")
+      call setpos('.', pos)
+      execute "normal! i, \<esc>h"
+    endif
+    startinsert
+  endfunction
+
+  nnoremap <silent> g,i :call AddArgument('<')<CR>
+  nnoremap <silent> g,a :call AddArgument('>')<CR>
+  nnoremap <silent> g,I :call AddArgument('<<')<CR>
+  nnoremap <silent> g,A :call AddArgument('>>')<CR>
+
 endif
 
 " }}}
