@@ -237,39 +237,34 @@ if s:plugin_installed('vim-sandwich')
       \   },
       \ ]
 
-    let g:sandwich_function_patterns = {}
-    let g:sandwich_function_patterns['_'] = [
-          \   {
-          \     'header' : '\<\h\k*',
-          \     'bra'    : '(',
-          \     'ket'    : ')',
-          \     'footer' : '',
-          \   },
-          \ ]
-    let g:sandwich_function_patterns['vim'] = [
-          \   {
-          \     'header' : '\C\<\%(\h\|[sa]:\h\|g:[A-Z]\)\k*',
-          \     'bra'    : '(',
-          \     'ket'    : ')',
-          \     'footer' : '',
-          \   },
-          \ ]
-    let g:sandwich_function_patterns['python'] = [
-          \   {
-          \     'header' : '\<\h\(\.\|\k\)*',
-          \     'bra'    : '(',
-          \     'ket'    : ')',
-          \     'footer' : '',
-          \   },
-          \ ]
-    let g:sandwich_function_patterns['cpp'] = [
-          \   {
-          \     'header' : '\<\h\([.>:]\|\k\)*',
-          \     'bra'    : '(',
-          \     'ket'    : ')',
-          \     'footer' : '',
-          \   },
-          \ ]
+    augroup sandwich-ft-mine
+      autocmd Filetype python let b:sandwich_magicchar_f_patterns = [
+            \   {
+            \     'header' : '\<\%(\h\k*\.\)*\h\k*',
+            \     'bra'    : '(',
+            \     'ket'    : ')',
+            \     'footer' : '',
+            \   },
+            \ ]
+
+      autocmd Filetype cpp let b:sandwich_magicchar_f_patterns = [
+            \   {
+            \     'header' : '\<\h\([.>:]\|\k\)*',
+            \     'bra'    : '(',
+            \     'ket'    : ')',
+            \     'footer' : '',
+            \   },
+            \ ]
+
+      autocmd Filetype vim let b:sandwich_magicchar_f_patterns = [
+            \   {
+            \     'header' : '\C\<\%(\h\|[sa]:\h\|g:[A-Z]\)\k*',
+            \     'bra'    : '(',
+            \     'ket'    : ')',
+            \     'footer' : '',
+            \   },
+            \ ]
+    augroup END
 
   endfunction
 
