@@ -49,7 +49,15 @@ function fish_prompt
   (__user) \
   (__rc $rc) \
   (set_color --bold white) \
-  (__prompt_pwd) "> " \
+  (__prompt_pwd) " > " \
+  (set_color normal)
+end
+
+function fish_right_prompt
+  set rc $status
+  echo -ns \
+  (set_color blue) \
+  (date '+%m/%d/%y %H:%M:%S') \
   (set_color normal)
 end
 
@@ -118,15 +126,15 @@ function __git_info
 end
 
 function __user
-  set_color brblue
-  echo -n "$USER"
   if [ -n "$SSH_CLIENT" ]
+    set_color brblue
+    echo -n "$USER"
     set_color cyan
     echo -n "@"
     echo -n (prompt_hostname)
     set_color normal
+    __sep
   end
-  __sep
 end
 
 function __prompt_pwd --description 'Print the current working directory, shortened to fit the prompt'
