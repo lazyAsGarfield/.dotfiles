@@ -94,9 +94,13 @@ if v:version >= 703
       if !p.isUnder(b:NERDTree.root.path)
         call b:NERDTree.changeRoot(g:NERDTreeDirNode.New(p.getParent(), b:NERDTree))
       endif
+      if p.isUnixHiddenFile()
+        call b:NERDTree.ui.setShowHidden(1)
+        call b:NERDTree.render()
+      endif
       let node = b:NERDTree.root.reveal(p)
       call node.putCursorHere(1,0)
-    catch NERDTree.InvalidArgumentsError
+    catch /NERDTree.InvalidArgumentsError/
       let path = fnamemodify(path, ':h')
       let p = g:NERDTreePath.New(path)
       let dir = g:NERDTreeDirNode.New(p, b:NERDTree)
@@ -577,6 +581,8 @@ Plug 'tpope/vim-endwise'
 Plug 'tpope/vim-rsi'
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-commentary'
+" for finding git root
+Plug 'tpope/vim-fugitive'
 
 let g:nremap = {"m": ""}
 

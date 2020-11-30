@@ -37,6 +37,7 @@ mkdir -p $HOME/.config/fish/
 cd $HOME/.config/fish/
 
 _install "$target_dir/config.fish"
+_install "$target_dir/fish_plugins"
 
 if [ ! -f "$target_dir/.vim/vim-plug/autoload/plug.vim" ]; then
   echo "Downloading plug.vim"

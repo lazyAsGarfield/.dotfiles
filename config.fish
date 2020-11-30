@@ -1,15 +1,9 @@
 set -x DOTFILES_DIR "$HOME/.dotfiles"
 
 if [ -z "$_ONCE_" ]
-  set -g _ONCE_ 1
-
   if not functions -q fisher
-    set -q XDG_CONFIG_HOME; or set XDG_CONFIG_HOME ~/.config
-    curl https://git.io/fisher --create-dirs -sLo $XDG_CONFIG_HOME/fish/functions/fisher.fish
-    fish -c fisher
-
-    fisher add jethrokuan/z
-    fisher add jhillyerd/plugin-git
+    curl -sL git.io/fisher | source
+    fisher update
   end
 
   [ -r "$HOME/.config/fish/once.local.fish" ] && . "$HOME/.config/fish/once.local.fish"
