@@ -16,17 +16,30 @@
 			<key>ImageSettings</key>
 			<dict>
 				<key>Compression Quality</key>
-				<real>0</real>
+				<real>0.0</real>
 				<key>ImageCompression</key>
 				<string>ImageJPEGCompress</string>
 				<key>ImageScaleSettings</key>
 				<dict>
 					<key>ImageResolution</key>
-					<integer>0</integer>
+					<integer>600</integer>
 					<key>ImageScaleFactor</key>
-					<real>0.5</real>
+					<real>0.0</real>
 					<key>ImageScaleInterpolate</key>
-					<integer>1</integer>
+					<integer>3</integer>
+					<key>ImageSizeMax</key>
+					<integer>0</integer>
+					<key>ImageSizeMin</key>
+					<integer>0</integer>
+				</dict>
+				<key>MonoImageScaleSettings</key>
+				<dict>
+					<key>ImageResolution</key>
+					<integer>600</integer>
+					<key>ImageScaleFactor</key>
+					<real>0.0</real>
+					<key>ImageScaleInterpolate</key>
+					<integer>3</integer>
 					<key>ImageSizeMax</key>
 					<integer>0</integer>
 					<key>ImageSizeMin</key>
@@ -38,6 +51,6 @@
 	<key>FilterType</key>
 	<integer>1</integer>
 	<key>Name</key>
-	<string>Reduce file size (50%)</string>
+	<string>Reduce to 600 dpi average quality</string>
 </dict>
 </plist>

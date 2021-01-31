@@ -33,6 +33,13 @@ _install "$target_dir/.vim/.vimrc"
 
 _install "$target_dir/.terminfo"
 
+if [[ $(uname -s) =~ Darwin ]]; then
+  cd $HOME/Library/Filters/
+  for f in $target_dir/filters/*; do
+    _install "$f"
+  done
+fi
+
 mkdir -p $HOME/.config/fish/
 cd $HOME/.config/fish/
 
